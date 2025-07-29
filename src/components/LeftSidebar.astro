@@ -77,30 +77,10 @@ const { sections, currentFile } = Astro.props;
                       : 'text-light-secondary dark:text-dark-secondary hover:bg-light-hover dark:hover:bg-dark-hover hover:text-light-text dark:hover:text-dark-text'
                   }`}
                 >
-                  <div class="flex items-center gap-2">
-                    <!-- File Type Icon -->
-                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      {file.type === 'notebook' ? (
-                        <!-- Notebook icon -->
-                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6z"/>
-                      ) : (
-                        <!-- Markdown icon -->
-                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2v6l2-2 2 2V7H6z"/>
-                      )}
-                    </svg>
-                    
+                  <div class="flex items-center">
                     <!-- File Name -->
                     <span class="truncate">
                       {file.metadata.title}
-                    </span>
-                    
-                    <!-- File Extension Badge -->
-                    <span class={`text-xs px-1.5 py-0.5 rounded ${
-                      file.type === 'notebook' 
-                        ? 'bg-orange-500/20 text-orange-400' 
-                        : 'bg-blue-500/20 text-blue-400'
-                    }`}>
-                      {file.type === 'notebook' ? 'ipynb' : 'md'}
                     </span>
                   </div>
                   

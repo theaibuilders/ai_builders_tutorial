@@ -25,7 +25,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
         <style>
           /* Enhanced notebook styling with working copy buttons and scrolling */
           .professional-notebook .nb-cell {
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             border-radius: 8px;
             overflow: visible;
             position: relative;
@@ -124,8 +124,8 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           }
           .professional-notebook .nb-markdown {
             color: #e5e7eb;
-            padding: 1rem;
-            line-height: 1.6;
+            padding: 1.5rem;
+            line-height: 1.8;
           }
           .professional-notebook .nb-markdown h1 {
             color: #ffffff;
@@ -148,12 +148,13 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             color: #ffffff;
             font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
           }
           .professional-notebook .nb-markdown p {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             color: #d1d5db;
+            line-height: 1.8;
           }
           .professional-notebook .nb-markdown code {
             background-color: rgba(55, 65, 81, 0.6);
@@ -300,12 +301,28 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             color: #93c5fd;
           }
           .professional-notebook ul, .professional-notebook ol {
-            margin: 1rem 0;
-            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            padding-left: 2rem;
           }
           .professional-notebook li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             color: #d1d5db;
+            line-height: 1.7;
+          }
+          .professional-notebook .nb-markdown ul ul, .professional-notebook ol ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+          }
+          .professional-notebook ul ul li, .professional-notebook ol ol li {
+            margin-bottom: 0.4rem;
+          }
+          .professional-notebook .nb-markdown strong {
+            font-weight: 600;
+            color: #ffffff;
+          }
+          .professional-notebook .nb-markdown em {
+            font-style: italic;
+            color: #93c5fd;
           }
         </style>
         ${notebookHtml}
@@ -344,10 +361,28 @@ function renderNotebookFallback(notebook: any): string {
 function renderMarkdownCellFallback(source: string | string[], cellId: string): string {
   const sourceText = Array.isArray(source) ? source.join('\n') : source || '';
   
+  // Function to generate heading ID
+  function generateHeadingId(text: string): string {
+    return text.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+  
   const markdownHtml = sourceText
-    .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">$1</h1>')
+    .replace(/^### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h3 id="${id}" class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+    })
+    .replace(/^## (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h2 id="${id}" class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+    })
+    .replace(/^# (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h1 id="${id}" class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+    })
     .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-4 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
@@ -425,21 +460,39 @@ function highlightPython(code: string): string {
 function renderMarkdownSSR(markdown: string): string {
   if (!markdown) return '<div class="text-center text-gray-400 py-8"><p>No content available</p></div>';
   
+  // Function to generate heading ID
+  function generateHeadingId(text: string): string {
+    return text.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+  
   // Enhanced markdown parsing with improved styling
   const markdownHtml = markdown
-    .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">$1</h1>')
+    .replace(/^### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h3 id="${id}" class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+    })
+    .replace(/^## (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h2 id="${id}" class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+    })
+    .replace(/^# (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h1 id="${id}" class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+    })
     .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
     .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>')
-    .replace(/^\* (.+)$/gm, '<li class="mb-2 text-gray-300">$1</li>')
-    .replace(/^- (.+)$/gm, '<li class="mb-2 text-gray-300">$1</li>')
-    .replace(/\n\n/gim, '</p><p class="mb-4 text-gray-300 leading-relaxed">')
-    .replace(/^([^<\n].*)$/gm, '<p class="mb-4 text-gray-300 leading-relaxed">$1</p>')
-    .replace(/(<li.*<\/li>)/gms, '<ul class="list-disc list-inside mb-4 space-y-1">$1</ul>');
+    .replace(/^\* (.+)$/gm, '<li class="mb-3 text-gray-300 leading-relaxed">$1</li>')
+    .replace(/^- (.+)$/gm, '<li class="mb-3 text-gray-300 leading-relaxed">$1</li>')
+    .replace(/\n\n/gim, '</p><p class="mb-6 text-gray-300 leading-loose">')
+    .replace(/^([^<\n].*)$/gm, '<p class="mb-6 text-gray-300 leading-loose">$1</p>')
+    .replace(/(<li.*<\/li>)/gms, '<ul class="list-disc list-inside mb-6 space-y-2 pl-6">$1</ul>');
   
   return markdownHtml;
 }
@@ -467,77 +520,18 @@ if (currentFile) {
           {currentFile.metadata.title}
         </h1>
         
-        {currentFile.metadata.description && (
-          <p class="text-lg text-light-secondary dark:text-dark-secondary mb-4">
-            {currentFile.metadata.description}
-          </p>
-        )}
-        
         <!-- Metadata -->
         <div class="flex items-center gap-6 text-sm text-light-secondary dark:text-dark-secondary">
           {currentFile.metadata.author && (
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
               <span>{currentFile.metadata.author}</span>
             </div>
           )}
           
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-            </svg>
             <span>Last updated: {new Date(currentFile.metadata.lastUpdated).toLocaleDateString()}</span>
           </div>
-          
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              {currentFile.type === 'notebook' ? (
-                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6z"/>
-              ) : (
-                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2v6l2-2 2 2V7H6z"/>
-              )}
-            </svg>
-            <span class={`px-2 py-1 rounded text-xs ${
-              currentFile.type === 'notebook' 
-                ? 'bg-orange-500/20 text-orange-400' 
-                : 'bg-blue-500/20 text-blue-400'
-            }`}>
-              {currentFile.type === 'notebook' ? 'Jupyter Notebook' : 'Markdown'}
-            </span>
-          </div>
-          
-          {currentFile.metadata.difficulty && (
-            <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd" />
-              </svg>
-              <span class={`px-2 py-1 rounded text-xs capitalize ${
-                currentFile.metadata.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                currentFile.metadata.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                'bg-red-500/20 text-red-400'
-              }`}>
-                {currentFile.metadata.difficulty}
-              </span>
-            </div>
-          )}
         </div>
-        
-        {currentFile.metadata.tags && currentFile.metadata.tags.length > 0 && (
-          <div class="flex items-center gap-2 mt-3">
-            <svg class="w-4 h-4 text-light-secondary dark:text-dark-secondary" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-            </svg>
-            <div class="flex flex-wrap gap-2">
-              {currentFile.metadata.tags.map((tag) => (
-                <span class="px-2 py-1 bg-light-surface dark:bg-dark-surface text-light-secondary dark:text-dark-secondary text-xs rounded">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
       </header>
       
       <!-- Tutorial Content -->
@@ -870,5 +864,34 @@ if (currentFile) {
         }
       });
     }, 2000);
+    
+    // Add IDs to headings for proper navigation in both notebook and markdown content
+    setTimeout(() => {
+      console.log('Adding IDs to headings...');
+      
+      function generateHeadingId(text) {
+        return text.toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim();
+      }
+      
+      // Find all headings in the content area
+      const headings = document.querySelectorAll('.professional-notebook h1, .professional-notebook h2, .professional-notebook h3, h1, h2, h3');
+      
+      headings.forEach(heading => {
+        if (!heading.id) {
+          const text = heading.textContent || heading.innerText || '';
+          const id = generateHeadingId(text);
+          if (id) {
+            heading.id = id;
+            console.log(`Added ID "${id}" to heading: ${text}`);
+          }
+        }
+      });
+      
+      console.log(`Processed ${headings.length} headings`);
+    }, 500); // Run earlier to ensure headings have IDs before other scripts
   });
 </script>

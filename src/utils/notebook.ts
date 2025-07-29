@@ -274,15 +274,25 @@ export function extractMarkdownHeadings(content: string): Array<{id: string, tex
     const match = line.match(/^(#{1,6})\s+(.+)$/);
     if (match) {
       const level = match[1].length;
-      const text = match[2].trim();
-      const id = text.toLowerCase()
+      const rawText = match[2].trim();
+      
+      // Clean up markdown formatting for display text
+      const cleanText = rawText
+        .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove bold formatting **text**
+        .replace(/\*(.*?)\*/g, '$1')      // Remove italic formatting *text*
+        .replace(/`([^`]+)`/g, '$1')      // Remove inline code formatting `code`
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove link formatting [text](url)
+        .trim();
+      
+      // Generate ID from cleaned text
+      const id = cleanText.toLowerCase()
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim();
       
       if (level >= 2 && level <= 3) { // Only h2 and h3 for TOC
-        headings.push({ id, text, level });
+        headings.push({ id, text: cleanText, level });
       }
     }
   }

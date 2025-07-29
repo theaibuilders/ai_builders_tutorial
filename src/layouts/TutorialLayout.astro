@@ -179,15 +179,15 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   }
   
   :global(.prose p) {
-    @apply mb-4 text-light-secondary dark:text-dark-secondary leading-relaxed;
+    @apply mb-6 text-light-secondary dark:text-dark-secondary leading-loose;
   }
   
   :global(.prose ul, .prose ol) {
-    @apply mb-4 pl-6;
+    @apply mb-6 pl-8;
   }
   
   :global(.prose li) {
-    @apply mb-2 text-light-secondary dark:text-dark-secondary;
+    @apply mb-3 text-light-secondary dark:text-dark-secondary leading-relaxed;
   }
   
   :global(.prose code) {

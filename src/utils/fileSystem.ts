@@ -36,26 +36,9 @@ export function extractMarkdownMetadata(content: string): any {
   const titleMatch = content.match(/^#\s+(.+)$/m);
   const title = titleMatch ? titleMatch[1] : 'Untitled';
   
-  // Extract description from first paragraph after title
-  const lines = content.split('\n');
-  let description = '';
-  let foundTitle = false;
-  
-  for (const line of lines) {
-    if (line.startsWith('#') && !foundTitle) {
-      foundTitle = true;
-      continue;
-    }
-    if (foundTitle && line.trim() && !line.startsWith('#')) {
-      description = line.trim();
-      break;
-    }
-  }
-  
   return {
     title,
-    description: description || 'No description available',
-    author: 'AI Builders Team',
+    author: 'Devon Sun',
     lastUpdated: new Date().toISOString(),
     difficulty: 'beginner',
     tags: []
@@ -65,7 +48,6 @@ export function extractMarkdownMetadata(content: string): any {
 export function extractNotebookMetadata(notebook: any): any {
   // Try to get title from first markdown cell
   let title = 'Untitled Notebook';
-  let description = 'Jupyter notebook tutorial';
   
   if (notebook.cells && notebook.cells.length > 0) {
     const firstCell = notebook.cells.find((cell: any) => cell.cell_type === 'markdown');
@@ -75,22 +57,12 @@ export function extractNotebookMetadata(notebook: any): any {
       if (titleMatch) {
         title = titleMatch[1].trim();
       }
-      
-      // Extract description from the content
-      const lines = source.split('\n');
-      for (const line of lines) {
-        if (line.trim() && !line.startsWith('#') && !line.startsWith('**') && line.length > 20) {
-          description = line.trim();
-          break;
-        }
-      }
     }
   }
   
   return {
     title,
-    description,
-    author: 'AI Builders Team',
+    author: 'Devon Sun',
     lastUpdated: new Date().toISOString(),
     difficulty: 'beginner',
     tags: ['jupyter', 'tutorial']
