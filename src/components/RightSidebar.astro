@@ -1,0 +1,148 @@
+---
+interface Props {
+  headings: Array<{id: string, text: string, level: number}>;
+}
+
+const { headings } = Astro.props;
+---
+
+<div class="h-screen overflow-y-auto p-6">
+  <div class="sticky top-0 bg-light-bg dark:bg-dark-bg">
+    <h2 class="text-sm font-semibold text-light-text dark:text-dark-text mb-4 pb-2 border-b border-light-border dark:border-dark-border">
+      On This Page
+    </h2>
+  </div>
+  
+  {headings.length > 0 ? (
+    <nav class="space-y-1">
+      {headings.map((heading) => (
+        <a
+          href={`#${heading.id}`}
+          class={`block py-1 text-sm transition-colors hover:text-light-text dark:hover:text-dark-text ${
+            heading.level === 2 
+              ? 'text-light-secondary dark:text-dark-secondary font-medium' 
+              : 'text-light-secondary dark:text-dark-secondary pl-4'
+          }`}
+          data-heading-link={heading.id}
+        >
+          {heading.text}
+        </a>
+      ))}
+    </nav>
+  ) : (
+    <div class="text-center text-light-secondary dark:text-dark-secondary py-8">
+      <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417" />
+      </svg>
+      <p class="text-xs">No headings found</p>
+    </div>
+  )}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Intersection Observer for active heading highlighting
+    const headingLinks = document.querySelectorAll('[data-heading-link]');
+    const headingElements = Array.from(headingLinks).map(link => {
+      const id = link.getAttribute('data-heading-link');
+      return { link, element: document.getElementById(id!) };
+    }).filter(item => item.element);
+
+    if (headingElements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          const link = document.querySelector(`[data-heading-link="${id}"]`);
+          
+          if (link) {
+            if (entry.isIntersecting) {
+              // Remove active class from all links
+              headingLinks.forEach(l => {
+                l.classList.remove('text-blue-400', 'border-r-2', 'border-blue-400');
+              });
+              
+              // Add active class to current link
+              link.classList.add('text-blue-400', 'border-r-2', 'border-blue-400');
+            }
+          }
+        });
+      },
+      {
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      }
+    );
+
+    // Observe all heading elements
+    headingElements.forEach(({ element }) => {
+      if (element) observer.observe(element);
+    });
+
+    // Smooth scroll for heading links
+    headingLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = link.getAttribute('data-heading-link');
+        const target = document.getElementById(id!);
+        
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Update URL without triggering navigation
+          history.pushState(null, '', `#${id}`);
+        }
+      });
+    });
+
+    // Handle initial hash in URL
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) {
+        setTimeout(() => {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
+      }
+    }
+  });
+</script>
+
+<style>
+  /* Smooth scrolling for the entire page */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom scrollbar for the sidebar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.light.border');
+    border-radius: 2px;
+  }
+  
+  :global(.dark) ::-webkit-scrollbar-thumb {
+    background: theme('colors.dark.border');
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.light.hover');
+  }
+  
+  :global(.dark) ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.dark.hover');
+  }
+</style>

@@ -1,0 +1,174 @@
+---
+// Simple search component using vanilla JS
+---
+
+<div class="relative" id="search-container">
+  <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg
+        class="h-4 w-4 text-light-secondary dark:text-dark-secondary"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+    </div>
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Search tutorials..."
+      class="w-full pl-10 pr-4 py-2 text-sm bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-light-secondary dark:placeholder-dark-secondary"
+    />
+    <div id="search-loading" class="absolute inset-y-0 right-0 pr-3 flex items-center hidden">
+      <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- Search Results Dropdown -->
+  <div id="search-results" class="absolute z-50 w-full mt-2 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 overflow-y-auto hidden">
+    <!-- Results will be populated by JavaScript -->
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results') as HTMLElement;
+    const searchLoading = document.getElementById('search-loading') as HTMLElement;
+    
+    let searchTimeout: NodeJS.Timeout;
+    
+    // Mock search data - in a real app, this would come from an API
+    const mockTutorials = [
+      {
+        title: 'Getting Started with LangChain',
+        path: 'langchain/01-introduction.md',
+        type: 'markdown',
+        description: 'Introduction to LangChain framework',
+        section: 'LangChain'
+      },
+      {
+        title: 'LangChain Basics',
+        path: 'langchain/02-langchain-basics.ipynb',
+        type: 'notebook',
+        description: 'Basic concepts and examples',
+        section: 'LangChain'
+      },
+      {
+        title: 'LlamaIndex Introduction',
+        path: 'llamaindex/01-introduction.md',
+        type: 'markdown',
+        description: 'Getting started with LlamaIndex',
+        section: 'LlamaIndex'
+      }
+    ];
+    
+    function searchTutorials(query: string) {
+      const lowercaseQuery = query.toLowerCase();
+      return mockTutorials.filter(tutorial => 
+        tutorial.title.toLowerCase().includes(lowercaseQuery) ||
+        tutorial.description.toLowerCase().includes(lowercaseQuery) ||
+        tutorial.section.toLowerCase().includes(lowercaseQuery)
+      );
+    }
+    
+    function renderResults(results: typeof mockTutorials) {
+      if (results.length === 0) {
+        searchResults.innerHTML = `
+          <div class="p-4 text-center text-light-secondary dark:text-dark-secondary">
+            <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417m0 0A7.962 7.962 0 0112 3" />
+            </svg>
+            <p class="text-sm">No tutorials found for "${searchInput.value}"</p>
+          </div>
+        `;
+        return;
+      }
+      
+      searchResults.innerHTML = results.map(result => `
+        <button
+          class="w-full px-4 py-3 text-left hover:bg-light-hover dark:hover:bg-dark-hover transition-colors border-b border-light-border dark:border-dark-border last:border-b-0"
+          onclick="window.location.href='/tutorials/${result.path}'"
+        >
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4 text-light-secondary dark:text-dark-secondary" fill="currentColor" viewBox="0 0 20 20">
+                ${result.type === 'notebook' ? `
+                  <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                ` : `
+                  <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2v6l2-2 2 2V7H6z"/>
+                `}
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="text-sm font-medium text-light-text dark:text-dark-text truncate">
+                  ${result.title}
+                </h3>
+                <span class="text-xs px-2 py-0.5 rounded ${result.type === 'notebook' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}">
+                  ${result.type === 'notebook' ? 'ipynb' : 'md'}
+                </span>
+              </div>
+              <div class="text-xs text-light-secondary dark:text-dark-secondary mb-1">
+                ${result.section}
+              </div>
+              <p class="text-xs text-light-secondary dark:text-dark-secondary line-clamp-2">
+                ${result.description}
+              </p>
+            </div>
+          </div>
+        </button>
+      `).join('');
+    }
+    
+    searchInput.addEventListener('input', (e) => {
+      const query = (e.target as HTMLInputElement).value.trim();
+      
+      clearTimeout(searchTimeout);
+      
+      if (!query) {
+        searchResults.classList.add('hidden');
+        searchLoading.classList.add('hidden');
+        return;
+      }
+      
+      searchLoading.classList.remove('hidden');
+      
+      searchTimeout = setTimeout(() => {
+        const results = searchTutorials(query);
+        renderResults(results);
+        searchResults.classList.remove('hidden');
+        searchLoading.classList.add('hidden');
+      }, 300);
+    });
+    
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchResults.classList.add('hidden');
+        searchInput.blur();
+      }
+    });
+    
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
+        searchResults.classList.add('hidden');
+      }
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

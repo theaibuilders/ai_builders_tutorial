@@ -1,0 +1,208 @@
+---
+import LeftSidebar from '../components/LeftSidebar.astro';
+import MainContent from '../components/MainContent.astro';
+import RightSidebar from '../components/RightSidebar.astro';
+import type { TutorialFile, TutorialSection } from '../types/tutorial';
+
+interface Props {
+  title: string;
+  currentFile?: TutorialFile;
+  sections: TutorialSection[];
+  headings?: Array<{id: string, text: string, level: number}>;
+}
+
+const { title, currentFile, sections, headings = [] } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} | AI Builders Tutorial</title>
+    <meta name="description" content="Learn AI development with comprehensive tutorials and hands-on examples." />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Theme Script (runs before page load to prevent flash) -->
+    <script is:inline>
+      // Check for saved theme preference or default to 'dark'
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    </script>
+  </head>
+  
+  <body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text font-sans antialiased">
+    <!-- Main Layout Container -->
+    <div class="flex min-h-screen">
+      <!-- Left Sidebar -->
+      <aside class="w-80 flex-shrink-0 border-r border-light-border dark:border-dark-border">
+        <LeftSidebar sections={sections} currentFile={currentFile} />
+      </aside>
+      
+      <!-- Main Content Area -->
+      <main class="flex-1 min-w-0">
+        <div class="flex">
+          <!-- Tutorial Content -->
+          <div class="flex-1 min-w-0">
+            <MainContent currentFile={currentFile} />
+          </div>
+          
+          <!-- Right Sidebar (On This Page) -->
+          {headings.length > 0 && (
+            <aside class="w-64 flex-shrink-0 border-l border-light-border dark:border-dark-border">
+              <RightSidebar headings={headings} />
+            </aside>
+          )}
+        </div>
+      </main>
+    </div>
+    
+    <!-- Theme Toggle Script -->
+    <script>
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        
+        html.classList.toggle('dark', !isDark);
+        localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+        
+        // Dispatch custom event for components that need to react to theme changes
+        window.dispatchEvent(new CustomEvent('theme-changed', { 
+          detail: { theme: !isDark ? 'dark' : 'light' } 
+        }));
+      }
+      
+      // Make toggleTheme available globally
+      window.toggleTheme = toggleTheme;
+    </script>
+    
+    <!-- Copy to Clipboard Script -->
+    <script>
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          // Show success feedback
+          console.log('Copied to clipboard');
+        }).catch(err => {
+          console.error('Failed to copy to clipboard:', err);
+        });
+      }
+      
+      // Make copyToClipboard available globally
+      window.copyToClipboard = copyToClipboard;
+    </script>
+  </body>
+</html>
+
+<style>
+  /* Custom scrollbar styles */
+  :global(::-webkit-scrollbar) {
+    width: 6px;
+  }
+  
+  :global(::-webkit-scrollbar-track) {
+    @apply bg-transparent;
+  }
+  
+  :global(::-webkit-scrollbar-thumb) {
+    @apply bg-light-border dark:bg-dark-border rounded-full;
+  }
+  
+  :global(::-webkit-scrollbar-thumb:hover) {
+    @apply bg-light-hover dark:bg-dark-hover;
+  }
+  
+  /* Notebook cell styles */
+  :global(.notebook-cell) {
+    @apply mb-6;
+  }
+  
+  :global(.markdown-cell .cell-content) {
+    @apply px-4 py-2;
+  }
+  
+  :global(.code-cell) {
+    @apply border border-light-border dark:border-dark-border rounded-lg overflow-hidden;
+  }
+  
+  :global(.cell-input) {
+    @apply flex;
+  }
+  
+  :global(.cell-prompt) {
+    @apply flex-shrink-0 w-20 p-3 bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border text-sm font-mono text-light-secondary dark:text-dark-secondary;
+  }
+  
+  :global(.cell-code-container) {
+    @apply flex-1 relative;
+  }
+  
+  :global(.cell-code) {
+    @apply p-4 bg-light-surface dark:bg-dark-surface font-mono text-sm overflow-x-auto;
+  }
+  
+  :global(.cell-output) {
+    @apply border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg p-4;
+  }
+  
+  :global(.output-stream pre) {
+    @apply font-mono text-sm whitespace-pre-wrap;
+  }
+  
+  :global(.output-error) {
+    @apply text-red-400;
+  }
+  
+  :global(.output-image img) {
+    @apply max-w-full h-auto;
+  }
+  
+  /* Prose styles for rendered markdown */
+  :global(.prose) {
+    @apply max-w-none;
+  }
+  
+  :global(.prose h1) {
+    @apply text-3xl font-bold mb-6 text-light-text dark:text-dark-text;
+  }
+  
+  :global(.prose h2) {
+    @apply text-2xl font-semibold mb-4 mt-8 text-light-text dark:text-dark-text;
+  }
+  
+  :global(.prose h3) {
+    @apply text-xl font-semibold mb-3 mt-6 text-light-text dark:text-dark-text;
+  }
+  
+  :global(.prose p) {
+    @apply mb-4 text-light-secondary dark:text-dark-secondary leading-relaxed;
+  }
+  
+  :global(.prose ul, .prose ol) {
+    @apply mb-4 pl-6;
+  }
+  
+  :global(.prose li) {
+    @apply mb-2 text-light-secondary dark:text-dark-secondary;
+  }
+  
+  :global(.prose code) {
+    @apply bg-light-surface dark:bg-dark-surface px-2 py-1 rounded text-sm font-mono;
+  }
+  
+  :global(.prose pre) {
+    @apply bg-light-surface dark:bg-dark-surface p-4 rounded-lg overflow-x-auto font-mono text-sm;
+  }
+  
+  :global(.prose a) {
+    @apply text-blue-500 hover:text-blue-400 underline;
+  }
+  
+  :global(.prose blockquote) {
+    @apply border-l-4 border-light-border dark:border-dark-border pl-4 italic text-light-secondary dark:text-dark-secondary;
+  }
+</style>

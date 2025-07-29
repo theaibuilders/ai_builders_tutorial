@@ -1,0 +1,573 @@
+---
+import TutorialLayout from '../../layouts/TutorialLayout.astro';
+import { extractMarkdownHeadings } from '../../utils/notebook';
+import { scanTutorialsDirectory, findTutorialFile } from '../../utils/fileSystem';
+import type { TutorialFile, TutorialSection } from '../../types/tutorial';
+
+export async function getStaticPaths() {
+  try {
+    // Scan the actual tutorials directory to generate paths
+    const sections = scanTutorialsDirectory();
+    const staticPaths: { params: { slug: string } }[] = [];
+    
+    for (const section of sections) {
+      for (const file of section.files) {
+        // Remove file extension for clean URLs
+        const cleanPath = file.path.replace(/\.(md|ipynb)$/, '');
+        staticPaths.push({ params: { slug: cleanPath } });
+      }
+    }
+    
+    // Add fallback paths in case file system scanning fails
+    const fallbackPaths = [
+      { params: { slug: 'overview/tutorial_overview' } },
+      { params: { slug: 'langchain/01-introduction' } },
+      { params: { slug: 'langchain/02-langchain-basics' } },
+      { params: { slug: 'langchain/langchain' } },
+      { params: { slug: 'llamaindex/01-introduction' } },
+    ];
+    
+    // Combine scanned paths with fallback, removing duplicates
+    const allPaths = [...staticPaths, ...fallbackPaths];
+    const uniquePaths = allPaths.filter((path, index, self) => 
+      index === self.findIndex((p) => p.params.slug === path.params.slug)
+    );
+    
+    console.log('Generated static paths:', uniquePaths);
+    return uniquePaths;
+  } catch (error) {
+    console.error('Error generating static paths:', error);
+    // Return fallback paths if scanning fails
+    return [
+      { params: { slug: 'overview/tutorial_overview' } },
+      { params: { slug: 'langchain/01-introduction' } },
+      { params: { slug: 'langchain/02-langchain-basics' } },
+      { params: { slug: 'langchain/langchain' } },
+      { params: { slug: 'llamaindex/01-introduction' } },
+    ];
+  }
+}
+
+const { slug } = Astro.params;
+
+// Mock data for development - replace with actual GitHub API calls
+const mockSections: TutorialSection[] = [
+  {
+    name: 'Overview',
+    path: 'overview',
+    files: [
+      {
+        path: 'overview/tutorial_overview.md',
+        name: 'tutorial_overview.md',
+        type: 'markdown',
+        content: `# AI Builders Tutorial Overview
+
+Welcome to the AI Builders Tutorial platform! This comprehensive guide will take you through the fundamentals of building AI-powered applications using modern frameworks and tools.
+
+## What You'll Learn
+
+This tutorial series covers essential AI development concepts and practical implementations:
+
+### 🤖 Agent Frameworks
+- **LangChain**: Build applications powered by language models
+- **LlamaIndex**: Create powerful data indexing and retrieval systems
+- **Multi-agent systems**: Coordinate multiple AI agents for complex tasks
+
+### 🛠️ Core Concepts
+- **Prompt Engineering**: Craft effective prompts for better AI responses
+- **Retrieval-Augmented Generation (RAG)**: Connect LLMs to external data sources
+- **Memory Systems**: Maintain context across conversations
+- **Tool Integration**: Connect AI agents with external tools and APIs
+
+### 📚 Practical Applications
+- Building chatbots and virtual assistants
+- Document analysis and question-answering systems
+- Code generation and review assistants
+- Data analysis and visualization tools
+
+## Getting Started
+
+1. **Choose Your Path**: Start with the framework that interests you most
+2. **Follow Along**: Each tutorial includes both theoretical explanations and hands-on code examples
+3. **Experiment**: Try modifying the examples to suit your specific use cases
+4. **Build**: Apply what you learn to create your own AI applications
+
+## Tutorial Structure
+
+Each section includes:
+- 📖 **Introduction**: Core concepts and background
+- 💻 **Interactive Notebooks**: Jupyter notebooks with live code examples
+- 🔧 **Practical Projects**: Real-world applications and use cases
+- 📝 **Best Practices**: Tips and techniques from experienced developers
+
+## Prerequisites
+
+- Basic Python programming knowledge
+- Familiarity with APIs and web requests
+- Understanding of basic machine learning concepts (helpful but not required)
+
+Ready to start building? Choose a tutorial from the sidebar and begin your AI development journey!`,
+        metadata: {
+          title: 'AI Builders Tutorial Overview',
+          description: 'Comprehensive guide to building AI applications with modern frameworks',
+          author: 'AI Builders Team',
+          lastUpdated: '2024-01-15T12:00:00Z',
+          difficulty: 'beginner',
+          tags: ['overview', 'getting-started', 'ai', 'tutorial']
+        }
+      }
+    ]
+  },
+  {
+    name: 'LangChain',
+    path: 'langchain',
+    files: [
+      {
+        path: 'langchain/01-introduction.md',
+        name: '01-introduction.md',
+        type: 'markdown',
+        content: `# Getting Started with LangChain
+
+## Introduction
+
+LangChain is a framework for developing applications powered by language models. It enables applications that are:
+- **Data-aware**: connect a language model to other sources of data
+- **Agentic**: allow a language model to interact with its environment
+
+## Key Concepts
+
+### Components
+LangChain provides several key components:
+- **LLMs and Chat Models**: interfaces to various language models
+- **Prompts**: templates and utilities for formatting inputs
+- **Memory**: utilities for persisting state between calls
+- **Indexes**: ways to structure documents for LLMs
+
+### Chains
+Chains allow you to combine multiple components together:
+\`\`\`python
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+
+llm = OpenAI(temperature=0.9)
+prompt = PromptTemplate(
+    input_variables=["product"],
+    template="What is a good name for a company that makes {product}?",
+)
+\`\`\`
+
+## Next Steps
+
+Ready to dive deeper? Check out the LangChain Basics notebook to see practical examples.`,
+        metadata: {
+          title: 'Getting Started with LangChain',
+          description: 'Introduction to LangChain framework and core concepts',
+          author: 'AI Builders Team',
+          lastUpdated: '2024-01-15T10:00:00Z',
+          difficulty: 'beginner',
+          tags: ['langchain', 'introduction', 'getting-started']
+        }
+      },
+      {
+        path: 'langchain/02-langchain-basics.ipynb',
+        name: '02-langchain-basics.ipynb',
+        type: 'notebook',
+        content: JSON.stringify({
+          cells: [
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "# LangChain Basics\n",
+                "\n",
+                "This notebook demonstrates the basic concepts of LangChain through practical examples.\n",
+                "\n",
+                "## Setup\n",
+                "\n",
+                "First, let's install and import the necessary libraries."
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 1,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'stream',
+                  name: 'stdout',
+                  text: ['Successfully installed langchain!\n']
+                }
+              ],
+              source: [
+                "# Install LangChain\n",
+                "!pip install langchain openai\n",
+                "\n",
+                "# Import necessary modules\n",
+                "from langchain.llms import OpenAI\n",
+                "from langchain.prompts import PromptTemplate\n",
+                "from langchain.chains import LLMChain\n",
+                "\n",
+                "print('Successfully installed langchain!')"
+              ]
+            },
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "## Creating Your First Chain\n",
+                "\n",
+                "Let's create a simple chain that generates company names based on a product description."
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 2,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'execute_result',
+                  execution_count: 2,
+                  data: {
+                    'text/plain': ['\"CloudSecure Technologies\"']
+                  },
+                  metadata: {}
+                }
+              ],
+              source: [
+                "# Initialize the LLM\n",
+                "llm = OpenAI(temperature=0.9)\n",
+                "\n",
+                "# Create a prompt template\n",
+                "prompt = PromptTemplate(\n",
+                "    input_variables=[\"product\"],\n",
+                "    template=\"What is a good name for a company that makes {product}?\",\n",
+                ")\n",
+                "\n",
+                "# Create a chain\n",
+                "chain = LLMChain(llm=llm, prompt=prompt)\n",
+                "\n",
+                "# Run the chain\n",
+                "chain.run(\"cloud security software\")"
+              ]
+            }
+          ],
+          metadata: {
+            kernelspec: {
+              display_name: 'Python 3',
+              language: 'python',
+              name: 'python3'
+            },
+            language_info: {
+              name: 'python',
+              version: '3.9.0'
+            }
+          },
+          nbformat: 4,
+          nbformat_minor: 4
+        }),
+        notebook: {
+          cells: [
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "# LangChain Basics\n",
+                "\n",
+                "This notebook demonstrates the basic concepts of LangChain through practical examples.\n",
+                "\n",
+                "## Setup\n",
+                "\n",
+                "First, let's install and import the necessary libraries."
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 1,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'stream',
+                  name: 'stdout',
+                  text: ['Successfully installed langchain!\n']
+                }
+              ],
+              source: [
+                "# Install LangChain\n",
+                "!pip install langchain openai\n",
+                "\n",
+                "# Import necessary modules\n",
+                "from langchain.llms import OpenAI\n",
+                "from langchain.prompts import PromptTemplate\n",
+                "from langchain.chains import LLMChain\n",
+                "\n",
+                "print('Successfully installed langchain!')"
+              ]
+            },
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "## Creating Your First Chain\n",
+                "\n",
+                "Let's create a simple chain that generates company names based on a product description."
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 2,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'execute_result',
+                  execution_count: 2,
+                  data: {
+                    'text/plain': ['\"CloudSecure Technologies\"']
+                  },
+                  metadata: {}
+                }
+              ],
+              source: [
+                "# Initialize the LLM\n",
+                "llm = OpenAI(temperature=0.9)\n",
+                "\n",
+                "# Create a prompt template\n",
+                "prompt = PromptTemplate(\n",
+                "    input_variables=[\"product\"],\n",
+                "    template=\"What is a good name for a company that makes {product}?\",\n",
+                ")\n",
+                "\n",
+                "# Create a chain\n",
+                "chain = LLMChain(llm=llm, prompt=prompt)\n",
+                "\n",
+                "# Run the chain\n",
+                "chain.run(\"cloud security software\")"
+              ]
+            }
+          ],
+          metadata: {
+            kernelspec: {
+              display_name: 'Python 3',
+              language: 'python',
+              name: 'python3'
+            },
+            language_info: {
+              name: 'python',
+              version: '3.9.0'
+            }
+          },
+          nbformat: 4,
+          nbformat_minor: 4
+        },
+        metadata: {
+          title: 'LangChain Basics',
+          description: 'Basic concepts and practical examples with LangChain',
+          author: 'AI Builders Team',
+          lastUpdated: '2024-01-15T11:30:00Z',
+          difficulty: 'beginner',
+          tags: ['langchain', 'tutorial', 'hands-on']
+        }
+      },
+      {
+        path: 'langchain/langchain.ipynb',
+        name: 'langchain.ipynb',
+        type: 'notebook',
+        content: JSON.stringify({
+          cells: [
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "# LangChain Complete Tutorial\n",
+                "\n",
+                "This is a comprehensive notebook covering advanced LangChain concepts and practical implementations.\n",
+                "\n",
+                "## Table of Contents\n",
+                "1. Advanced Chains\n",
+                "2. Memory Systems\n",
+                "3. Agents and Tools\n",
+                "4. Custom Components"
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 1,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'stream',
+                  name: 'stdout',
+                  text: ['LangChain environment ready!\n']
+                }
+              ],
+              source: [
+                "# Advanced LangChain Setup\n",
+                "import os\n",
+                "from langchain.llms import OpenAI\n",
+                "from langchain.chains import ConversationChain\n",
+                "from langchain.memory import ConversationBufferMemory\n",
+                "from langchain.agents import load_tools, initialize_agent\n",
+                "\n",
+                "print('LangChain environment ready!')"
+              ]
+            },
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                "## Advanced Chain Examples\n",
+                "\n",
+                "Let's explore more complex chain patterns and memory management."
+              ]
+            },
+            {
+              cell_type: 'code',
+              execution_count: 2,
+              metadata: {},
+              outputs: [
+                {
+                  output_type: 'execute_result',
+                  execution_count: 2,
+                  data: {
+                    'text/plain': ['Conversation started with memory!']
+                  },
+                  metadata: {}
+                }
+              ],
+              source: [
+                "# Create a conversation chain with memory\n",
+                "llm = OpenAI(temperature=0.7)\n",
+                "memory = ConversationBufferMemory()\n",
+                "conversation = ConversationChain(\n",
+                "    llm=llm,\n",
+                "    memory=memory,\n",
+                "    verbose=True\n",
+                ")\n",
+                "\n",
+                "'Conversation started with memory!'"
+              ]
+            }
+          ],
+          metadata: {
+            kernelspec: {
+              display_name: 'Python 3',
+              language: 'python',
+              name: 'python3'
+            },
+            language_info: {
+              name: 'python',
+              version: '3.9.0'
+            }
+          },
+          nbformat: 4,
+          nbformat_minor: 4
+        }),
+        metadata: {
+          title: 'LangChain Complete Tutorial',
+          description: 'Comprehensive LangChain tutorial with advanced concepts',
+          author: 'AI Builders Team',
+          lastUpdated: '2024-01-15T12:00:00Z',
+          difficulty: 'intermediate',
+          tags: ['langchain', 'advanced', 'comprehensive']
+        }
+      }
+    ]
+  },
+  {
+    name: 'LlamaIndex',
+    path: 'llamaindex',
+    files: [
+      {
+        path: 'llamaindex/01-introduction.md',
+        name: '01-introduction.md',
+        type: 'markdown',
+        content: `# Getting Started with LlamaIndex
+
+## What is LlamaIndex?
+
+LlamaIndex is a data framework for building LLM applications. It provides tools to:
+- **Ingest** data from various sources
+- **Structure** data for efficient querying
+- **Query** data using natural language
+
+## Core Concepts
+
+### Data Connectors
+LlamaIndex supports various data sources:
+- Files (PDF, Word, PowerPoint)
+- Databases (SQL, NoSQL)
+- APIs (Slack, Notion, Google Drive)
+
+### Indexing
+Different index types for different use cases:
+- **Vector Store Index**: for semantic search
+- **Tree Index**: for hierarchical data
+- **Keyword Table Index**: for keyword-based retrieval
+
+## Quick Start
+
+Here's a simple example:
+
+\`\`\`python
+from llama_index import SimpleDirectoryReader, VectorStoreIndex
+
+# Load documents
+documents = SimpleDirectoryReader('data').load_data()
+
+# Create index
+index = VectorStoreIndex.from_documents(documents)
+
+# Query
+query_engine = index.as_query_engine()
+response = query_engine.query("What is the main topic?")
+print(response)
+\`\`\`
+
+Ready to learn more? Check out our comprehensive tutorials!`,
+        metadata: {
+          title: 'Getting Started with LlamaIndex',
+          description: 'Introduction to LlamaIndex data framework',
+          author: 'AI Builders Team',
+          lastUpdated: '2024-01-15T09:00:00Z',
+          difficulty: 'beginner',
+          tags: ['llamaindex', 'introduction', 'data-framework']
+        }
+      }
+    ]
+  }
+];
+
+// Load actual tutorial data from file system
+const sections = scanTutorialsDirectory();
+let currentFile: TutorialFile | undefined;
+
+if (slug) {
+  const fullPath = Array.isArray(slug) ? slug.join('/') : slug;
+  currentFile = findTutorialFile(sections, fullPath);
+}
+
+// Extract headings for TOC
+let headings: Array<{id: string, text: string, level: number}> = [];
+if (currentFile) {
+  if (currentFile.type === 'markdown' && currentFile.content) {
+    headings = extractMarkdownHeadings(currentFile.content);
+  } else if (currentFile.type === 'notebook' && currentFile.notebook) {
+    // Extract headings from notebook markdown cells
+    currentFile.notebook.cells.forEach(cell => {
+      if (cell.cell_type === 'markdown') {
+        const cellContent = Array.isArray(cell.source) ? cell.source.join('') : cell.source;
+        const cellHeadings = extractMarkdownHeadings(cellContent);
+        headings.push(...cellHeadings);
+      }
+    });
+  }
+}
+
+const pageTitle = currentFile ? currentFile.metadata.title : 'AI Builders Tutorial';
+---
+
+<TutorialLayout 
+  title={pageTitle}
+  currentFile={currentFile}
+  sections={sections}
+  headings={headings}
+/>
