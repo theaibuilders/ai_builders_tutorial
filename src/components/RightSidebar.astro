@@ -7,8 +7,8 @@ const { headings } = Astro.props;
 ---
 
 <div class="h-screen overflow-y-auto p-6">
-  <div class="sticky top-0 bg-light-bg dark:bg-dark-bg">
-    <h2 class="text-sm font-semibold text-light-text dark:text-dark-text mb-4 pb-2 border-b border-light-border dark:border-dark-border">
+  <div class="sticky top-0 bg-dark-bg">
+    <h2 class="text-sm font-semibold text-dark-text mb-4 pb-2 border-b border-dark-border">
       On This Page
     </h2>
   </div>
@@ -18,10 +18,10 @@ const { headings } = Astro.props;
       {headings.map((heading) => (
         <a
           href={`#${heading.id}`}
-          class={`block py-1 text-sm transition-colors hover:text-light-text dark:hover:text-dark-text ${
+          class={`block py-1 text-sm transition-colors hover:text-dark-text ${
             heading.level === 2 
-              ? 'text-light-secondary dark:text-dark-secondary font-medium' 
-              : 'text-light-secondary dark:text-dark-secondary pl-4'
+              ? 'text-dark-secondary font-medium' 
+              : 'text-dark-secondary pl-4'
           }`}
           data-heading-link={heading.id}
         >
@@ -30,7 +30,7 @@ const { headings } = Astro.props;
       ))}
     </nav>
   ) : (
-    <div class="text-center text-light-secondary dark:text-dark-secondary py-8">
+    <div class="text-center text-dark-secondary py-8">
       <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417" />
       </svg>
@@ -130,19 +130,11 @@ const { headings } = Astro.props;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: theme('colors.light.border');
+    background: theme('colors.dark.border');
     border-radius: 2px;
   }
   
-  :global(.dark) ::-webkit-scrollbar-thumb {
-    background: theme('colors.dark.border');
-  }
-  
   ::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.light.hover');
-  }
-  
-  :global(.dark) ::-webkit-scrollbar-thumb:hover {
     background: theme('colors.dark.hover');
   }
 </style>

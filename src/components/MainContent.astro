@@ -31,7 +31,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             position: relative;
           }
           .professional-notebook .nb-input {
-            background-color: rgba(17, 24, 39, 0.6);
+            background-color: #24282e !important;
             border: 1px solid rgba(75, 85, 99, 0.5);
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -41,7 +41,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           
           /* Code cells - target cells that have nb-input (which are code cells) */
           .professional-notebook .nb-cell:has(.nb-input) {
-            background-color: rgba(17, 24, 39, 0.2);
+            background-color: #24282e !important;
             border: 1px solid rgba(75, 85, 99, 0.3);
             border-radius: 8px;
             position: relative;
@@ -49,9 +49,16 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           
           /* Fallback for browsers without :has() support */
           .professional-notebook .nb-input {
-            background-color: rgba(17, 24, 39, 0.2);
+            background-color: #24282e !important;
             border: 1px solid rgba(75, 85, 99, 0.3);
             position: relative;
+          }
+          
+          /* Force background on all code-related elements */
+          .professional-notebook .nb-cell .nb-input,
+          .professional-notebook .nb-input,
+          .nb-input {
+            background-color: #24282e !important;
           }
           
           /* Copy button for code cells */
@@ -108,7 +115,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             min-width: 4rem;
           }
           .professional-notebook .nb-output {
-            background-color: rgba(17, 24, 39, 0.4);
+            background-color: rgba(36, 40, 46, 0.8);
             border: 1px solid rgba(75, 85, 99, 0.3);
             border-radius: 8px;
             margin-top: 1rem;
@@ -127,34 +134,123 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             padding: 1.5rem;
             line-height: 1.8;
           }
-          .professional-notebook .nb-markdown h1 {
+          /* Universal heading styles based on markdown hierarchy - applies to all content */
+          .professional-notebook h1, h1 {
             color: #ffffff;
-            font-size: 1.875rem;
-            font-weight: bold;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800; /* font-extrabold */
             margin-bottom: 2rem;
-            border-bottom: 2px solid #3b82f6;
+            margin-top: 3rem;
+            border-bottom: 3px solid #3b82f6;
             padding-bottom: 1rem;
+            line-height: 1.2;
           }
-          .professional-notebook .nb-markdown h2 {
+          .professional-notebook h2, h2 {
             color: #ffffff;
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
             margin-bottom: 1.5rem;
             margin-top: 2.5rem;
-            border-bottom: 1px solid rgba(75, 85, 99, 0.5);
+            border-bottom: 2px solid rgba(59, 130, 246, 0.6);
             padding-bottom: 0.75rem;
+            line-height: 1.3;
           }
-          .professional-notebook .nb-markdown h3 {
+          .professional-notebook h3, h3 {
             color: #ffffff;
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            margin-top: 2.5rem;
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            border-bottom: 1px solid rgba(75, 85, 99, 0.4);
+            padding-bottom: 0.5rem;
+            line-height: 1.4;
           }
-          .professional-notebook .nb-markdown p {
-            margin-bottom: 1.5rem;
+          .professional-notebook h4, h4 {
+            color: #ffffff;
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+            line-height: 1.4;
+          }
+          .professional-notebook h5, h5 {
+            color: #ffffff;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem;
+            margin-top: 1.25rem;
+            line-height: 1.5;
+          }
+          .professional-notebook h6, h6 {
+            color: #ffffff;
+            font-size: 1rem; /* text-base */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            line-height: 1.5;
+          }
+          /* Universal paragraph and text styles */
+          .professional-notebook p, p {
+            margin-bottom: 1.25rem;
             color: #d1d5db;
-            line-height: 1.8;
+            line-height: 1.7;
+            font-size: 1rem;
+          }
+          
+          /* Universal list styles based on markdown syntax */
+          .professional-notebook ul, ul,
+          .professional-notebook ol, ol {
+            margin: 1.5rem 0;
+            padding-left: 0;
+            list-style: none;
+          }
+          .professional-notebook li, li {
+            margin-bottom: 0.75rem;
+            color: #d1d5db;
+            line-height: 1.7;
+            position: relative;
+            padding-left: 1.5rem;
+            font-size: 1rem;
+          }
+          
+          /* Bullet point styling for unordered lists */
+          .professional-notebook ul li::before, ul li::before {
+            content: "•";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.1rem;
+          }
+          
+          /* Numbered list styling */
+          .professional-notebook ol, ol {
+            counter-reset: list-counter;
+          }
+          .professional-notebook ol li, ol li {
+            counter-increment: list-counter;
+          }
+          .professional-notebook ol li::before, ol li::before {
+            content: counter(list-counter) ".";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1rem;
+          }
+          
+          /* Nested list styles with different bullet types */
+          .professional-notebook ul ul li::before, ul ul li::before {
+            content: "◦";
+            color: #93c5fd;
+            font-size: 1rem;
+          }
+          .professional-notebook ul ul ul li::before, ul ul ul li::before {
+            content: "▪";
+            color: #ddd6fe;
+            font-size: 0.9rem;
           }
           .professional-notebook .nb-markdown code {
             background-color: rgba(55, 65, 81, 0.6);
@@ -165,7 +261,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-size: 0.875rem;
           }
           .professional-notebook .nb-markdown pre {
-            background-color: rgba(17, 24, 39, 0.8);
+            background-color: #24282e !important;
             border: 1px solid rgba(75, 85, 99, 0.5);
             border-radius: 8px;
             padding: 1rem;
@@ -209,6 +305,8 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             word-wrap: normal;
             word-break: normal;
             min-width: 0;
+            background-color: transparent !important;
+          }
           }
           .professional-notebook .nb-source::-webkit-scrollbar {
             height: 8px;
@@ -302,27 +400,68 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           }
           .professional-notebook ul, .professional-notebook ol {
             margin: 1.5rem 0;
-            padding-left: 2rem;
+            padding-left: 0;
+            list-style: none;
           }
           .professional-notebook li {
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.75rem;
             color: #d1d5db;
             line-height: 1.7;
+            position: relative;
+            padding-left: 1.5rem;
           }
-          .professional-notebook .nb-markdown ul ul, .professional-notebook ol ol {
+          .professional-notebook ul li::before {
+            content: "•";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+          }
+          .professional-notebook ol {
+            counter-reset: list-counter;
+          }
+          .professional-notebook ol li {
+            counter-increment: list-counter;
+          }
+          .professional-notebook ol li::before {
+            content: counter(list-counter) ".";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+          }
+          /* Nested list spacing */
+          .professional-notebook ul ul, ul ul,
+          .professional-notebook ol ol, ol ol {
             margin: 0.5rem 0;
             padding-left: 1.5rem;
           }
-          .professional-notebook ul ul li, .professional-notebook ol ol li {
-            margin-bottom: 0.4rem;
+          .professional-notebook ul ul li, ul ul li,
+          .professional-notebook ol ol li, ol ol li {
+            margin-bottom: 0.5rem;
           }
+          /* Universal text formatting styles */
+          .professional-notebook strong, strong,
           .professional-notebook .nb-markdown strong {
             font-weight: 600;
             color: #ffffff;
           }
+          .professional-notebook em, em,
           .professional-notebook .nb-markdown em {
             font-style: italic;
             color: #93c5fd;
+          }
+          
+          /* Universal code styling */
+          .professional-notebook code, code {
+            background-color: rgba(55, 65, 81, 0.6);
+            color: #93c5fd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
           }
         </style>
         ${notebookHtml}
@@ -370,34 +509,111 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string): 
       .trim();
   }
   
-  const markdownHtml = sourceText
+  // Enhanced markdown parsing for notebook cells with proper spacing
+  // First, remove the first # heading since it's already shown in the page header
+  let contentWithoutFirstTitle = sourceText.replace(/^# .*$/m, '');
+  
+  let markdownHtml = contentWithoutFirstTitle
+    // Handle code blocks first
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    // Handle headers with proper spacing and consistent font sizes
+    .replace(/^###### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h6 id="${id}" class="text-base font-semibold mb-2 mt-4 text-white">${text}</h6>`;
+    })
+    .replace(/^##### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h5 id="${id}" class="text-lg font-semibold mb-3 mt-5 text-white">${text}</h5>`;
+    })
+    .replace(/^#### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h4 id="${id}" class="text-xl font-semibold mb-3 mt-6 text-white">${text}</h4>`;
+    })
     .replace(/^### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h3 id="${id}" class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
     })
     .replace(/^## (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h2 id="${id}" class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
     })
     .replace(/^# (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h1 id="${id}" class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
     })
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-4 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    // Handle inline elements
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
-    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>')
-    .replace(/^\* (.+)$/gm, '<li class="mb-2 text-gray-300">$1</li>')
-    .replace(/^- (.+)$/gm, '<li class="mb-2 text-gray-300">$1</li>')
-    .replace(/\n\n/gim, '</p><p class="mb-4 text-gray-300 leading-relaxed">')
-    .replace(/^([^<\n].*)$/gm, '<p class="mb-4 text-gray-300 leading-relaxed">$1</p>')
-    .replace(/(<li.*<\/li>)/gms, '<ul class="list-disc list-inside mb-4 space-y-1">$1</ul>');
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
+  
+  // Process bullet points with proper nesting
+  const lines = markdownHtml.split('\n');
+  const processedLines = [];
+  let inList = false;
+  let listStack = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+    
+    const bulletMatch = line.match(/^(\s*)([-*+])\s+(.+)$/);
+    const numberMatch = line.match(/^(\s*)(\d+\.)\s+(.+)$/);
+    
+    if (bulletMatch || numberMatch) {
+      const match = bulletMatch || numberMatch;
+      const indent = match[1].length;
+      const content = match[3];
+      const isNumbered = !!numberMatch;
+      const level = Math.floor(indent / 2);
+      
+      if (!inList) {
+        inList = true;
+        listStack = [{ level, isNumbered }];
+        processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mb-6 space-y-2">`);
+      } else {
+        while (listStack.length > 0 && listStack[listStack.length - 1].level >= level) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        
+        if (listStack.length === 0 || listStack[listStack.length - 1].level < level) {
+          listStack.push({ level, isNumbered });
+          processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mt-2 space-y-1">`);
+        }
+      }
+      
+      processedLines.push(`<li class="text-gray-300 leading-relaxed">${content}</li>`);
+    } else {
+      if (inList) {
+        while (listStack.length > 0) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        inList = false;
+      }
+      
+      if (trimmedLine === '') {
+        processedLines.push('');
+      } else if (!trimmedLine.startsWith('<')) {
+        processedLines.push(`<p class="mb-6 text-gray-300 leading-loose">${line}</p>`);
+      } else {
+        processedLines.push(line);
+      }
+    }
+  }
+  
+  while (listStack.length > 0) {
+    const lastList = listStack.pop();
+    processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+  }
+  
+  const finalHtml = processedLines.join('\n');
   
   return `
     <div class="notebook-cell markdown-cell mb-8" data-cell-id="${cellId}">
       <div class="cell-content prose prose-dark dark:prose-dark max-w-none">
-        ${markdownHtml}
+        ${finalHtml}
       </div>
     </div>
   `;
@@ -430,7 +646,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
   
   return `
     <div class="notebook-cell code-cell mb-8" data-cell-id="${cellId}">
-      <div class="code-block relative bg-gray-900/30 border border-gray-700 rounded-lg overflow-hidden">
+      <div class="code-block relative border border-gray-700 rounded-lg overflow-hidden" style="background-color: #24282e;">
         <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
           <span class="text-xs text-gray-400 font-mono">Python</span>
           <copy-button class="copy-btn" data-content="${escapedSource}"></copy-button>
@@ -469,32 +685,120 @@ function renderMarkdownSSR(markdown: string): string {
       .trim();
   }
   
-  // Enhanced markdown parsing with improved styling
-  const markdownHtml = markdown
+  // Enhanced markdown parsing with improved spacing and bullet points
+  // First, remove the first # heading since it's already shown in the page header
+  let contentWithoutFirstTitle = markdown.replace(/^# .*$/m, '');
+  
+  let markdownHtml = contentWithoutFirstTitle
+    // First handle code blocks to preserve them
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+        // Handle headers with improved spacing and consistent font sizes
+    .replace(/^###### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h6 id="${id}" class="text-base font-semibold mb-2 mt-4 text-white">${text}</h6>`;
+    })
+    .replace(/^##### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h5 id="${id}" class="text-lg font-semibold mb-3 mt-5 text-white">${text}</h5>`;
+    })
+    .replace(/^#### (.*$)/gim, (match, text) => {
+      const id = generateHeadingId(text);
+      return `<h4 id="${id}" class="text-xl font-semibold mb-3 mt-6 text-white">${text}</h4>`;
+    })
     .replace(/^### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h3 id="${id}" class="text-xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
     })
     .replace(/^## (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h2 id="${id}" class="text-2xl font-semibold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
     })
     .replace(/^# (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h1 id="${id}" class="text-3xl font-bold mb-8 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
     })
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    // Handle inline code
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
+    // Handle bold and italic
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
-    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>')
-    .replace(/^\* (.+)$/gm, '<li class="mb-3 text-gray-300 leading-relaxed">$1</li>')
-    .replace(/^- (.+)$/gm, '<li class="mb-3 text-gray-300 leading-relaxed">$1</li>')
-    .replace(/\n\n/gim, '</p><p class="mb-6 text-gray-300 leading-loose">')
-    .replace(/^([^<\n].*)$/gm, '<p class="mb-6 text-gray-300 leading-loose">$1</p>')
-    .replace(/(<li.*<\/li>)/gms, '<ul class="list-disc list-inside mb-6 space-y-2 pl-6">$1</ul>');
+    // Handle links
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
   
-  return markdownHtml;
+  // Handle bullet points with proper nesting
+  const lines = markdownHtml.split('\n');
+  const processedLines = [];
+  let inList = false;
+  let listStack = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+    
+    // Check for list items
+    const bulletMatch = line.match(/^(\s*)([-*+])\s+(.+)$/);
+    const numberMatch = line.match(/^(\s*)(\d+\.)\s+(.+)$/);
+    
+    if (bulletMatch || numberMatch) {
+      const match = bulletMatch || numberMatch;
+      const indent = match[1].length;
+      const marker = match[2];
+      const content = match[3];
+      const isNumbered = !!numberMatch;
+      
+      // Determine nesting level
+      const level = Math.floor(indent / 2);
+      
+      // Handle list opening/closing based on nesting
+      if (!inList) {
+        // Starting a new list
+        inList = true;
+        listStack = [{ level, isNumbered }];
+        processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mb-6 space-y-2">`);
+      } else {
+        // Check if we need to open/close nested lists
+        while (listStack.length > 0 && listStack[listStack.length - 1].level >= level) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        
+        if (listStack.length === 0 || listStack[listStack.length - 1].level < level) {
+          // Open new nested list
+          listStack.push({ level, isNumbered });
+          processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mt-2 space-y-1">`);
+        }
+      }
+      
+      processedLines.push(`<li class="text-gray-300 leading-relaxed">${content}</li>`);
+    } else {
+      // Not a list item
+      if (inList) {
+        // Close all open lists
+        while (listStack.length > 0) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        inList = false;
+      }
+      
+      // Handle regular paragraphs
+      if (trimmedLine === '') {
+        processedLines.push('');
+      } else if (!trimmedLine.startsWith('<')) {
+        processedLines.push(`<p class="mb-6 text-gray-300 leading-loose">${line}</p>`);
+      } else {
+        processedLines.push(line);
+      }
+    }
+  }
+  
+  // Close any remaining open lists
+  while (listStack.length > 0) {
+    const lastList = listStack.pop();
+    processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+  }
+  
+  return processedLines.join('\n');
 }
 
 // Content rendering logic
@@ -516,12 +820,12 @@ if (currentFile) {
     <div class="max-w-4xl mx-auto p-8">
       <!-- Tutorial Header -->
       <header class="mb-8">
-        <h1 class="text-4xl font-bold text-light-text dark:text-dark-text mb-2">
+        <h1 class="text-4xl font-bold text-dark-text mb-2">
           {currentFile.metadata.title}
         </h1>
         
         <!-- Metadata -->
-        <div class="flex items-center gap-6 text-sm text-light-secondary dark:text-dark-secondary">
+        <div class="flex items-center gap-6 text-sm text-dark-secondary">
           {currentFile.metadata.author && (
             <div class="flex items-center gap-2">
               <span>{currentFile.metadata.author}</span>
@@ -544,20 +848,20 @@ if (currentFile) {
     <div class="h-full flex items-center justify-center">
       <div class="text-center max-w-md">
         <div class="mb-6">
-          <svg class="w-16 h-16 mx-auto text-light-secondary dark:text-dark-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 mx-auto text-dark-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
         </div>
         
-        <h2 class="text-2xl font-bold text-light-text dark:text-dark-text mb-3">
+        <h2 class="text-2xl font-bold text-dark-text mb-3">
           Welcome to AI Builders Tutorial
         </h2>
         
-        <p class="text-light-secondary dark:text-dark-secondary mb-6">
+        <p class="text-dark-secondary mb-6">
           Select a tutorial from the sidebar to get started with your AI development journey.
         </p>
         
-        <div class="text-sm text-light-secondary dark:text-dark-secondary">
+        <div class="text-sm text-dark-secondary">
           <p class="mb-2">📚 Interactive Jupyter Notebooks</p>
           <p class="mb-2">📖 Comprehensive Markdown Guides</p>
           <p>🔍 Full-text Search</p>
@@ -569,7 +873,7 @@ if (currentFile) {
 
 <!-- Copy Button Component -->
 <copy-button class="hidden">
-  <button class="px-3 py-1 bg-light-surface dark:bg-dark-surface hover:bg-light-hover dark:hover:bg-dark-hover border border-light-border dark:border-dark-border rounded text-xs text-light-secondary dark:text-dark-secondary transition-colors">
+  <button class="px-3 py-1 bg-dark-surface hover:bg-dark-hover border border-dark-border rounded text-xs text-dark-secondary transition-colors">
     Copy
   </button>
 </copy-button>

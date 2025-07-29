@@ -28,19 +28,18 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Theme Script (runs before page load to prevent flash) -->
+    <!-- Theme Script (runs before page load) -->
     <script is:inline>
-      // Check for saved theme preference or default to 'dark'
-      const theme = localStorage.getItem('theme') || 'dark';
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+      // Always use dark mode
+      document.documentElement.classList.add('dark');
     </script>
   </head>
   
-  <body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text font-sans antialiased">
+  <body class="bg-dark-bg text-dark-text font-sans antialiased">
     <!-- Main Layout Container -->
     <div class="flex min-h-screen">
       <!-- Left Sidebar -->
-      <aside class="w-80 flex-shrink-0 border-r border-light-border dark:border-dark-border">
+      <aside class="w-80 flex-shrink-0 border-r border-dark-border">
         <LeftSidebar sections={sections} currentFile={currentFile} />
       </aside>
       
@@ -54,32 +53,13 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
           
           <!-- Right Sidebar (On This Page) -->
           {headings.length > 0 && (
-            <aside class="w-64 flex-shrink-0 border-l border-light-border dark:border-dark-border">
+            <aside class="w-64 flex-shrink-0 border-l border-dark-border">
               <RightSidebar headings={headings} />
             </aside>
           )}
         </div>
       </main>
     </div>
-    
-    <!-- Theme Toggle Script -->
-    <script>
-      function toggleTheme() {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        
-        html.classList.toggle('dark', !isDark);
-        localStorage.setItem('theme', !isDark ? 'dark' : 'light');
-        
-        // Dispatch custom event for components that need to react to theme changes
-        window.dispatchEvent(new CustomEvent('theme-changed', { 
-          detail: { theme: !isDark ? 'dark' : 'light' } 
-        }));
-      }
-      
-      // Make toggleTheme available globally
-      window.toggleTheme = toggleTheme;
-    </script>
     
     <!-- Copy to Clipboard Script -->
     <script>
@@ -109,11 +89,11 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   }
   
   :global(::-webkit-scrollbar-thumb) {
-    @apply bg-light-border dark:bg-dark-border rounded-full;
+    @apply bg-dark-border rounded-full;
   }
   
   :global(::-webkit-scrollbar-thumb:hover) {
-    @apply bg-light-hover dark:bg-dark-hover;
+    @apply bg-dark-hover;
   }
   
   /* Notebook cell styles */
@@ -126,7 +106,7 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   }
   
   :global(.code-cell) {
-    @apply border border-light-border dark:border-dark-border rounded-lg overflow-hidden;
+    @apply border border-dark-border rounded-lg overflow-hidden;
   }
   
   :global(.cell-input) {
@@ -134,7 +114,7 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   }
   
   :global(.cell-prompt) {
-    @apply flex-shrink-0 w-20 p-3 bg-light-surface dark:bg-dark-surface border-r border-light-border dark:border-dark-border text-sm font-mono text-light-secondary dark:text-dark-secondary;
+    @apply flex-shrink-0 w-20 p-3 bg-dark-surface border-r border-dark-border text-sm font-mono text-dark-secondary;
   }
   
   :global(.cell-code-container) {
@@ -142,11 +122,11 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   }
   
   :global(.cell-code) {
-    @apply p-4 bg-light-surface dark:bg-dark-surface font-mono text-sm overflow-x-auto;
+    @apply p-4 bg-dark-surface font-mono text-sm overflow-x-auto;
   }
   
   :global(.cell-output) {
-    @apply border-t border-light-border dark:border-dark-border bg-light-bg dark:bg-dark-bg p-4;
+    @apply border-t border-dark-border bg-dark-bg p-4;
   }
   
   :global(.output-stream pre) {
@@ -161,48 +141,129 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
     @apply max-w-full h-auto;
   }
   
-  /* Prose styles for rendered markdown */
-  :global(.prose) {
-    @apply max-w-none;
+  /* Universal typography hierarchy - applies everywhere */
+  :global(h1) {
+    @apply text-4xl font-extrabold mb-6 text-dark-text;
+    border-bottom: 3px solid #3b82f6;
+    padding-bottom: 1rem;
+    margin-top: 3rem;
   }
   
-  :global(.prose h1) {
-    @apply text-3xl font-bold mb-6 text-light-text dark:text-dark-text;
+  :global(h2) {
+    @apply text-3xl font-bold mb-4 mt-8 text-dark-text;
+    border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+    padding-bottom: 0.75rem;
+    margin-top: 2.5rem;
   }
   
-  :global(.prose h2) {
-    @apply text-2xl font-semibold mb-4 mt-8 text-light-text dark:text-dark-text;
+  :global(h3) {
+    @apply text-2xl font-semibold mb-3 mt-6 text-dark-text;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.4);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
   }
   
-  :global(.prose h3) {
-    @apply text-xl font-semibold mb-3 mt-6 text-light-text dark:text-dark-text;
+  :global(h4) {
+    @apply text-xl font-semibold mb-3 mt-5 text-dark-text;
+    margin-top: 1.5rem;
   }
   
-  :global(.prose p) {
-    @apply mb-6 text-light-secondary dark:text-dark-secondary leading-loose;
+  :global(h5) {
+    @apply text-lg font-semibold mb-2 mt-4 text-dark-text;
+    margin-top: 1.25rem;
   }
   
-  :global(.prose ul, .prose ol) {
-    @apply mb-6 pl-8;
+  :global(h6) {
+    @apply text-base font-semibold mb-2 mt-3 text-dark-text;
+    margin-top: 1rem;
   }
   
-  :global(.prose li) {
-    @apply mb-3 text-light-secondary dark:text-dark-secondary leading-relaxed;
+  
+  /* Universal paragraph and text styles */
+  :global(p) {
+    @apply mb-6 text-dark-secondary leading-loose;
+  }
+
+  /* Universal list styles based on markdown syntax */
+  :global(ul, ol) {
+    @apply mb-6;
+    padding-left: 0;
+    list-style: none;
+    margin: 1.5rem 0;
   }
   
-  :global(.prose code) {
+  :global(li) {
+    @apply mb-3 text-dark-secondary leading-relaxed;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  
+  /* Bullet points for unordered lists */
+  :global(ul li::before) {
+    content: "•";
+    color: #60a5fa;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.1rem;
+  }
+  
+  /* Numbered lists */
+  :global(ol) {
+    counter-reset: list-counter;
+  }
+  :global(ol li) {
+    counter-increment: list-counter;
+  }
+  :global(ol li::before) {
+    content: counter(list-counter) ".";
+    color: #60a5fa;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  
+  /* Nested lists */
+  :global(ul ul li::before) {
+    content: "◦";
+    color: #93c5fd;
+  }
+  :global(ul ul ul li::before) {
+    content: "▪";
+    color: #ddd6fe;
+    font-size: 0.9rem;
+  }
+  
+  
+  /* Universal code and inline elements */
+  :global(code) {
     @apply bg-light-surface dark:bg-dark-surface px-2 py-1 rounded text-sm font-mono;
   }
   
-  :global(.prose pre) {
+  :global(pre) {
     @apply bg-light-surface dark:bg-dark-surface p-4 rounded-lg overflow-x-auto font-mono text-sm;
   }
   
-  :global(.prose a) {
+  :global(a) {
     @apply text-blue-500 hover:text-blue-400 underline;
   }
   
-  :global(.prose blockquote) {
+  :global(blockquote) {
     @apply border-l-4 border-light-border dark:border-dark-border pl-4 italic text-light-secondary dark:text-dark-secondary;
+  }
+  
+  :global(strong) {
+    @apply font-semibold text-light-text dark:text-dark-text;
+  }
+  
+  :global(em) {
+    @apply italic text-blue-400;
+  }
+  
+  /* Preserve prose class for specific containers that need it */
+  :global(.prose) {
+    @apply max-w-none;
   }
 </style>

@@ -6,7 +6,7 @@
   <div class="relative">
     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
       <svg
-        class="h-4 w-4 text-light-secondary dark:text-dark-secondary"
+        class="h-4 w-4 text-dark-secondary"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -23,7 +23,7 @@
       type="text"
       id="search-input"
       placeholder="Search tutorials..."
-      class="w-full pl-10 pr-4 py-2 text-sm bg-light-surface dark:bg-dark-surface border border-light-border dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-light-text dark:text-dark-text placeholder-light-secondary dark:placeholder-dark-secondary"
+      class="w-full pl-10 pr-4 py-2 text-sm bg-dark-surface border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-dark-text placeholder-dark-secondary"
     />
     <div id="search-loading" class="absolute inset-y-0 right-0 pr-3 flex items-center hidden">
       <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
@@ -31,7 +31,7 @@
   </div>
 
   <!-- Search Results Dropdown -->
-  <div id="search-results" class="absolute z-50 w-full mt-2 bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border rounded-lg shadow-lg max-h-80 overflow-y-auto hidden">
+  <div id="search-results" class="absolute z-50 w-full mt-2 bg-dark-bg border border-dark-border rounded-lg shadow-lg max-h-80 overflow-y-auto hidden">
     <!-- Results will be populated by JavaScript -->
   </div>
 </div>
@@ -81,7 +81,7 @@
     function renderResults(results: typeof mockTutorials) {
       if (results.length === 0) {
         searchResults.innerHTML = `
-          <div class="p-4 text-center text-light-secondary dark:text-dark-secondary">
+          <div class="p-4 text-center text-dark-secondary">
             <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417m0 0A7.962 7.962 0 0112 3" />
             </svg>
@@ -93,12 +93,12 @@
       
       searchResults.innerHTML = results.map(result => `
         <button
-          class="w-full px-4 py-3 text-left hover:bg-light-hover dark:hover:bg-dark-hover transition-colors border-b border-light-border dark:border-dark-border last:border-b-0"
+          class="w-full px-4 py-3 text-left hover:bg-dark-hover transition-colors border-b border-dark-border last:border-b-0"
           onclick="window.location.href='/tutorials/${result.path}'"
         >
           <div class="flex items-start gap-3">
             <div class="flex-shrink-0 mt-0.5">
-              <svg class="w-4 h-4 text-light-secondary dark:text-dark-secondary" fill="currentColor" viewBox="0 0 20 20">
+              <svg class="w-4 h-4 text-dark-secondary" fill="currentColor" viewBox="0 0 20 20">
                 ${result.type === 'notebook' ? `
                   <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5zm2 2a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6zm0 3a1 1 0 000 2h8a1 1 0 100-2H6z"/>
                 ` : `
@@ -108,17 +108,17 @@
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
-                <h3 class="text-sm font-medium text-light-text dark:text-dark-text truncate">
+                <h3 class="text-sm font-medium text-dark-text truncate">
                   ${result.title}
                 </h3>
                 <span class="text-xs px-2 py-0.5 rounded ${result.type === 'notebook' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}">
                   ${result.type === 'notebook' ? 'ipynb' : 'md'}
                 </span>
               </div>
-              <div class="text-xs text-light-secondary dark:text-dark-secondary mb-1">
+              <div class="text-xs text-dark-secondary mb-1">
                 ${result.section}
               </div>
-              <p class="text-xs text-light-secondary dark:text-dark-secondary line-clamp-2">
+              <p class="text-xs text-dark-secondary line-clamp-2">
                 ${result.description}
               </p>
             </div>

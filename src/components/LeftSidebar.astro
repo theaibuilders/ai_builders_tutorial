@@ -12,22 +12,11 @@ const { sections, currentFile } = Astro.props;
 
 <div class="h-screen flex flex-col">
   <!-- Header -->
-  <div class="flex-shrink-0 p-6 border-b border-light-border dark:border-dark-border">
+  <div class="flex-shrink-0 p-6 border-b border-dark-border">
     <div class="flex items-center justify-between mb-4">
-      <h1 class="text-xl font-bold text-light-text dark:text-dark-text">
+      <h1 class="text-xl font-bold text-dark-text">
         AI Builders Tutorial
       </h1>
-      <button 
-        id="theme-toggle"
-        class="p-2 rounded-lg bg-light-surface dark:bg-dark-surface hover:bg-light-hover dark:hover:bg-dark-hover transition-colors"
-        onclick="toggleTheme()"
-        aria-label="Toggle theme"
-      >
-        <svg class="w-5 h-5 text-light-secondary dark:text-dark-secondary" fill="currentColor" viewBox="0 0 20 20">
-          <path class="dark:hidden" fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
-          <path class="hidden dark:block" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-        </svg>
-      </button>
     </div>
     
     <!-- Search Bar -->
@@ -41,15 +30,15 @@ const { sections, currentFile } = Astro.props;
         <div class="mb-6">
           <!-- Section Header -->
           <button 
-            class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-light-hover dark:hover:bg-dark-hover transition-colors group"
+            class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-dark-hover transition-colors group"
             data-section={section.path}
             onclick="toggleSection(this)"
           >
-            <span class="font-semibold text-light-text dark:text-dark-text capitalize">
+            <span class="font-semibold text-dark-text capitalize">
               {section.name}
             </span>
             <svg 
-              class="w-4 h-4 text-light-secondary dark:text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90"
+              class="w-4 h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90"
               fill="currentColor" 
               viewBox="0 0 20 20"
             >
@@ -74,7 +63,7 @@ const { sections, currentFile } = Astro.props;
                   class={`block p-2 rounded-lg text-sm transition-colors ${
                     isActive 
                       ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' 
-                      : 'text-light-secondary dark:text-dark-secondary hover:bg-light-hover dark:hover:bg-dark-hover hover:text-light-text dark:hover:text-dark-text'
+                      : 'text-dark-secondary hover:bg-dark-hover hover:text-dark-text'
                   }`}
                 >
                   <div class="flex items-center">
@@ -86,7 +75,7 @@ const { sections, currentFile } = Astro.props;
                   
                   <!-- File Description (if available) -->
                   {file.metadata.description && (
-                    <div class="mt-1 text-xs text-light-secondary dark:text-dark-secondary opacity-75 line-clamp-2">
+                    <div class="mt-1 text-xs text-dark-secondary opacity-75 line-clamp-2">
                       {file.metadata.description}
                     </div>
                   )}
