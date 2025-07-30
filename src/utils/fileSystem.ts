@@ -49,7 +49,7 @@ export function extractNotebookMetadata(notebook: any): any {
   // Try to get title from first markdown cell
   let title = 'Untitled Notebook';
   
-  if (notebook.cells && notebook.cells.length > 0) {
+  if (notebook && notebook.cells && notebook.cells.length > 0) {
     const firstCell = notebook.cells.find((cell: any) => cell.cell_type === 'markdown');
     if (firstCell && firstCell.source) {
       const source = Array.isArray(firstCell.source) ? firstCell.source.join('') : firstCell.source;
@@ -90,28 +90,37 @@ export function scanTutorialsDirectory(): TutorialSection[] {
         const filePath = path.join(sectionPath, fileName);
         const relativePath = `${sectionDir}/${fileName}`;
         
-        if (fileName.endsWith('.md')) {
-          const content = readMarkdownFile(filePath);
-          const metadata = extractMarkdownMetadata(content);
-          
-          files.push({
-            path: relativePath,
-            name: fileName,
-            type: 'markdown',
-            content,
-            metadata
-          });
-        } else if (fileName.endsWith('.ipynb')) {
-          const notebook = readNotebookFile(filePath);
-          const metadata = extractNotebookMetadata(notebook);
-          
-          files.push({
-            path: relativePath,
-            name: fileName,
-            type: 'notebook',
-            notebook,
-            metadata
-          });
+        try {
+          if (fileName.endsWith('.md')) {
+            const content = readMarkdownFile(filePath);
+            if (content) {
+              const metadata = extractMarkdownMetadata(content);
+              
+              files.push({
+                path: relativePath,
+                name: fileName,
+                type: 'markdown',
+                content,
+                metadata
+              });
+            }
+          } else if (fileName.endsWith('.ipynb')) {
+            const notebook = readNotebookFile(filePath);
+            if (notebook) {
+              const metadata = extractNotebookMetadata(notebook);
+              
+              files.push({
+                path: relativePath,
+                name: fileName,
+                type: 'notebook',
+                notebook,
+                metadata
+              });
+            }
+          }
+        } catch (error) {
+          console.error(`Error processing file ${filePath}:`, error);
+          // Skip this file and continue with others
         }
       }
       

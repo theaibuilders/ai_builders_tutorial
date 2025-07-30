@@ -1,27 +1,48 @@
 ---
 import TutorialLayout from '../layouts/TutorialLayout.astro';
 import { extractMarkdownHeadings } from '../utils/notebook';
-import { scanTutorialsDirectory, findTutorialFile } from '../utils/fileSystem';
+import { scanTutorialsDirectory } from '../utils/fileSystem';
+import fs from 'fs';
+import path from 'path';
 
-// Load the tutorial overview content directly
+// Load sections for sidebar
 const sections = scanTutorialsDirectory();
-const tutorialFile = findTutorialFile(sections, 'Overview/tutorial_overview');
 
-if (!tutorialFile) {
-  return new Response('Tutorial overview not found', { status: 404 });
+// Load README.md content
+const readmePath = path.join(process.cwd(), 'README.md');
+let readmeContent = '';
+
+try {
+  readmeContent = fs.readFileSync(readmePath, 'utf-8');
+} catch (error) {
+  console.error('Error reading README.md:', error);
+  readmeContent = '# Welcome to AI Builders Tutorial\n\nWelcome to the comprehensive AI development tutorial platform!';
 }
 
 // Extract headings for table of contents
-const headings = tutorialFile.type === 'markdown' 
-  ? extractMarkdownHeadings(tutorialFile.content || '')
-  : [];
+const headings = extractMarkdownHeadings(readmeContent);
 
-const title = tutorialFile.metadata?.title || 'AI Builders Tutorial Overview';
+// Create a tutorial file object for the README
+const readmeFile = {
+  path: 'README.md',
+  name: 'README.md',
+  type: 'markdown' as const,
+  content: readmeContent,
+  metadata: {
+    title: 'AI Builders Tutorial',
+    author: 'AI Builders Team',
+    lastUpdated: new Date().toISOString(),
+    difficulty: 'beginner',
+    tags: ['overview', 'getting-started']
+  }
+};
+
+const title = 'AI Builders Tutorial';
 ---
 
 <TutorialLayout 
   title={title}
   sections={sections}
   headings={headings}
-  tutorialFile={tutorialFile}
+  currentFile={readmeFile}
 />
