@@ -36,7 +36,6 @@ export default {
             },
             a: {
               color: 'var(--tw-prose-links)',
-              textDecoration: 'underline',
               fontWeight: '500',
             },
             strong: {

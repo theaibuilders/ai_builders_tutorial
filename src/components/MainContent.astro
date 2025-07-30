@@ -17,7 +17,10 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
   try {
     // Create a new notebook renderer instance
     const renderer = nb.parse(notebook);
-    const notebookHtml = renderer.render().outerHTML;
+    let notebookHtml = renderer.render().outerHTML;
+    
+    // Remove the first H1 heading from the notebook content since it's already shown in the page header
+    notebookHtml = notebookHtml.replace(/<h1[^>]*>.*?<\/h1>/i, '');
     
     // Apply our custom styling to the professional output with copy buttons
     return `
@@ -25,7 +28,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
         <style>
           /* Enhanced notebook styling with working copy buttons and scrolling */
           .professional-notebook .nb-cell {
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             border-radius: 8px;
             overflow: visible;
             position: relative;
@@ -34,7 +37,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             background-color: #24282e !important;
             border: 1px solid rgba(75, 85, 99, 0.5);
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             position: relative;
             overflow: visible;
           }
@@ -58,6 +61,27 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           .professional-notebook .nb-cell .nb-input,
           .professional-notebook .nb-input,
           .nb-input {
+            background-color: #24282e !important;
+          }
+          
+          /* Additional comprehensive selectors for code cells */
+          .professional-notebook .nb-cell[data-cell-type="code"],
+          .professional-notebook .nb-cell.nb-cell-type-code,
+          .professional-notebook .nb-cell:has(pre),
+          .professional-notebook .nb-cell:has(code),
+          .professional-notebook div[class*="nb-input"],
+          .professional-notebook div[class*="code"],
+          .professional-notebook pre,
+          .professional-notebook .nb-source {
+            background-color: #24282e !important;
+          }
+          
+          /* Force background on any element containing code */
+          .professional-notebook * {
+            --code-bg: #24282e;
+          }
+          
+          .professional-notebook [style*="background"] {
             background-color: #24282e !important;
           }
           
@@ -118,7 +142,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             background-color: rgba(36, 40, 46, 0.8);
             border: 1px solid rgba(75, 85, 99, 0.3);
             border-radius: 8px;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
           }
           .professional-notebook .nb-output-prompt {
             background-color: rgba(220, 38, 38, 0.1);
@@ -141,7 +165,6 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-weight: 800; /* font-extrabold */
             margin-bottom: 2rem;
             margin-top: 3rem;
-            border-bottom: 3px solid #3b82f6;
             padding-bottom: 1rem;
             line-height: 1.2;
           }
@@ -151,7 +174,6 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-weight: 700; /* font-bold */
             margin-bottom: 1.5rem;
             margin-top: 2.5rem;
-            border-bottom: 2px solid rgba(59, 130, 246, 0.6);
             padding-bottom: 0.75rem;
             line-height: 1.3;
           }
@@ -161,7 +183,6 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-weight: 600; /* font-semibold */
             margin-bottom: 1rem;
             margin-top: 2rem;
-            border-bottom: 1px solid rgba(75, 85, 99, 0.4);
             padding-bottom: 0.5rem;
             line-height: 1.4;
           }
@@ -393,7 +414,6 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           }
           .professional-notebook a {
             color: #60a5fa;
-            text-decoration: underline;
           }
           .professional-notebook a:hover {
             color: #93c5fd;
@@ -463,6 +483,60 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-family: ui-monospace, monospace;
             font-size: 0.875rem;
           }
+          
+          /* Ultra-specific overrides to ensure code cell background is correct */
+          .professional-notebook .nb-cell.nb-cell-type-code,
+          .professional-notebook .nb-input,
+          .professional-notebook .nb-cell:has(.nb-input),
+          .professional-notebook [class*="nb-input"],
+          .professional-notebook [class*="code-cell"],
+          .professional-notebook pre,
+          div[class*="nb-input"],
+          div[class*="nb-cell"]:has(pre),
+          div[class*="nb-cell"]:has(code) {
+            background-color: #24282e !important;
+          }
+          
+          /* Force via CSS custom properties */
+          :root {
+            --notebook-code-bg: #24282e;
+          }
+          
+          /* Re-apply transparent backgrounds to markdown elements to match app background */
+          .professional-notebook .nb-markdown,
+          .professional-notebook .nb-markdown p,
+          .professional-notebook .nb-markdown span,
+          .professional-notebook .nb-markdown div,
+          .professional-notebook .nb-markdown h1,
+          .professional-notebook .nb-markdown h2,
+          .professional-notebook .nb-markdown h3,
+          .professional-notebook .nb-markdown h4,
+          .professional-notebook .nb-markdown h5,
+          .professional-notebook .nb-markdown h6,
+          .professional-notebook .nb-markdown ul,
+          .professional-notebook .nb-markdown ol,
+          .professional-notebook .nb-markdown li,
+          .professional-notebook .nb-markdown blockquote,
+          .professional-notebook .nb-cell-type-markdown,
+          .professional-notebook .nb-cell:not(:has(.nb-input)),
+          .professional-notebook .nb-cell .nb-markdown {
+            background-color: transparent !important;
+          }
+          
+          /* Ensure markdown cells match app background */
+          .professional-notebook .nb-cell-type-markdown,
+          .professional-notebook .nb-cell:not(.nb-cell-type-code),
+          .notebook-cell.markdown-cell,
+          .notebook-cell .cell-content,
+          .markdown-cell {
+            background-color: #1f2123 !important;
+          }
+          
+          /* Also ensure fallback markdown cells are transparent */
+          .notebook-cell.markdown-cell .cell-content,
+          .cell-content.prose {
+            background-color: transparent !important;
+          }
         </style>
         ${notebookHtml}
       </div>
@@ -480,13 +554,17 @@ function renderNotebookFallback(notebook: any): string {
     return '<div class="text-center text-red-400 py-8"><p>Invalid notebook format</p></div>';
   }
   
+  let isFirstMarkdownCell = true;
+  
   const cellsHtml = notebook.cells.map((cell: any, index: number) => {
     const cellId = `cell-${index}`;
     const source = Array.isArray(cell.source) ? cell.source.join('') : cell.source || '';
     
     switch (cell.cell_type) {
       case 'markdown':
-        return renderMarkdownCellFallback(source, cellId);
+        const result = renderMarkdownCellFallback(source, cellId, isFirstMarkdownCell);
+        if (isFirstMarkdownCell) isFirstMarkdownCell = false;
+        return result;
       case 'code':
         return renderCodeCellFallback(source, cellId, cell.execution_count, cell.outputs);
       default:
@@ -497,7 +575,7 @@ function renderNotebookFallback(notebook: any): string {
   return cellsHtml;
 }
 
-function renderMarkdownCellFallback(source: string | string[], cellId: string): string {
+function renderMarkdownCellFallback(source: string | string[], cellId: string, isFirstMarkdownCell: boolean = false): string {
   const sourceText = Array.isArray(source) ? source.join('\n') : source || '';
   
   // Function to generate heading ID
@@ -510,8 +588,11 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string): 
   }
   
   // Enhanced markdown parsing for notebook cells with proper spacing
-  // First, remove the first # heading since it's already shown in the page header
-  let contentWithoutFirstTitle = sourceText.replace(/^# .*$/m, '');
+  // Only remove the first # heading from the very first markdown cell since it's already shown in the page header
+  let contentWithoutFirstTitle = sourceText;
+  if (isFirstMarkdownCell) {
+    contentWithoutFirstTitle = sourceText.replace(/^# .*$/m, '');
+  }
   
   let markdownHtml = contentWithoutFirstTitle
     // Handle code blocks first
@@ -531,21 +612,21 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string): 
     })
     .replace(/^### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white pb-2">${text}</h3>`;
     })
     .replace(/^## (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white pb-3">${text}</h2>`;
     })
     .replace(/^# (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white pb-4">${text}</h1>`;
     })
     // Handle inline elements
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
-    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300">$1</a>');
   
   // Process bullet points with proper nesting
   const lines = markdownHtml.split('\n');
@@ -611,7 +692,7 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string): 
   const finalHtml = processedLines.join('\n');
   
   return `
-    <div class="notebook-cell markdown-cell mb-8" data-cell-id="${cellId}">
+    <div class="notebook-cell markdown-cell mb-4" data-cell-id="${cellId}">
       <div class="cell-content prose prose-dark dark:prose-dark max-w-none">
         ${finalHtml}
       </div>
@@ -629,7 +710,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
       if (output.output_type === 'stream') {
         const text = Array.isArray(output.text) ? output.text.join('') : output.text || '';
         return `
-          <div class="output-stream bg-gray-900/60 border border-gray-600 rounded-lg p-4 mt-4">
+          <div class="output-stream bg-gray-900/60 border border-gray-600 rounded-lg p-4 mt-2">
             <pre class="text-green-300 font-mono text-sm whitespace-pre-wrap">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
           </div>
         `;
@@ -645,7 +726,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
   const escapedSource = sourceText.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   
   return `
-    <div class="notebook-cell code-cell mb-8" data-cell-id="${cellId}">
+    <div class="notebook-cell code-cell mb-4" data-cell-id="${cellId}">
       <div class="code-block relative border border-gray-700 rounded-lg overflow-hidden" style="background-color: #24282e;">
         <div class="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
           <span class="text-xs text-gray-400 font-mono">Python</span>
@@ -707,15 +788,15 @@ function renderMarkdownSSR(markdown: string): string {
     })
     .replace(/^### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white border-b border-gray-700 pb-2">${text}</h3>`;
+      return `<h3 id="${id}" class="text-2xl font-semibold mb-4 mt-8 text-white pb-2">${text}</h3>`;
     })
     .replace(/^## (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white border-b border-gray-600 pb-3">${text}</h2>`;
+      return `<h2 id="${id}" class="text-3xl font-bold mb-6 mt-10 text-white pb-3">${text}</h2>`;
     })
     .replace(/^# (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
-      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white border-b-2 border-blue-500 pb-4">${text}</h1>`;
+      return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white pb-4">${text}</h1>`;
     })
     // Handle inline code
     .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
@@ -723,7 +804,7 @@ function renderMarkdownSSR(markdown: string): string {
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
     // Handle links
-    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300">$1</a>');
   
   // Handle bullet points with proper nesting
   const lines = markdownHtml.split('\n');
@@ -1017,9 +1098,65 @@ if (currentFile) {
   document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, setting up notebook highlighting...');
     
+    // Force background colors on all code-related elements
+    function forceCodeCellBackgrounds() {
+      console.log('Forcing code cell backgrounds to #24282e and markdown backgrounds to match app...');
+      
+      // Target all possible code cell containers
+      const codeElements = document.querySelectorAll([
+        '.professional-notebook .nb-input',
+        '.professional-notebook .nb-cell:has(.nb-input)',
+        '.professional-notebook [class*="nb-input"]',
+        '.professional-notebook [class*="code"]',
+        '.nb-input',
+        '.nb-cell:has(pre)',
+        '.nb-cell:has(code)',
+        'div[class*="nb-input"]'
+      ].join(', '));
+      
+      codeElements.forEach(element => {
+        element.style.backgroundColor = '#24282e';
+        element.style.setProperty('background-color', '#24282e', 'important');
+      });
+      
+      // Target markdown cells and ensure they match app background
+      const markdownElements = document.querySelectorAll([
+        '.professional-notebook .nb-cell-type-markdown',
+        '.professional-notebook .nb-cell:not(:has(.nb-input))',
+        '.professional-notebook .nb-markdown',
+        '.professional-notebook .nb-cell .nb-markdown',
+        '.notebook-cell.markdown-cell',
+        '.markdown-cell'
+      ].join(', '));
+      
+      markdownElements.forEach(element => {
+        element.style.backgroundColor = '#1f2123';
+        element.style.setProperty('background-color', '#1f2123', 'important');
+      });
+      
+      // Make sure markdown content areas are transparent
+      const markdownContentElements = document.querySelectorAll([
+        '.professional-notebook .nb-markdown',
+        '.notebook-cell .cell-content',
+        '.cell-content.prose',
+        '.markdown-cell .cell-content'
+      ].join(', '));
+      
+      markdownContentElements.forEach(element => {
+        element.style.backgroundColor = 'transparent';
+        element.style.setProperty('background-color', 'transparent', 'important');
+      });
+      
+      console.log(`Applied background color to ${codeElements.length} code elements and ${markdownElements.length} markdown elements`);
+    }
+    
+    // Apply immediately and after notebook rendering
+    forceCodeCellBackgrounds();
+    
     // Wait a bit for the notebook to render
     setTimeout(() => {
       console.log('Looking for notebook elements...');
+      forceCodeCellBackgrounds(); // Apply again after notebook loads
       
       // Target the actual code input elements generated by notebookjs
       const codeInputs = document.querySelectorAll('.professional-notebook .nb-input');
@@ -1196,6 +1333,14 @@ if (currentFile) {
       });
       
       console.log(`Processed ${headings.length} headings`);
+      
+      // Final pass to ensure code cell backgrounds are correct
+      forceCodeCellBackgrounds();
     }, 500); // Run earlier to ensure headings have IDs before other scripts
+    
+    // Also run after a longer delay to catch any late-loading elements
+    setTimeout(() => {
+      forceCodeCellBackgrounds();
+    }, 2000);
   });
 </script>
