@@ -1,204 +1,171 @@
 # AI Builders Tutorial
 
-A comprehensive tutorial platform built with Astro, inspired by the OpenAI Tutorial design. This platform hosts AI development tutorials, primarily as Jupyter Notebooks and Markdown files, with a focus on creating an excellent developer experience.
+A comprehensive tutorial platform for learning AI development with modern frameworks and tools. Master the fundamentals of building AI-powered applications through hands-on interactive tutorials and practical examples.
 
-## 🚀 Features
+## 🎯 What You'll Learn
 
-- **Three-Column Layout**: Left sidebar navigation, main content area, and right sidebar table of contents
-- **Dark/Light Theme**: Default dark theme with the ability to toggle between themes
-- **Interactive Notebooks**: Full support for rendering Jupyter Notebooks with syntax highlighting
-- **Search Functionality**: Real-time search across all tutorials and content
-- **Responsive Design**: Optimized for desktop and mobile devices
-- **GitHub Integration**: Fetch content directly from GitHub repositories
-- **Copy-to-Clipboard**: Easy code copying from notebooks and examples
-- **TypeScript Support**: Fully typed codebase for better development experience
+### 🤖 AI Frameworks
 
-## 🎨 Design
+Build powerful applications using the most popular AI development frameworks:
 
-The design is heavily inspired by the OpenAI Tutorial interface, featuring:
+**LangChain**
 
-- **Dark Theme Colors**:
-  - Background: `#1f2123`
-  - Text: `#f8fafc`
-  - Secondary text: `#a7a9ac`
-  - Borders: `#374151`
+- Create applications powered by Large Language Models (LLMs)
+- Master LangChain Expression Language (LCEL) for building chains
+- Work with prompt templates and output parsers
+- Build Retrieval-Augmented Generation (RAG) systems
+- Stream responses and handle structured outputs
+- Create conditional chains with RunnableBranch
 
-- **Clean, Modern Aesthetic**: Minimalist design focused on readability and developer experience
-- **Hierarchical Navigation**: Collapsible tree structure based on repository folder organization
-- **Syntax Highlighting**: Beautiful code highlighting using Shiki
+**LlamaIndex**
 
-## 🛠️ Technology Stack
+- Build RAG applications that connect LLMs to your private data
+- Load and index documents from various sources (PDFs, text files, web pages)
+- Implement vector-based search and retrieval
+- Create query engines for intelligent document questioning
+- Persist and manage vector indexes
+- Fine-tune retrieval for better results
 
-- **Framework**: [Astro](https://astro.build/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Language**: TypeScript
-- **UI Components**: Astro components with interactive islands
-- **Syntax Highlighting**: [Shiki](https://github.com/shikijs/shiki)
-- **Fonts**: Inter (sans-serif) and Fira Code (monospace)
+**LiteLLM** *(Coming Soon)*
 
-## 📁 Project Structure
+- Unified interface for multiple LLM providers
+- Cost optimization and model switching
+- Request routing and load balancing
 
-```
-src/
-├── components/           # Astro components
-│   ├── LeftSidebar.astro      # Navigation sidebar
-│   ├── MainContent.astro      # Tutorial content display
-│   ├── RightSidebar.astro     # Table of contents
-│   └── SearchBar.astro        # Search functionality
-├── layouts/
-│   └── TutorialLayout.astro   # Main layout template
-├── pages/
-│   ├── index.astro           # Homepage
-│   └── tutorials/
-│       └── [...slug].astro   # Dynamic tutorial pages
-├── types/
-│   └── tutorial.ts           # TypeScript type definitions
-├── utils/
-│   ├── github.ts            # GitHub API integration
-│   └── notebook.ts          # Jupyter notebook rendering
-└── islands/                 # Interactive components (unused in current implementation)
-```
+### 🛠️ Core AI Concepts
+
+- **Prompt Engineering**: Craft effective prompts for better AI responses
+- **Retrieval-Augmented Generation (RAG)**: Connect LLMs to external data sources
+- **Vector Embeddings**: Understand and implement semantic search
+- **Document Processing**: Load, chunk, and index various document types
+- **Memory Systems**: Maintain context across conversations
+- **Tool Integration**: Connect AI agents with external tools and APIs
+
+### 📚 Practical Applications
+
+Learn to build real-world AI applications:
+
+- Intelligent document analysis and Q&A systems
+- Conversational AI chatbots and virtual assistants
+- Code generation and review assistants
+- Data analysis and visualization tools
+- Multi-agent systems for complex task coordination
+
+## 🚀 Tutorial Features
+
+- **Interactive Jupyter Notebooks**: Learn by doing with executable code examples
+- **Step-by-Step Guidance**: From basic concepts to advanced implementations
+- **Real-World Projects**: Build applications you can use immediately
+- **Best Practices**: Industry-tested techniques and patterns
+- **Copy-to-Clipboard**: Easy code copying for quick experimentation
+- **Search Functionality**: Find specific topics and code examples instantly
+
+## 📖 Content Structure
+
+### Overview
+
+- Tutorial platform introduction
+- Learning path recommendations
+- Prerequisites and setup guides
+
+### Frameworks
+
+- **LangChain**: Complete tutorial from fundamentals to advanced RAG
+- **LlamaIndex**: Building RAG applications with document indexing
+- **LiteLLM**: Multi-provider LLM integration *(Coming Soon)*
+
+### Model Providers *(Coming Soon)*
+
+- OpenAI integration and best practices
+- Anthropic Claude implementation
+- Hugging Face model deployment
+- Local model setup and optimization
+
+## 🎓 Learning Path
+
+### Beginner Track
+
+1. Start with the **Tutorial Overview** to understand core concepts
+2. Follow the **LangChain tutorial** for comprehensive LLM application development
+3. Explore **LlamaIndex** for document-based AI applications
+
+### Intermediate Track
+
+1. Deep dive into advanced RAG implementations
+2. Build multi-step reasoning systems
+3. Implement custom tools and integrations
+
+### Advanced Track
+
+1. Create multi-agent systems
+2. Optimize performance and costs
+3. Deploy production-ready applications
+
+## 🔧 Prerequisites
+
+- **Basic Python Knowledge**: Understanding of Python syntax and concepts
+- **API Familiarity**: Experience with REST APIs and web requests
+- **Machine Learning Basics**: Helpful but not required - concepts explained as needed
+- **OpenAI API Key**: Required for most tutorials (free tier available)
 
 ## 🚦 Getting Started
 
-### Prerequisites
+1. **Visit the Tutorial Platform**: [AI Builders Tutorial](https://ai-builders-tutorial-k7qsrhe54-dz007s-projects-03f4a785.vercel.app)
+2. **Choose Your Learning Path**:
 
-- Node.js 18+ 
-- npm or yarn
+   - New to AI? Start with the Tutorial Overview
+   - Want to build LLM apps? Begin with LangChain
+   - Need document Q&A systems? Start with LlamaIndex
+3. **Follow the Interactive Examples**: Each tutorial includes executable code you can run and modify
+4. **Build Your Own Projects**: Apply what you learn to create custom AI applications
 
-### Installation
+## 💡 Tutorial Highlights
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd ai_builders_tutorial
-```
+### LangChain Tutorial: From Fundamentals to Advanced RAG
 
-2. Install dependencies:
-```bash
-npm install
-```
+- **Setup and Installation**: Get started with LangChain and OpenAI
+- **Building Your First Chain**: Create simple LLM applications with LCEL
+- **Structured Output**: Parse LLM responses into Python objects
+- **Advanced Chains**: Build conditional and branching logic
+- **Complete RAG System**: Implement document loading, embedding, and retrieval
+- **Real-World Examples**: Working code for practical applications
 
-3. Start the development server:
-```bash
-npm run dev
-```
+### LlamaIndex Tutorial: Building RAG Applications
 
-4. Open your browser and navigate to `http://localhost:4321`
+- **Document Loading**: Import data from PDFs, text files, and web sources
+- **Vector Indexing**: Create searchable embeddings for semantic search
+- **Query Engines**: Build intelligent Q&A systems for your documents
+- **Custom Retrieval**: Fine-tune search for better results
+- **Persistence**: Save and load indexes for production use
+- **Interactive Demo**: Test your RAG system with real queries
 
-### Configuration
+## 🎯 Key Learning Outcomes
 
-#### GitHub Integration
+By completing these tutorials, you'll be able to:
 
-To fetch content from GitHub, update the configuration in `src/utils/github.ts`:
+✅ **Build Production-Ready AI Applications**
 
-```typescript
-const REPO_OWNER = 'your-github-username';
-const REPO_NAME = 'your-repository-name';
-const TUTORIALS_PATH = 'tutorials'; // Path to tutorials in your repo
-```
+- Create LLM-powered apps that solve real problems
+- Implement robust error handling and user experience
+- Deploy applications to production environments
 
-#### Content Structure
+✅ **Master RAG Systems**
 
-Organize your tutorials in the following structure in your GitHub repository:
+- Connect any LLM to your private data
+- Implement efficient document retrieval and indexing
+- Build intelligent question-answering systems
 
-```
-tutorials/
-├── getting-started/
-│   ├── 01-introduction.md
-│   └── 02-setup.ipynb
-├── langchain-basics/
-│   ├── 01-prompts-and-parsers.ipynb
-│   └── 02-building-chains.ipynb
-└── advanced-rag/
-    └── 01-multi-query-retriever.ipynb
-```
+✅ **Understand AI Development Best Practices**
 
-## 📝 Content Format
+- Optimize costs and performance
+- Implement proper prompt engineering techniques
+- Handle edge cases and error scenarios
 
-### Markdown Files
+✅ **Integrate Multiple AI Tools**
 
-Markdown files support frontmatter for metadata:
-
-```markdown
----
-title: "Getting Started with LangChain"
-author: "AI Builders Team"
-description: "Introduction to LangChain framework"
-difficulty: "beginner"
-tags: ["langchain", "introduction"]
----
-
-# Getting Started with LangChain
-
-Your content here...
-```
-
-### Jupyter Notebooks
-
-Jupyter notebooks are automatically parsed and rendered with:
-- Syntax highlighting for code cells
-- Proper rendering of markdown cells
-- Output display for executed cells
-- Copy-to-clipboard functionality for code
-
-## 🎯 Key Components
-
-### LeftSidebar.astro
-- Hierarchical navigation tree
-- Search functionality
-- Theme toggle
-- Collapsible sections
-
-### MainContent.astro
-- Tutorial content rendering
-- Jupyter notebook support
-- Metadata display
-- Copy buttons for code
-
-### RightSidebar.astro
-- Table of contents generation
-- Active section highlighting
-- Smooth scrolling navigation
-
-## 🔧 Customization
-
-### Theme Colors
-
-Update colors in `tailwind.config.mjs`:
-
-```javascript
-colors: {
-  dark: {
-    bg: '#1f2123',      // Background color
-    text: '#f8fafc',    // Primary text
-    secondary: '#a7a9ac', // Secondary text
-    // ... more colors
-  }
-}
-```
-
-### Fonts
-
-Fonts are loaded from Google Fonts in the layout. Update the font imports in `TutorialLayout.astro` to change typography.
-
-### Layout
-
-The three-column layout can be customized by modifying the grid classes in `TutorialLayout.astro`.
-
-## 📦 Building for Production
-
-1. Build the project:
-```bash
-npm run build
-```
-
-2. Preview the build:
-```bash
-npm run preview
-```
-
-The built files will be in the `dist/` directory, ready for deployment to any static hosting service.
+- Combine different frameworks for optimal results
+- Choose the right tool for specific use cases
+- Build modular and maintainable AI systems
 
 ## 🤝 Contributing
 
@@ -212,17 +179,10 @@ The built files will be in the `dist/` directory, ready for deployment to any st
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
-## 🙏 Acknowledgments
-
-- Design inspiration from [OpenAI Tutorial](https://platform.openai.com/docs/tutorials)
-- Built with [Astro](https://astro.build/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Syntax highlighting by [Shiki](https://github.com/shikijs/shiki)
-
 ## 📞 Support
 
-For questions and support, please contact the AI Builders Singapore community or open an issue in this repository.
+For questions and support, please contact the AI Builders community or open an issue in this repository.
 
 ---
 
-Built with ❤️ by the AI Builders Singapore community
+Built with ❤️ by the AI Builders community
