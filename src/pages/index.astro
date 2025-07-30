@@ -1,91 +1,27 @@
 ---
-// Redirect to the tutorial overview as the default page
-return Astro.redirect('/tutorials/Overview/tutorial_overview');
+import TutorialLayout from '../layouts/TutorialLayout.astro';
+import { extractMarkdownHeadings } from '../utils/notebook';
+import { scanTutorialsDirectory, findTutorialFile } from '../utils/fileSystem';
+
+// Load the tutorial overview content directly
+const sections = scanTutorialsDirectory();
+const tutorialFile = findTutorialFile(sections, 'Overview/tutorial_overview');
+
+if (!tutorialFile) {
+  return new Response('Tutorial overview not found', { status: 404 });
+}
+
+// Extract headings for table of contents
+const headings = tutorialFile.type === 'markdown' 
+  ? extractMarkdownHeadings(tutorialFile.content || '')
+  : [];
+
+const title = tutorialFile.metadata?.title || 'AI Builders Tutorial Overview';
 ---
 
-<html lang="en" class="dark">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Builders Tutorial</title>
-    <meta name="description" content="Learn AI development with comprehensive tutorials and hands-on examples." />
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
-  </head>
-  
-  <body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text font-sans antialiased">
-    <div class="min-h-screen flex items-center justify-center p-8">
-      <div class="text-center max-w-2xl">
-        <div class="mb-8">
-          <svg class="w-20 h-20 mx-auto text-blue-500 mb-6" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
-          </svg>
-          <h1 class="text-5xl font-bold text-light-text dark:text-dark-text mb-4">
-            AI Builders Tutorial
-          </h1>
-          <p class="text-xl text-light-secondary dark:text-dark-secondary">
-            Learn AI development with comprehensive tutorials and hands-on examples
-          </p>
-        </div>
-        
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="p-6 bg-light-surface dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border">
-            <div class="text-2xl mb-2">📚</div>
-            <h3 class="font-semibold text-light-text dark:text-dark-text mb-2">Interactive Notebooks</h3>
-            <p class="text-sm text-light-secondary dark:text-dark-secondary">
-              Jupyter notebooks with live code examples and explanations
-            </p>
-          </div>
-          
-          <div class="p-6 bg-light-surface dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border">
-            <div class="text-2xl mb-2">📖</div>
-            <h3 class="font-semibold text-light-text dark:text-dark-text mb-2">Comprehensive Guides</h3>
-            <p class="text-sm text-light-secondary dark:text-dark-secondary">
-              Step-by-step tutorials covering AI frameworks and tools
-            </p>
-          </div>
-          
-          <div class="p-6 bg-light-surface dark:bg-dark-surface rounded-lg border border-light-border dark:border-dark-border">
-            <div class="text-2xl mb-2">🔍</div>
-            <h3 class="font-semibold text-light-text dark:text-dark-text mb-2">Full-text Search</h3>
-            <p class="text-sm text-light-secondary dark:text-dark-secondary">
-              Quickly find tutorials and topics across all content
-            </p>
-          </div>
-        </div>
-        
-        <div class="space-y-4">
-          <a 
-            href="/tutorials/langchain/01-introduction"
-            class="inline-flex items-center px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
-          >
-            Get Started
-            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </a>
-          
-          <div class="text-sm text-light-secondary dark:text-dark-secondary">
-            or browse the
-            <a 
-              href="/tutorials/langchain/02-langchain-basics"
-              class="text-blue-500 hover:text-blue-400 underline"
-            >
-              interactive notebooks
-            </a>
-          </div>
-        </div>
-        
-        <div class="mt-12 pt-8 border-t border-light-border dark:border-dark-border">
-          <p class="text-sm text-light-secondary dark:text-dark-secondary">
-            Built with ❤️ by the AI Builders Singapore community
-          </p>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+<TutorialLayout 
+  title={title}
+  sections={sections}
+  headings={headings}
+  tutorialFile={tutorialFile}
+/>
