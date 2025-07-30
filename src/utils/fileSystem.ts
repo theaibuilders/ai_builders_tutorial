@@ -3,7 +3,7 @@ import path from 'path';
 import type { TutorialFile, TutorialSection } from '../types/tutorial';
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
-const TUTORIALS_DIR = '/Users/devon/ai_builders_tutorial/tutorials';
+const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
 
 export function readMarkdownFile(filePath: string): string {
   try {

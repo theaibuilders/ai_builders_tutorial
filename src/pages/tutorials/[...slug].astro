@@ -20,11 +20,9 @@ export async function getStaticPaths() {
     
     // Add fallback paths in case file system scanning fails
     const fallbackPaths = [
-      { params: { slug: 'overview/tutorial_overview' } },
-      { params: { slug: 'langchain/01-introduction' } },
-      { params: { slug: 'langchain/02-langchain-basics' } },
-      { params: { slug: 'langchain/langchain' } },
-      { params: { slug: 'llamaindex/01-introduction' } },
+      { params: { slug: 'Overview/tutorial_overview' } },
+      { params: { slug: 'Frameworks/langchain' } },
+      { params: { slug: 'Frameworks/llamaindex_tutorial' } },
     ];
     
     // Combine scanned paths with fallback, removing duplicates
@@ -39,11 +37,9 @@ export async function getStaticPaths() {
     console.error('Error generating static paths:', error);
     // Return fallback paths if scanning fails
     return [
-      { params: { slug: 'overview/tutorial_overview' } },
-      { params: { slug: 'langchain/01-introduction' } },
-      { params: { slug: 'langchain/02-langchain-basics' } },
-      { params: { slug: 'langchain/langchain' } },
-      { params: { slug: 'llamaindex/01-introduction' } },
+      { params: { slug: 'Overview/tutorial_overview' } },
+      { params: { slug: 'Frameworks/langchain' } },
+      { params: { slug: 'Frameworks/llamaindex_tutorial' } },
     ];
   }
 }
@@ -54,10 +50,10 @@ const { slug } = Astro.params;
 const mockSections: TutorialSection[] = [
   {
     name: 'Overview',
-    path: 'overview',
+    path: 'Overview',
     files: [
       {
-        path: 'overview/tutorial_overview.md',
+        path: 'Overview/tutorial_overview.md',
         name: 'tutorial_overview.md',
         type: 'markdown',
         content: `# AI Builders Tutorial Overview
