@@ -11,19 +11,6 @@ const { sections, currentFile } = Astro.props;
 ---
 
 <div class="h-screen flex flex-col lg:pt-0">
-  <!-- Mobile Close Button -->
-  <div class="lg:hidden flex items-center justify-between px-4 py-1 border-b border-dark-border min-h-[48px]">
-    <h1 class="text-base font-bold text-white">Navigation</h1>
-    <button
-      onclick="closeMobileNav()"
-      class="p-1 rounded-lg hover:bg-dark-hover transition-colors"
-      aria-label="Close navigation"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
 
   <!-- Header -->
   <div class="flex-shrink-0 p-6 border-b border-dark-border lg:block hidden">
@@ -40,7 +27,7 @@ const { sections, currentFile } = Astro.props;
   </div>
 
   <!-- Mobile Search Bar -->
-  <div class="lg:hidden p-4 border-b border-dark-border">
+  <div class="lg:hidden p-3 border-b border-dark-border">
     <SearchBar />
   </div>
   
@@ -111,21 +98,35 @@ const { sections, currentFile } = Astro.props;
   </div>
 
   <!-- Logo at Bottom Left -->
-  <div class="flex-shrink-0 p-4 border-t border-dark-border bg-dark-bg sticky bottom-0">
-    <div class="flex justify-center">
-      <a 
-        href="https://www.theaibuilders.dev/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        class="block transition-opacity duration-300 hover:opacity-100"
-      >
-        <img 
-          src="/full_logo_white_text_transparent_2.png" 
-          alt="AI Builders Tutorial Logo" 
-          class="h-14 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300 max-w-full"
-          style="min-height: 56px;"
-        />
-      </a>
+  <div class="flex-shrink-0 border-t border-dark-border bg-dark-bg sticky bottom-0">
+    <!-- Logo Section with Close Button -->
+    <div class="p-4">
+      <div class="flex items-center justify-center relative">
+        <a 
+          href="https://www.theaibuilders.dev/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="block transition-opacity duration-300 hover:opacity-100"
+        >
+          <img 
+            src="/full_logo_white_text_transparent_2.png" 
+            alt="AI Builders Tutorial Logo" 
+            class="h-14 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300 max-w-full"
+            style="min-height: 56px;"
+          />
+        </a>
+        
+        <!-- Mobile Close Button -->
+        <button
+          onclick="closeMobileNav()"
+          class="lg:hidden absolute right-0 p-2 rounded-lg hover:bg-dark-hover transition-colors"
+          aria-label="Close navigation"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>
