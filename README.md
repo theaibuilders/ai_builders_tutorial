@@ -15,16 +15,16 @@ All tutorials are interactive Jupyter notebooks with detailed explanations and c
 
 ### Frameworks
 
-- **[LangChain Tutorial: From Fundamentals to Advanced RAG](http://localhost:4321/tutorials/Frameworks/langchain)** - Master LangChain from basic chains to sophisticated RAG systems
-- **[LlamaIndex Tutorial: Building RAG Applications](http://localhost:4321/tutorials/Frameworks/llamaindex_tutorial)** - Learn to build powerful document retrieval systems with LlamaIndex
-- **[LiteLLM Tutorial: Unified API for 100+ LLMs](http://localhost:4321/tutorials/Frameworks/litellm_tutorial)** - Use a single interface to work with any LLM provider
+- **[LangChain Tutorial: From Fundamentals to Advanced RAG](https://tutorial.theaibuilders.dev/tutorials/Frameworks/langchain)** - Master LangChain from basic chains to sophisticated RAG systems
+- **[LlamaIndex Tutorial: Building RAG Applications](https://tutorial.theaibuilders.dev/tutorials/Frameworks/llamaindex_tutorial)** - Learn to build powerful document retrieval systems with LlamaIndex
+- **[LiteLLM Tutorial: Unified API for 100+ LLMs](https://tutorial.theaibuilders.dev/tutorials/Frameworks/litellm_tutorial)** - Use a single interface to work with any LLM provider
 
 ### Model Providers
 
-- **[OpenAI API Complete Tutorial](http://localhost:4321/tutorials/ModelProviders/openai_api_tutorial)** - Master OpenAI's APIs including GPT models, Assistants, and advanced features
-- **[Claude API Complete Tutorial](http://localhost:4321/tutorials/ModelProviders/claude_api_tutorial)** - Learn Anthropic's Claude API with practical examples and best practices
-- **[Groq API Tutorial](http://localhost:4321/tutorials/ModelProviders/groq_tutorial)** - Ultra-fast inference with Groq's specialized LLM infrastructure
+- **[OpenAI API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/openai_api_tutorial)** - Master OpenAI's APIs including GPT models, Assistants, and advanced features
+- **[Claude API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/claude_api_tutorial)** - Learn Anthropic's Claude API with practical examples and best practices
+- **[Groq API Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/groq_tutorial)** - Ultra-fast inference with Groq's specialized LLM infrastructure
 
 ### Observability
 
-- **[Traceloop Tutorial: Complete Guide to LLM Monitoring](http://localhost:4321/tutorials/Observability/traceloop_tutorial)** - Monitor and trace your LLM applications with comprehensive observability
+- **[Traceloop Tutorial: Complete Guide to LLM Monitoring](https://tutorial.theaibuilders.dev/tutorials/Observability/traceloop_tutorial)** - Monitor and trace your LLM applications with comprehensive observability
