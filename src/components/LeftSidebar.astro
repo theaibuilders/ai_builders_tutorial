@@ -10,13 +10,13 @@ interface Props {
 const { sections, currentFile } = Astro.props;
 ---
 
-<div class="h-screen flex flex-col pt-10 lg:pt-0">
+<div class="h-screen flex flex-col lg:pt-0">
   <!-- Mobile Close Button -->
-  <div class="lg:hidden flex items-center justify-between p-4 border-b border-dark-border">
-    <h1 class="text-lg font-bold text-white">Navigation</h1>
+  <div class="lg:hidden flex items-center justify-between px-4 py-1 border-b border-dark-border min-h-[48px]">
+    <h1 class="text-base font-bold text-white">Navigation</h1>
     <button
       onclick="closeMobileNav()"
-      class="p-2 rounded-lg hover:bg-dark-hover transition-colors"
+      class="p-1 rounded-lg hover:bg-dark-hover transition-colors"
       aria-label="Close navigation"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
