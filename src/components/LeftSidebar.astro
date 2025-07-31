@@ -46,7 +46,7 @@ const { sections, currentFile } = Astro.props;
   
   <!-- Navigation Content -->
   <div class="flex-1 overflow-y-auto">
-    <nav class="p-4">
+    <nav class="p-4 pb-20">
       {sections.map((section) => (
         <div class="mb-6">
           <!-- Section Header -->
@@ -108,6 +108,24 @@ const { sections, currentFile } = Astro.props;
         </div>
       ))}
     </nav>
+  </div>
+
+  <!-- Logo at Bottom Left -->
+  <div class="flex-shrink-0 p-4 border-t border-dark-border">
+    <div class="flex justify-center">
+      <a 
+        href="https://www.theaibuilders.dev/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="transition-opacity duration-300 hover:opacity-100"
+      >
+        <img 
+          src="/full_logo_white_text_transparent_2.png" 
+          alt="AI Builders Tutorial Logo" 
+          class="h-16 w-auto opacity-80 hover:opacity-100 transition-opacity duration-300"
+        />
+      </a>
+    </div>
   </div>
 </div>
 
