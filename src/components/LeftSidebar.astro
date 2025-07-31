@@ -23,12 +23,12 @@ const { sections, currentFile } = Astro.props;
     </div>
     
     <!-- Search Bar -->
-    <SearchBar />
+    <SearchBar sections={sections} id="desktop" />
   </div>
 
   <!-- Mobile Search Bar -->
   <div class="lg:hidden p-3 border-b border-dark-border">
-    <SearchBar />
+    <SearchBar sections={sections} id="mobile" />
   </div>
   
   <!-- Navigation Content -->

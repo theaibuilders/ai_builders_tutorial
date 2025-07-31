@@ -2,7 +2,7 @@
 import type { TutorialSection } from '../types/tutorial';
 
 interface Props {
-  sections: TutorialSection[];
+  sections: TutorialSection              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0-1.933-.685-3.708-1.826 5.074M6.326 6.417m0 0A7.962 7.962 0 0112 3" />];
   id?: string;
 }
 
@@ -64,13 +64,19 @@ const searchableData = sections.flatMap(section =>
 </div>
 
 <!-- Search data for client-side script (only include once) -->
-{id === 'desktop' && (
+{id === 'main' && (
   <script type="application/json" id="search-data" set:html={JSON.stringify(searchableData)}></script>
 )}
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    // Real tutorial data from server (shared across all instances)
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const searchResults = document.getElementById('search-results') as HTMLElement;
+    const searchLoading = document.getElementById('search-loading') as HTMLElement;
+    
+    let searchTimeout: NodeJS.Timeout;
+    
+    // Real tutorial data from server
     const searchDataElement = document.getElementById('search-data');
     
     let tutorialData = [];
@@ -79,7 +85,7 @@ const searchableData = sections.flatMap(section =>
     } catch (error) {
       console.error('Error parsing search data:', error);
     }
-
+    
     function searchTutorials(query: string) {
       const lowercaseQuery = query.toLowerCase();
       const results = tutorialData.filter((tutorial: any) => {
@@ -91,23 +97,24 @@ const searchableData = sections.flatMap(section =>
         
         return matches;
       });
+      console.log('Search results:', results);
       return results;
     }
-
-    function renderResults(results: typeof tutorialData, searchResultsElement: HTMLElement, searchInputElement: HTMLInputElement) {
+    
+    function renderResults(results: typeof tutorialData) {
       if (results.length === 0) {
-        searchResultsElement.innerHTML = `
+        searchResults.innerHTML = `
           <div class="p-4 text-center text-dark-secondary">
             <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 515.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0-1.933-.685-3.708-1.826 5.074M6.326 6.417m0 0A7.962 7.962 0 0112 3" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417m0 0A7.962 7.962 0 0112 3" />
             </svg>
-            <p class="text-sm">No tutorials found for "${searchInputElement.value}"</p>
+            <p class="text-sm">No tutorials found for "${searchInput.value}"</p>
           </div>
         `;
         return;
       }
       
-      searchResultsElement.innerHTML = results.map(result => `
+      searchResults.innerHTML = results.map(result => `
         <button
           class="w-full px-4 py-3 text-left hover:bg-dark-hover transition-colors border-b border-dark-border last:border-b-0"
           onclick="window.location.href='/tutorials/${result.path}'"
@@ -139,60 +146,40 @@ const searchableData = sections.flatMap(section =>
         </button>
       `).join('');
     }
-
-    // Initialize all search instances on the page
-    function initializeSearchInstance(instanceId: string) {
-      const searchInput = document.getElementById(`search-input-${instanceId}`) as HTMLInputElement;
-      const searchResults = document.getElementById(`search-results-${instanceId}`) as HTMLElement;
-      const searchLoading = document.getElementById(`search-loading-${instanceId}`) as HTMLElement;
+    
+    searchInput.addEventListener('input', (e) => {
+      const query = (e.target as HTMLInputElement).value.trim();
       
-      if (!searchInput || !searchResults || !searchLoading) {
-        return; // Skip if elements don't exist
+      clearTimeout(searchTimeout);
+      
+      if (!query) {
+        searchResults.classList.add('hidden');
+        searchLoading.classList.add('hidden');
+        return;
       }
-
-      let searchTimeout: NodeJS.Timeout;
       
-      searchInput.addEventListener('input', (e) => {
-        const query = (e.target as HTMLInputElement).value.trim();
-        
-        clearTimeout(searchTimeout);
-        
-        if (!query) {
-          searchResults.classList.add('hidden');
-          searchLoading.classList.add('hidden');
-          return;
-        }
-        
-        searchLoading.classList.remove('hidden');
-        
-        searchTimeout = setTimeout(() => {
-          const results = searchTutorials(query);
-          renderResults(results, searchResults, searchInput);
-          searchResults.classList.remove('hidden');
-          searchLoading.classList.add('hidden');
-        }, 300);
-      });
+      searchLoading.classList.remove('hidden');
       
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          searchResults.classList.add('hidden');
-          searchInput.blur();
-        }
-      });
-      
-      // Close search results when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
-          searchResults.classList.add('hidden');
-        }
-      });
-    }
-
-    // Initialize all search instances
-    const searchContainers = document.querySelectorAll('[id^="search-container-"]');
-    searchContainers.forEach(container => {
-      const instanceId = container.id.replace('search-container-', '');
-      initializeSearchInstance(instanceId);
+      searchTimeout = setTimeout(() => {
+        const results = searchTutorials(query);
+        renderResults(results);
+        searchResults.classList.remove('hidden');
+        searchLoading.classList.add('hidden');
+      }, 300);
+    });
+    
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        searchResults.classList.add('hidden');
+        searchInput.blur();
+      }
+    });
+    
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
+        searchResults.classList.add('hidden');
+      }
     });
   });
 </script>
