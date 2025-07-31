@@ -6,37 +6,54 @@ interface Props {
 const { headings } = Astro.props;
 ---
 
-<div class="h-screen overflow-y-auto p-6">
-  <div class="sticky top-0 bg-dark-bg">
-    <h2 class="text-sm font-semibold text-dark-text mb-4 pb-2 border-b border-dark-border">
-      On This Page
-    </h2>
-  </div>
-  
-  {headings.length > 0 ? (
-    <nav class="space-y-1">
-      {headings.map((heading) => (
-        <a
-          href={`#${heading.id}`}
-          class={`block py-1 text-sm transition-colors hover:text-dark-text ${
-            heading.level === 2 
-              ? 'text-dark-secondary font-medium' 
-              : 'text-dark-secondary pl-4'
-          }`}
-          data-heading-link={heading.id}
-        >
-          {heading.text}
-        </a>
-      ))}
-    </nav>
-  ) : (
-    <div class="text-center text-dark-secondary py-8">
-      <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417" />
+<div class="h-screen overflow-y-auto">
+  <!-- Mobile Close Button -->
+  <div class="lg:hidden flex items-center justify-between p-4 border-b border-dark-border">
+    <h2 class="text-lg font-bold text-white">Table of Contents</h2>
+    <button
+      onclick="closeMobileToc()"
+      class="p-2 rounded-lg hover:bg-dark-hover transition-colors"
+      aria-label="Close table of contents"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
       </svg>
-      <p class="text-xs">No headings found</p>
+    </button>
+  </div>
+
+  <div class="p-6">
+    <div class="sticky top-0 bg-dark-bg lg:block hidden">
+      <h2 class="text-sm font-semibold text-dark-text mb-4 pb-2 border-b border-dark-border">
+        On This Page
+      </h2>
     </div>
-  )}
+    
+    {headings.length > 0 ? (
+      <nav class="space-y-1">
+        {headings.map((heading) => (
+          <a
+            href={`#${heading.id}`}
+            class={`block py-2 px-3 lg:px-0 lg:py-1 text-sm transition-colors hover:text-dark-text rounded-lg lg:rounded-none hover:bg-dark-hover lg:hover:bg-transparent ${
+              heading.level === 2 
+                ? 'text-dark-secondary font-medium' 
+                : 'text-dark-secondary pl-6 lg:pl-4'
+            }`}
+            data-heading-link={heading.id}
+            onclick="closeMobileToc()"
+          >
+            {heading.text}
+          </a>
+        ))}
+      </nav>
+    ) : (
+      <div class="text-center text-dark-secondary py-8">
+        <svg class="w-8 h-8 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.674-2.583m0 0A7.962 7.962 0 014 9c0-1.933.685-3.708 1.826-5.074C7.178 2.564 9.5 2 12 2s4.822.564 6.174 1.926C19.315 5.292 20 7.067 20 9c0 1.933-.685 3.708-1.826 5.074M6.326 6.417" />
+        </svg>
+        <p class="text-xs">No headings found</p>
+      </div>
+    )}
+  </div>
 </div>
 
 <script>

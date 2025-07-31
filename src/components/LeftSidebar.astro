@@ -10,9 +10,23 @@ interface Props {
 const { sections, currentFile } = Astro.props;
 ---
 
-<div class="h-screen flex flex-col">
+<div class="h-screen flex flex-col pt-10 lg:pt-0">
+  <!-- Mobile Close Button -->
+  <div class="lg:hidden flex items-center justify-between p-4 border-b border-dark-border">
+    <h1 class="text-lg font-bold text-white">Navigation</h1>
+    <button
+      onclick="closeMobileNav()"
+      class="p-2 rounded-lg hover:bg-dark-hover transition-colors"
+      aria-label="Close navigation"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
   <!-- Header -->
-  <div class="flex-shrink-0 p-6 border-b border-dark-border">
+  <div class="flex-shrink-0 p-6 border-b border-dark-border lg:block hidden">
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-xl font-bold">
         <a href="/" class="text-white hover:text-gray-300 transition-colors cursor-pointer !text-white">
@@ -24,6 +38,11 @@ const { sections, currentFile } = Astro.props;
     <!-- Search Bar -->
     <SearchBar />
   </div>
+
+  <!-- Mobile Search Bar -->
+  <div class="lg:hidden p-4 border-b border-dark-border">
+    <SearchBar />
+  </div>
   
   <!-- Navigation Content -->
   <div class="flex-1 overflow-y-auto">
@@ -32,7 +51,7 @@ const { sections, currentFile } = Astro.props;
         <div class="mb-6">
           <!-- Section Header -->
           <button 
-            class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-dark-hover transition-colors group"
+            class="flex items-center justify-between w-full text-left p-3 sm:p-2 rounded-lg hover:bg-dark-hover transition-colors group"
             data-section={section.path}
             onclick="toggleSection(this)"
           >
@@ -40,7 +59,7 @@ const { sections, currentFile } = Astro.props;
               {section.name}
             </span>
             <svg 
-              class="w-4 h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90"
+              class="w-5 h-5 sm:w-4 sm:h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90"
               fill="currentColor" 
               viewBox="0 0 20 20"
             >
@@ -62,11 +81,12 @@ const { sections, currentFile } = Astro.props;
               return (
                 <a
                   href={`/tutorials/${cleanPath}`}
-                  class={`block p-2 rounded-lg text-sm transition-colors ${
+                  class={`block p-3 sm:p-2 rounded-lg text-sm transition-colors ${
                     isActive 
                       ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' 
                       : 'text-dark-secondary hover:bg-dark-hover hover:text-dark-text'
                   }`}
+                  onclick="closeMobileNav()"
                 >
                   <div class="flex items-center">
                     <!-- File Name -->

@@ -139,41 +139,13 @@ Learn to build real-world AI applications:
 - **Persistence**: Save and load indexes for production use
 - **Interactive Demo**: Test your RAG system with real queries
 
-## 🎯 Key Learning Outcomes
+## TODOs
 
-By completing these tutorials, you'll be able to:
-
-✅ **Build Production-Ready AI Applications**
-
-- Create LLM-powered apps that solve real problems
-- Implement robust error handling and user experience
-- Deploy applications to production environments
-
-✅ **Master RAG Systems**
-
-- Connect any LLM to your private data
-- Implement efficient document retrieval and indexing
-- Build intelligent question-answering systems
-
-✅ **Understand AI Development Best Practices**
-
-- Optimize costs and performance
-- Implement proper prompt engineering techniques
-- Handle edge cases and error scenarios
-
-✅ **Integrate Multiple AI Tools**
-
-- Combine different frameworks for optimal results
-- Choose the right tool for specific use cases
-- Build modular and maintainable AI systems
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes and commit: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request
+- Crarifai
+- Langfuse
+- LangGraph
+- CrewAI
+- NLWeb
 
 ## 📄 License
 
