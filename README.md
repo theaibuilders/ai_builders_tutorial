@@ -27,4 +27,4 @@ All tutorials are interactive Jupyter notebooks with detailed explanations and c
 
 ### Observability
 
-- **[Traceloop Tutorial: Complete Guide to LLM Monitoring](https://tutorial.theaibuilders.dev/tutorials/Observability/traceloop_tutorial)** - Monitor and trace your LLM applications with comprehensive observability
+- **[Traceloop Tutorial: Complete Guide to LLM Monitoring](https://tutorial.theaibuilders.dev/tutorials/Observarbility/traceloop_tutorial)** - Monitor and trace your LLM applications with comprehensive observability
