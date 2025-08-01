@@ -23,7 +23,7 @@ All tutorials are interactive Jupyter notebooks with detailed explanations and c
 
 - **[OpenAI API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/openai_api_tutorial)** - Master OpenAI's APIs including GPT models, Assistants, and advanced features
 - **[Claude API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/claude_api_tutorial)** - Learn Anthropic's Claude API with practical examples and best practices
-- **[Groq API Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/groq_tutorial)** - Ultra-fast inference with Groq's specialized LLM infrastructure
+- **[Nosana Tutorial](https://tutorial.theaibuilders.dev/tutorials/ModelProviders/nosana_tutorial_openai_sdk)** - Dectralized GPU network with advanced open source models
 
 ### Observability
 
