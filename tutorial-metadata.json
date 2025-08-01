@@ -1,0 +1,42 @@
+{
+  "tutorials": {
+    "Frameworks/langchain.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-04-15"
+    },
+    "Frameworks/litellm_tutorial.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-05-12"
+    },
+    "Frameworks/llamaindex_tutorial.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-06-07"
+    },
+    "ModelProviders/claude_api_tutorial.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-06-12"
+    },
+    "ModelProviders/openai_api_tutorial.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-05-25"
+    },
+    "Observarbility/traceloop_tutorial.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-06-30"
+    },
+    "ModelProviders/nosana_tutorial_openai_sdk.ipynb": {
+      "author": "Devon Sun",
+      "lastUpdated": "2025-08-01"
+    }
+  },
+  "_instructions": {
+    "description": "This file allows you to manually override author and lastUpdated metadata for tutorials.",
+    "usage": "Add entries using the tutorial path (relative to tutorials directory) as the key.",
+    "example": {
+      "SectionName/tutorial_file.ipynb": {
+        "author": "Your Name",
+        "lastUpdated": "2025-01-01"
+      }
+    }
+  }
+}

@@ -3,11 +3,12 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
+    "dev": "node manage-metadata.js auto-update && astro dev",
+    "start": "node manage-metadata.js auto-update && astro dev",
+    "build": "node manage-metadata.js auto-update && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "update-metadata": "node manage-metadata.js auto-update"
   },
   "dependencies": {
     "@astrojs/preact": "^3.5.3",

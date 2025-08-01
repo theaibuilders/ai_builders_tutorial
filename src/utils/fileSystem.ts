@@ -4,6 +4,23 @@ import type { TutorialFile, TutorialSection } from '../types/tutorial';
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
 const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
+const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
+
+// Load manual metadata overrides
+function loadMetadataOverrides(): Record<string, any> {
+  try {
+    if (fs.existsSync(METADATA_CONFIG_PATH)) {
+      const content = fs.readFileSync(METADATA_CONFIG_PATH, 'utf-8');
+      const config = JSON.parse(content);
+      return config.tutorials || {};
+    }
+  } catch (error) {
+    console.error('Error loading metadata overrides:', error);
+  }
+  return {};
+}
+
+const metadataOverrides = loadMetadataOverrides();
 
 export function readMarkdownFile(filePath: string): string {
   try {
@@ -31,21 +48,33 @@ export function readNotebookFile(filePath: string): any {
   }
 }
 
-export function extractMarkdownMetadata(content: string): any {
+export function extractMarkdownMetadata(content: string, filePath?: string): any {
   // Extract title from first heading
   const titleMatch = content.match(/^#\s+(.+)$/m);
   const title = titleMatch ? titleMatch[1] : 'Untitled';
   
-  return {
+  // Default metadata
+  const defaultMetadata = {
     title,
-    author: 'Devon Sun',
-    lastUpdated: new Date().toISOString(),
+    author: 'AI Builders Team',
+    lastUpdated: '2025-01-01',
     difficulty: 'beginner',
     tags: []
   };
+
+  // Apply manual overrides if they exist
+  if (filePath && metadataOverrides[filePath]) {
+    const overrides = metadataOverrides[filePath];
+    return {
+      ...defaultMetadata,
+      ...overrides
+    };
+  }
+  
+  return defaultMetadata;
 }
 
-export function extractNotebookMetadata(notebook: any): any {
+export function extractNotebookMetadata(notebook: any, filePath?: string): any {
   // Try to get title from first markdown cell
   let title = 'Untitled Notebook';
   
@@ -60,13 +89,25 @@ export function extractNotebookMetadata(notebook: any): any {
     }
   }
   
-  return {
+  // Default metadata
+  const defaultMetadata = {
     title,
-    author: 'Devon Sun',
-    lastUpdated: new Date().toISOString(),
+    author: 'AI Builders Team',
+    lastUpdated: '2025-01-01',
     difficulty: 'beginner',
     tags: ['jupyter', 'tutorial']
   };
+
+  // Apply manual overrides if they exist
+  if (filePath && metadataOverrides[filePath]) {
+    const overrides = metadataOverrides[filePath];
+    return {
+      ...defaultMetadata,
+      ...overrides
+    };
+  }
+  
+  return defaultMetadata;
 }
 
 export function scanTutorialsDirectory(): TutorialSection[] {
@@ -94,7 +135,7 @@ export function scanTutorialsDirectory(): TutorialSection[] {
           if (fileName.endsWith('.md')) {
             const content = readMarkdownFile(filePath);
             if (content) {
-              const metadata = extractMarkdownMetadata(content);
+              const metadata = extractMarkdownMetadata(content, relativePath);
               
               files.push({
                 path: relativePath,
@@ -107,7 +148,7 @@ export function scanTutorialsDirectory(): TutorialSection[] {
           } else if (fileName.endsWith('.ipynb')) {
             const notebook = readNotebookFile(filePath);
             if (notebook) {
-              const metadata = extractNotebookMetadata(notebook);
+              const metadata = extractNotebookMetadata(notebook, relativePath);
               
               files.push({
                 path: relativePath,
