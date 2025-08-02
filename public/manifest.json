@@ -1,0 +1,60 @@
+{
+  "name": "AI Builders Tutorial - Learn AI Engineering & Development",
+  "short_name": "AI Builders Tutorial",
+  "description": "Master AI development with hands-on tutorials covering LangChain, OpenAI API, Claude API, RAG systems, AI agents, and LLM applications",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/full_logo_white_text_transparent_2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "developer"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/github_banner.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "AI Builders Tutorial Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "LangChain Tutorial",
+      "short_name": "LangChain",
+      "description": "Learn LangChain framework",
+      "url": "/tutorials/Frameworks/langchain",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    },
+    {
+      "name": "OpenAI API Tutorial", 
+      "short_name": "OpenAI",
+      "description": "Master OpenAI API",
+      "url": "/tutorials/ModelProviders/openai_api_tutorial",
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    },
+    {
+      "name": "Claude API Tutorial",
+      "short_name": "Claude",
+      "description": "Learn Claude API",
+      "url": "/tutorials/ModelProviders/claude_api_tutorial", 
+      "icons": [{ "src": "/favicon.ico", "sizes": "32x32" }]
+    }
+  ]
+}

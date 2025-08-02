@@ -1,0 +1,28 @@
+# humanstxt.org
+# The humans responsible & technology colophon
+
+# TEAM
+AI Builders Team -- Creators & Maintainers
+Site: https://tutorial.theaibuilders.dev
+GitHub: https://github.com/devonsunml/ai_builders_tutorial
+Location: Global
+
+# THANKS
+Contributors and the open-source community
+
+# TECHNOLOGY COLOPHON
+Framework: Astro
+Language: TypeScript, Python
+Styling: Tailwind CSS
+Hosting: Vercel/Netlify
+Version Control: Git
+IDE: Visual Studio Code
+
+# CONTENT
+AI Engineering Tutorials
+Machine Learning Guides
+LLM Application Development
+RAG System Implementation
+API Integration Tutorials
+
+Last update: 2025/08/02

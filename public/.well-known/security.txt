@@ -1,0 +1,5 @@
+Contact: mailto:support@theaibuilders.dev
+Expires: 2026-08-02T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://tutorial.theaibuilders.dev/.well-known/security.txt
+Policy: https://tutorial.theaibuilders.dev/security-policy

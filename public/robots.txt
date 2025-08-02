@@ -1,0 +1,40 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://tutorial.theaibuilders.dev/sitemap.xml
+
+# Additional resources
+# Human-readable info
+# https://tutorial.theaibuilders.dev/humans.txt
+
+# Allow all search engines to crawl the site
+# Optimize crawl budget by directing to important pages
+Crawl-delay: 1
+
+# Allow access to CSS, JS, and image files
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.ico$
+Allow: /manifest.json
+Allow: /humans.txt
+
+# High priority pages for crawlers
+# Main tutorial sections
+Allow: /tutorials/Frameworks/
+Allow: /tutorials/ModelProviders/
+Allow: /tutorials/Observarbility/
+
+# Specific important tutorials
+Allow: /tutorials/Frameworks/langchain
+Allow: /tutorials/Frameworks/llamaindex_tutorial
+Allow: /tutorials/Frameworks/litellm_tutorial
+Allow: /tutorials/ModelProviders/openai_api_tutorial
+Allow: /tutorials/ModelProviders/claude_api_tutorial
+Allow: /tutorials/ModelProviders/nosana_tutorial_openai_sdk
+Allow: /tutorials/Observarbility/traceloop_tutorial

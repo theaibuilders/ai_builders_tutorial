@@ -1,0 +1,77 @@
+---
+export interface SEOProps {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  type?: 'website' | 'article';
+  image?: string;
+  imageAlt?: string;
+  canonical?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
+}
+
+const {
+  title = "AI Builders Tutorial - Learn AI Engineering & Development",
+  description = "Master AI development with hands-on tutorials covering LangChain, OpenAI API, Claude API, RAG systems, AI agents, and LLM applications. Interactive Jupyter notebooks with practical examples.",
+  keywords = [],
+  type = "website",
+  image = "/github_banner.png",
+  imageAlt = "AI Builders Tutorial - Comprehensive AI Development Course",
+  canonical,
+  noindex = false,
+  nofollow = false
+} = Astro.props;
+
+const baseKeywords = [
+  "AI Engineering Tutorial",
+  "AI Engineer Tutorial", 
+  "Artificial Intelligence course",
+  "LLM course",
+  "AI Agent course",
+  "Machine Learning tutorial",
+  "LangChain tutorial",
+  "OpenAI API tutorial",
+  "RAG tutorial",
+  "AI development course",
+  "Python AI tutorial"
+];
+
+const allKeywords = [...baseKeywords, ...keywords].join(", ");
+const robots = `${noindex ? 'noindex' : 'index'}, ${nofollow ? 'nofollow' : 'follow'}`;
+const canonicalUrl = canonical || `https://tutorial.theaibuilders.dev${Astro.url.pathname}`;
+const fullImageUrl = image.startsWith('http') ? image : `https://tutorial.theaibuilders.dev${image}`;
+---
+
+<!-- SEO Meta Tags -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="keywords" content={allKeywords} />
+<meta name="robots" content={robots} />
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph -->
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={fullImageUrl} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:site_name" content="AI Builders Tutorial" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={fullImageUrl} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+{type === 'article' && (
+  <>
+    <meta property="article:author" content="AI Builders Team" />
+    <meta property="article:section" content="AI Tutorial" />
+    <meta property="article:tag" content="AI Engineering" />
+    <meta property="article:tag" content="Machine Learning" />
+    <meta property="article:tag" content="Tutorial" />
+  </>
+)}

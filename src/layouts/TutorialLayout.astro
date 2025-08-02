@@ -9,9 +9,75 @@ interface Props {
   currentFile?: TutorialFile;
   sections: TutorialSection[];
   headings?: Array<{id: string, text: string, level: number}>;
+  description?: string;
+  keywords?: string[];
+  type?: 'website' | 'article';
 }
 
-const { title, currentFile, sections, headings = [] } = Astro.props;
+const { 
+  title, 
+  currentFile, 
+  sections, 
+  headings = [],
+  description,
+  keywords = [],
+  type = currentFile ? 'article' : 'website'
+} = Astro.props;
+
+// Generate dynamic description based on content
+const defaultDescription = currentFile 
+  ? `Learn ${title} - Interactive AI tutorial with hands-on examples, code snippets, and practical applications. Master AI engineering with step-by-step guidance.`
+  : "Master AI development with hands-on tutorials covering LangChain, OpenAI API, Claude API, RAG systems, AI agents, and LLM applications. Interactive Jupyter notebooks with practical examples.";
+
+const finalDescription = description || defaultDescription;
+
+// Enhanced keywords based on the current page
+const baseKeywords = [
+  "AI Engineering Tutorial",
+  "AI Engineer Tutorial", 
+  "Artificial Intelligence course",
+  "LLM course",
+  "AI Agent course",
+  "Machine Learning tutorial",
+  "LangChain tutorial",
+  "OpenAI API tutorial",
+  "Claude API tutorial",
+  "RAG tutorial",
+  "AI development course",
+  "Python AI tutorial",
+  "Deep learning course",
+  "Natural Language Processing tutorial",
+  "Chatbot development",
+  "AI model training",
+  "LLM application development",
+  "Anthropic Claude tutorial",
+  "AI frameworks",
+  "AI programming"
+];
+
+// Add page-specific keywords
+let pageKeywords = [...baseKeywords, ...keywords];
+if (currentFile) {
+  if (title.toLowerCase().includes('langchain')) {
+    pageKeywords.push("LangChain tutorial", "LangChain framework", "LangChain Python", "LangChain agents", "LangChain chains");
+  }
+  if (title.toLowerCase().includes('openai')) {
+    pageKeywords.push("OpenAI API", "GPT tutorial", "OpenAI Python", "GPT-4 tutorial", "OpenAI completions");
+  }
+  if (title.toLowerCase().includes('claude')) {
+    pageKeywords.push("Claude API", "Anthropic Claude", "Claude tutorial", "Claude Python", "Claude AI");
+  }
+  if (title.toLowerCase().includes('rag')) {
+    pageKeywords.push("RAG system", "Retrieval Augmented Generation", "Vector database", "Document retrieval");
+  }
+  if (title.toLowerCase().includes('llamaindex')) {
+    pageKeywords.push("LlamaIndex tutorial", "LlamaIndex Python", "Document indexing", "Knowledge base");
+  }
+}
+
+const allKeywords = pageKeywords.join(", ");
+const canonicalUrl = `https://tutorial.theaibuilders.dev${Astro.url.pathname}`;
+const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Development`;
 ---
 
 <!DOCTYPE html>
@@ -19,14 +85,164 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} | AI Builders Tutorial</title>
-    <meta name="description" content="Learn AI development with comprehensive tutorials and hands-on examples." />
+    
+    <!-- Primary Meta Tags -->
+    <title>{pageTitle}</title>
+    <meta name="title" content={pageTitle} />
+    <meta name="description" content={finalDescription} />
+    <meta name="keywords" content={allKeywords} />
+    <meta name="author" content="AI Builders Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={finalDescription} />
+    <meta property="og:image" content="https://tutorial.theaibuilders.dev/github_banner.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="AI Builders Tutorial" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={finalDescription} />
+    <meta property="twitter:image" content="https://tutorial.theaibuilders.dev/github_banner.png" />
+    
+    <!-- Article-specific meta tags -->
+    {type === 'article' && (
+      <>
+        <meta property="article:author" content="AI Builders Team" />
+        <meta property="article:section" content="AI Tutorial" />
+        <meta property="article:tag" content="AI Engineering" />
+        <meta property="article:tag" content="Machine Learning" />
+        <meta property="article:tag" content="Tutorial" />
+        <meta property="article:published_time" content={currentFile?.metadata?.lastUpdated || new Date().toISOString()} />
+        <meta property="article:modified_time" content={currentFile?.metadata?.lastUpdated || new Date().toISOString()} />
+      </>
+    )}
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1f2937" />
+    <meta name="msapplication-TileColor" content="#1f2937" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": type === 'article' ? "TechArticle" : "EducationalOrganization",
+      "name": currentFile ? title : "AI Builders Tutorial",
+      "headline": currentFile ? title : "AI Builders Tutorial - Learn AI Engineering & Development",
+      "description": finalDescription,
+      "url": canonicalUrl,
+      "image": "https://tutorial.theaibuilders.dev/github_banner.png",
+      "author": {
+        "@type": "Organization",
+        "name": "AI Builders Team"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "AI Builders Team",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://tutorial.theaibuilders.dev/full_logo_white_text_transparent_2.png"
+        }
+      },
+      "datePublished": currentFile?.metadata?.lastUpdated || "2025-08-02",
+      "dateModified": currentFile?.metadata?.lastUpdated || "2025-08-02",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": canonicalUrl
+      },
+      "articleSection": "AI Tutorial",
+      "keywords": allKeywords,
+      "educationalLevel": currentFile?.metadata?.difficulty || "Beginner to Advanced",
+      "teaches": [
+        "AI Engineering",
+        "Large Language Models",
+        "RAG Systems", 
+        "AI Agents",
+        "LangChain Framework",
+        "OpenAI API",
+        "Anthropic Claude API",
+        "Machine Learning",
+        "Natural Language Processing"
+      ],
+      "isAccessibleForFree": true,
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    }
+    </script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Performance and Resource Hints -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/github_banner.png" as="image" type="image/png">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="generator" content="Astro" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="AI Builders Tutorial" />
+    
+    <!-- Geo tags for location-based search -->
+    <meta name="geo.region" content="US" />
+    <meta name="geo.placename" content="United States" />
+    
+    <!-- Copyright and content info -->
+    <meta name="copyright" content="AI Builders Team" />
+    <meta name="distribution" content="global" />
+    <meta name="rating" content="general" />
+    <meta name="referrer" content="origin-when-cross-origin" />
+    
+    <!-- Additional structured data for breadcrumbs if it's a tutorial page -->
+    {currentFile && (
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://tutorial.theaibuilders.dev"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Tutorials",
+            "item": "https://tutorial.theaibuilders.dev/tutorials"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": title,
+            "item": canonicalUrl
+          }
+        ]
+      }
+      </script>
+    )}
     
     <!-- Theme Script (runs before page load) -->
     <script is:inline>
