@@ -1,0 +1,22 @@
+{
+  "authors": {
+    "devon-sun": {
+      "name": "Devon Sun",
+      "picture": "/devon-pic.png",
+      "url": "https://www.linkedin.com/in/devonsun/",
+      "bio": "AI Builder and Developer"
+    }
+  },
+  "_instructions": {
+    "description": "This file contains author information that can be referenced in tutorial-metadata.json",
+    "usage": "Add authors with unique IDs, then reference them in tutorial-metadata.json using authorId",
+    "example": {
+      "author-id": {
+        "name": "Author Name",
+        "picture": "/author-profile.png",
+        "url": "https://author-website.com",
+        "bio": "Author biography"
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-![AI Builders Tutorial Banner](public/github_banner.png)
+![AI Builders Tutorial Banner](/github_banner.png)
 
 # AI Builders Tutorial
 

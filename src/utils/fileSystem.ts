@@ -1,10 +1,25 @@
 import fs from 'fs';
 import path from 'path';
-import type { TutorialFile, TutorialSection } from '../types/tutorial';
+import type { TutorialFile, TutorialSection, AuthorMetadata } from '../types/tutorial';
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
 const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
 const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
+const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
+
+// Load author metadata
+function loadAuthorMetadata(): Record<string, AuthorMetadata> {
+  try {
+    if (fs.existsSync(AUTHOR_METADATA_PATH)) {
+      const content = fs.readFileSync(AUTHOR_METADATA_PATH, 'utf-8');
+      const config = JSON.parse(content);
+      return config.authors || {};
+    }
+  } catch (error) {
+    console.error('Error loading author metadata:', error);
+  }
+  return {};
+}
 
 // Load manual metadata overrides
 function loadMetadataOverrides(): Record<string, any> {
@@ -20,7 +35,22 @@ function loadMetadataOverrides(): Record<string, any> {
   return {};
 }
 
+const authorMetadata = loadAuthorMetadata();
 const metadataOverrides = loadMetadataOverrides();
+
+// Resolve author information from authorId
+function resolveAuthorInfo(authorId?: string): { author?: string; authorPicture?: string; authorUrl?: string } {
+  if (!authorId || !authorMetadata[authorId]) {
+    return {};
+  }
+  
+  const authorInfo = authorMetadata[authorId];
+  return {
+    author: authorInfo.name,
+    authorPicture: authorInfo.picture,
+    authorUrl: authorInfo.url
+  };
+}
 
 export function readMarkdownFile(filePath: string): string {
   try {
@@ -62,13 +92,19 @@ export function extractMarkdownMetadata(content: string, filePath?: string): any
     tags: []
   };
 
-  // Apply manual overrides if they exist
+  // Apply manual overrides if they exist  
   if (filePath && metadataOverrides[filePath]) {
     const overrides = metadataOverrides[filePath];
-    return {
+    
+    // Resolve author information if authorId is provided
+    const authorInfo = resolveAuthorInfo(overrides.authorId);
+    
+    const finalMetadata = {
       ...defaultMetadata,
-      ...overrides
+      ...overrides,
+      ...authorInfo // This will override any existing author fields with resolved data
     };
+    return finalMetadata;
   }
   
   return defaultMetadata;
@@ -101,12 +137,19 @@ export function extractNotebookMetadata(notebook: any, filePath?: string): any {
   // Apply manual overrides if they exist
   if (filePath && metadataOverrides[filePath]) {
     const overrides = metadataOverrides[filePath];
-    return {
+    
+    // Resolve author information if authorId is provided
+    const authorInfo = resolveAuthorInfo(overrides.authorId);
+    
+    const finalMetadata = {
       ...defaultMetadata,
-      ...overrides
+      ...overrides,
+      ...authorInfo // This will override any existing author fields with resolved data
     };
+    return finalMetadata;
   }
   
+  return defaultMetadata;
   return defaultMetadata;
 }
 

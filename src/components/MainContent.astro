@@ -803,8 +803,10 @@ function renderMarkdownSSR(markdown: string): string {
     // Handle bold and italic
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
+    // Handle images (must come before links)
+    .replace(/!\[([^\]]*)\]\(([^)]*)\)/gim, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" />')
     // Handle links
-    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300">$1</a>');
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
   
   // Handle bullet points with proper nesting
   const lines = markdownHtml.split('\n');
@@ -894,6 +896,23 @@ if (currentFile) {
     renderedContent = renderMarkdownSSR(currentFile.content);
   }
 }
+
+// Function to generate GitHub URL for a tutorial file
+function getGithubUrl(filePath: string): string {
+  // Special case for README.md - it's in the root directory, not tutorials
+  if (filePath === 'README.md') {
+    return 'https://github.com/devonsunml/ai_builders_tutorial/tree/main';
+  }
+  
+  const baseUrl = 'https://github.com/devonsunml/ai_builders_tutorial/blob/main/tutorials/';
+  return baseUrl + filePath;
+}
+
+// Function to generate nbviewer URL for a notebook file
+function getNbviewerUrl(filePath: string): string {
+  const githubUrl = `https://github.com/devonsunml/ai_builders_tutorial/blob/main/tutorials/${filePath}`;
+  return `https://nbviewer.org/github/devonsunml/ai_builders_tutorial/blob/main/tutorials/${filePath}`;
+}
 ---
 
 <div class="h-screen overflow-y-auto">
@@ -906,15 +925,77 @@ if (currentFile) {
         </h1>
         
         <!-- Metadata -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 text-sm text-dark-secondary">
-          {currentFile.metadata.author && (
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-6 text-sm text-dark-secondary">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+            {currentFile.metadata.author && (
+              <div class="flex items-center gap-2">
+                {currentFile.metadata.authorUrl ? (
+                  <a 
+                    href={currentFile.metadata.authorUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="flex items-center gap-2 text-dark-secondary hover:text-dark-text transition-colors cursor-pointer group"
+                    title={`Visit ${currentFile.metadata.author}'s profile`}
+                  >
+                    {currentFile.metadata.authorPicture && (
+                      <img 
+                        src={currentFile.metadata.authorPicture} 
+                        alt={`${currentFile.metadata.author} profile picture`}
+                        class="w-6 h-6 rounded-full object-cover border border-gray-600 group-hover:border-gray-400 transition-colors duration-200"
+                        onError="this.style.display='none'"
+                      />
+                    )}
+                    <span>{currentFile.metadata.author}</span>
+                  </a>
+                ) : (
+                  <div class="flex items-center gap-2">
+                    {currentFile.metadata.authorPicture && (
+                      <img 
+                        src={currentFile.metadata.authorPicture} 
+                        alt={`${currentFile.metadata.author} profile picture`}
+                        class="w-6 h-6 rounded-full object-cover border border-gray-600"
+                        onError="this.style.display='none'"
+                      />
+                    )}
+                    <span>{currentFile.metadata.author}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            
             <div class="flex items-center gap-2">
-              <span>{currentFile.metadata.author}</span>
+              <span>Last updated: {new Date(currentFile.metadata.lastUpdated).toLocaleDateString()}</span>
             </div>
-          )}
+          </div>
           
-          <div class="flex items-center gap-2">
-            <span>Last updated: {new Date(currentFile.metadata.lastUpdated).toLocaleDateString()}</span>
+          <!-- View in Github Link -->
+          <div class="flex items-center gap-2 sm:gap-4">
+            <a 
+              href={getGithubUrl(currentFile.path)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-1 text-dark-secondary hover:text-dark-text transition-colors"
+            >
+              <svg class="w-4 h-4 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span>View in Github</span>
+            </a>
+            
+            {/* Only show nbviewer link for notebook files */}
+            {currentFile.type === 'notebook' && (
+              <a 
+                href={getNbviewerUrl(currentFile.path)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1 text-dark-secondary hover:text-dark-text transition-colors"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7.5 2A1.5 1.5 0 0 0 6 3.5v17A1.5 1.5 0 0 0 7.5 22h9a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 16.5 2h-9zM8 4h8v16H8V4zm1 2v2h2V6H9zm3 0v2h2V6h-2zm3 0v2h2V6h-2zM9 9v2h2V9H9zm3 0v2h2V9h-2zm3 0v2h2V9h-2zM9 12v2h2v-2H9zm3 0v2h2v-2h-2zm3 0v2h2v-2h-2zM9 15v2h2v-2H9zm3 0v2h2v-2h-2zm3 0v2h2v-2h-2z"/>
+                </svg>
+                <span>View in nbviewer</span>
+              </a>
+            )}
           </div>
         </div>
       </header>

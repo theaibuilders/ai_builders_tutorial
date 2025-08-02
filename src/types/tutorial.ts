@@ -49,9 +49,19 @@ export interface TutorialMetadata {
   title: string;
   description?: string;
   author?: string;
+  authorPicture?: string;
+  authorUrl?: string;
+  authorId?: string;
   lastUpdated: string;
   tags?: string[];
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
+}
+
+export interface AuthorMetadata {
+  name: string;
+  picture?: string;
+  url?: string;
+  bio?: string;
 }
 
 export interface TutorialFile {
