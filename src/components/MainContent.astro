@@ -19,16 +19,7 @@ function enhanceNotebookOutputs(notebookHtml: string): string {
         const lang = language || 'python';
         const highlightedCode = highlightPythonCodeServerSide(code.trim());
         
-        return `
-          <div class="code-block border border-gray-600 rounded-lg overflow-hidden my-4" style="background-color: #1f2123;">
-            <div class="flex items-center justify-between px-4 py-2 bg-gray-700/30 border-b border-gray-600">
-              <span class="text-xs text-gray-400 font-mono">${lang}</span>
-            </div>
-            <div class="p-4 overflow-x-auto">
-              <pre class="text-sm"><code>${highlightedCode}</code></pre>
-            </div>
-          </div>
-        `;
+        return `<div class="code-block border border-gray-600 rounded-lg overflow-hidden" style="background-color: #1f2123;"><div class="p-2 overflow-x-auto"><pre class="text-sm"><code>${highlightedCode}</code></pre></div></div>`;
       });
       
       return openTag + enhancedContent + closeTag;
@@ -38,30 +29,17 @@ function enhanceNotebookOutputs(notebookHtml: string): string {
   });
 }
 
-// Server-side Python highlighting function (basic version)
+// Server-side Python highlighting function (disabled for output cells to prevent color codes)
 function highlightPythonCodeServerSide(code: string): string {
   if (!code) return '';
   
-  // Basic server-side highlighting - escape HTML first
-  let highlighted = code
+  // Just escape HTML entities without applying syntax highlighting to avoid color codes in output
+  let escaped = code
+    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/&/g, '&amp;');
+    .replace(/>/g, '&gt;');
   
-  // Apply basic syntax highlighting patterns
-  highlighted = highlighted
-    // Keywords
-    .replace(/\b(import|from|def|class|if|else|elif|for|while|try|except|finally|with|as|return|yield|break|continue|pass|lambda|global|nonlocal|assert|del|raise|and|or|not|in|is|True|False|None)\b/g, '<span style="color: #569cd6;">$1</span>')
-    // Strings
-    .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span style="color: #ce9178;">$1$2$1</span>')
-    // Comments
-    .replace(/(#.*$)/gm, '<span style="color: #6a9955;">$1</span>')
-    // Numbers
-    .replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #b5cea8;">$1</span>')
-    // Function names
-    .replace(/\b(\w+)(?=\s*\()/g, '<span style="color: #dcdcaa;">$1</span>');
-  
-  return highlighted;
+  return escaped;
 }
 
 // Professional notebook rendering using notebookjs
@@ -422,7 +400,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             color: #e5e7eb;
             font-family: ui-monospace, monospace;
             font-size: 0.875rem;
-            padding: 1rem;
+            padding: 0.5rem;
             white-space: pre-wrap;
             word-wrap: break-word;
             overflow-wrap: break-word;
@@ -837,7 +815,7 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
   
   let markdownHtml = contentWithoutFirstTitle
     // Handle code blocks first
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-2 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
     // Handle headers with proper spacing and consistent font sizes
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
@@ -967,7 +945,7 @@ function processMarkdownWithCodeHighlighting(markdown: string): string {
         <div class="flex items-center justify-between px-4 py-2 bg-gray-700/30 border-b border-gray-600">
           <span class="text-xs text-gray-400 font-mono">${lang}</span>
         </div>
-        <div class="p-4 overflow-x-auto">
+        <div class="p-2 overflow-x-auto">
           <pre class="text-sm"><code>${highlightedCode}</code></pre>
         </div>
       </div>
@@ -1003,7 +981,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
       if (output.output_type === 'stream') {
         const text = Array.isArray(output.text) ? output.text.join('') : output.text || '';
         return `
-          <div class="output-stream border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
+          <div class="output-stream border border-gray-600 rounded-lg p-2 mt-2" style="background-color: #1f2123;">
             <pre class="text-green-300 font-mono text-sm whitespace-pre-wrap">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
           </div>
         `;
@@ -1018,7 +996,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
           const processedMarkdown = processMarkdownWithCodeHighlighting(markdownText);
           
           return `
-            <div class="output-display-data border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
+            <div class="output-display-data border border-gray-600 rounded-lg p-2 mt-2" style="background-color: #1f2123;">
               <div class="markdown-output">${processedMarkdown}</div>
             </div>
           `;
@@ -1028,7 +1006,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
             : output.data['text/plain'];
           
           return `
-            <div class="output-plain border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
+            <div class="output-plain border border-gray-600 rounded-lg p-2 mt-2" style="background-color: #1f2123;">
               <pre class="text-gray-300 font-mono text-sm whitespace-pre-wrap">${plainText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
             </div>
           `;
@@ -1051,7 +1029,7 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
           <span class="text-xs text-gray-400 font-mono">Python</span>
           <copy-button class="copy-btn" data-content="${escapedSource}"></copy-button>
         </div>
-        <div class="code-content p-4 overflow-x-auto">
+        <div class="code-content p-2 overflow-x-auto">
           <pre class="language-python text-sm"><code>${highlightedCode}</code></pre>
         </div>
       </div>
@@ -1091,7 +1069,7 @@ function renderMarkdownSSR(markdown: string): string {
   
   let markdownHtml = contentWithoutFirstTitle
     // First handle code blocks to preserve them
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-2 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
         // Handle headers with improved spacing and consistent font sizes
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
@@ -1714,19 +1692,7 @@ function getNbviewerUrl(filePath: string): string {
         }
       });
       
-      // Also highlight code blocks in output cells
-      const outputCodeBlocks = document.querySelectorAll('.output-display-data .code-block code, .output-display-data pre code, .markdown-output pre code, .markdown-output .code-block code');
-      
-      outputCodeBlocks.forEach((codeElement) => {
-        if (!codeElement.hasAttribute('data-highlighted')) {
-          const originalCode = codeElement.textContent || codeElement.innerText || '';
-          if (originalCode.trim()) {
-            const highlightedCode = highlightPythonCode(originalCode);
-            codeElement.innerHTML = highlightedCode;
-            codeElement.setAttribute('data-highlighted', 'true');
-          }
-        }
-      });
+      // Note: Removed automatic highlighting of output cells to preserve plain text appearance
     }, 2000);
     
     // Add IDs to headings for proper navigation in both notebook and markdown content
@@ -1756,10 +1722,10 @@ function getNbviewerUrl(filePath: string): string {
       // Final pass to ensure code cell backgrounds are correct
       forceCodeCellBackgrounds();
       
-      // Also highlight any code blocks that might be in notebook outputs (from notebookjs or fallback renderer)
-      const allCodeBlocks = document.querySelectorAll('pre code, .code-block code, .output-display-data code, .markdown-output code, .nb-output pre, .nb-output code');
+      // Only highlight input code blocks, not output cells
+      const inputCodeBlocks = document.querySelectorAll('pre code:not(.nb-output pre code):not(.output-display-data code):not(.markdown-output code):not(.cell-output code), .code-block code:not(.nb-output .code-block code):not(.output-display-data .code-block code):not(.markdown-output .code-block code)');
       
-      allCodeBlocks.forEach((codeElement) => {
+      inputCodeBlocks.forEach((codeElement) => {
         if (!codeElement.hasAttribute('data-highlighted')) {
           const originalCode = codeElement.textContent || codeElement.innerText || '';
           if (originalCode.trim()) {
