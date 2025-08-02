@@ -8,13 +8,13 @@ interface Props {
 
 const { currentFile } = Astro.props;
 
-// Function to enhance notebook outputs with code highlighting
+// Function to enhance notebook outputs - only highlight actual code blocks, not plain text
 function enhanceNotebookOutputs(notebookHtml: string): string {
-  // Look for output content that might contain code blocks
+  // Look for output content that contains markdown-style code blocks (```)
   return notebookHtml.replace(/(<div[^>]*class="[^"]*nb-output[^"]*"[^>]*>)(.*?)(<\/div>)/gs, (match, openTag, content, closeTag) => {
-    // Check if content contains code blocks
-    if (content.includes('```') || content.includes('<pre>') || content.includes('<code>')) {
-      // Process any markdown-style code blocks in the output
+    // Only process content that contains markdown-style code blocks (```)
+    if (content.includes('```')) {
+      // Process markdown-style code blocks in the output
       let enhancedContent = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (codeMatch, language, code) => {
         const lang = language || 'python';
         const highlightedCode = highlightPythonCodeServerSide(code.trim());
@@ -33,6 +33,7 @@ function enhanceNotebookOutputs(notebookHtml: string): string {
       
       return openTag + enhancedContent + closeTag;
     }
+    // Return unchanged if no code blocks found - this preserves plain text outputs
     return match;
   });
 }
@@ -683,6 +684,99 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             overflow-wrap: break-word !important;
             word-wrap: break-word !important;
             white-space: pre-wrap !important;
+          }
+          
+          /* Reduce spacing between markdown display outputs */
+          .professional-notebook .nb-output .rendered_html h1,
+          .professional-notebook .nb-output .rendered_html h2,
+          .professional-notebook .nb-output .rendered_html h3,
+          .professional-notebook .nb-output .rendered_html h4,
+          .professional-notebook .nb-output .rendered_html h5,
+          .professional-notebook .nb-output .rendered_html h6,
+          .markdown-output h1,
+          .markdown-output h2,
+          .markdown-output h3,
+          .markdown-output h4,
+          .markdown-output h5,
+          .markdown-output h6 {
+            margin-top: 0.1rem !important;
+            margin-bottom: 0.1rem !important;
+            line-height: 1.2 !important;
+          }
+          
+          .professional-notebook .nb-output .rendered_html p,
+          .professional-notebook .nb-output .rendered_html ul,
+          .professional-notebook .nb-output .rendered_html ol,
+          .professional-notebook .nb-output .rendered_html blockquote,
+          .markdown-output p,
+          .markdown-output ul,
+          .markdown-output ol,
+          .markdown-output blockquote {
+            margin-top: 0.05rem !important;
+            margin-bottom: 0.05rem !important;
+            line-height: 1.3 !important;
+          }
+          
+          .professional-notebook .nb-output .rendered_html hr,
+          .markdown-output hr {
+            margin-top: 0.1rem !important;
+            margin-bottom: 0.1rem !important;
+          }
+          
+          /* Reduce spacing between output cells */
+          .professional-notebook .nb-output,
+          .output-display-data,
+          .output-stream,
+          .output-plain,
+          .cell-output,
+          .notebook-cell .cell-output,
+          .markdown-output {
+            margin-bottom: 0.2rem !important;
+            padding-bottom: 0.1rem !important;
+          }
+          
+          /* Reduce spacing for list items */
+          .professional-notebook .nb-output .rendered_html li,
+          .markdown-output li {
+            margin-bottom: 0.05rem !important;
+            line-height: 1.3 !important;
+          }
+          
+          /* Ultra-aggressive spacing reduction for all output content */
+          .professional-notebook .nb-output *,
+          .output-display-data *,
+          .output-stream *,
+          .output-plain *,
+          .cell-output *,
+          .notebook-cell .cell-output *,
+          .markdown-output * {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 1.2 !important;
+          }
+          
+          /* Specific targeting for numbered lists and paragraphs */
+          .professional-notebook .nb-output .rendered_html ol,
+          .professional-notebook .nb-output .rendered_html ul,
+          .professional-notebook .nb-output .rendered_html div,
+          .professional-notebook .nb-output .rendered_html span,
+          .markdown-output ol,
+          .markdown-output ul,
+          .markdown-output div,
+          .markdown-output span {
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.1 !important;
+          }
+          
+          /* Override any default browser spacing */
+          .professional-notebook .nb-output .rendered_html p + p,
+          .professional-notebook .nb-output .rendered_html li + li,
+          .markdown-output p + p,
+          .markdown-output li + li {
+            margin-top: 0 !important;
           }
         </style>
         ${notebookHtml}
