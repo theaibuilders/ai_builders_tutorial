@@ -33,6 +33,16 @@ const { title, currentFile, sections, headings = [] } = Astro.props;
       // Always use dark mode
       document.documentElement.classList.add('dark');
     </script>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNHCYDMDCX"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RNHCYDMDCX');
+    </script>
   </head>
   
   <body class="bg-dark-bg text-dark-text font-sans antialiased">
