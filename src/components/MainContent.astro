@@ -8,6 +8,61 @@ interface Props {
 
 const { currentFile } = Astro.props;
 
+// Function to enhance notebook outputs with code highlighting
+function enhanceNotebookOutputs(notebookHtml: string): string {
+  // Look for output content that might contain code blocks
+  return notebookHtml.replace(/(<div[^>]*class="[^"]*nb-output[^"]*"[^>]*>)(.*?)(<\/div>)/gs, (match, openTag, content, closeTag) => {
+    // Check if content contains code blocks
+    if (content.includes('```') || content.includes('<pre>') || content.includes('<code>')) {
+      // Process any markdown-style code blocks in the output
+      let enhancedContent = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (codeMatch, language, code) => {
+        const lang = language || 'python';
+        const highlightedCode = highlightPythonCodeServerSide(code.trim());
+        
+        return `
+          <div class="code-block border border-gray-600 rounded-lg overflow-hidden my-4" style="background-color: #1f2123;">
+            <div class="flex items-center justify-between px-4 py-2 bg-gray-700/30 border-b border-gray-600">
+              <span class="text-xs text-gray-400 font-mono">${lang}</span>
+            </div>
+            <div class="p-4 overflow-x-auto">
+              <pre class="text-sm"><code>${highlightedCode}</code></pre>
+            </div>
+          </div>
+        `;
+      });
+      
+      return openTag + enhancedContent + closeTag;
+    }
+    return match;
+  });
+}
+
+// Server-side Python highlighting function (basic version)
+function highlightPythonCodeServerSide(code: string): string {
+  if (!code) return '';
+  
+  // Basic server-side highlighting - escape HTML first
+  let highlighted = code
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&/g, '&amp;');
+  
+  // Apply basic syntax highlighting patterns
+  highlighted = highlighted
+    // Keywords
+    .replace(/\b(import|from|def|class|if|else|elif|for|while|try|except|finally|with|as|return|yield|break|continue|pass|lambda|global|nonlocal|assert|del|raise|and|or|not|in|is|True|False|None)\b/g, '<span style="color: #569cd6;">$1</span>')
+    // Strings
+    .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span style="color: #ce9178;">$1$2$1</span>')
+    // Comments
+    .replace(/(#.*$)/gm, '<span style="color: #6a9955;">$1</span>')
+    // Numbers
+    .replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #b5cea8;">$1</span>')
+    // Function names
+    .replace(/\b(\w+)(?=\s*\()/g, '<span style="color: #dcdcaa;">$1</span>');
+  
+  return highlighted;
+}
+
 // Professional notebook rendering using notebookjs
 function renderNotebookWithProfessionalTools(notebook: any): string {
   if (!notebook || !notebook.cells) {
@@ -21,6 +76,9 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
     
     // Remove the first H1 heading from the notebook content since it's already shown in the page header
     notebookHtml = notebookHtml.replace(/<h1[^>]*>.*?<\/h1>/i, '');
+    
+    // Post-process the notebook HTML to enhance output cells with code highlighting
+    notebookHtml = enhanceNotebookOutputs(notebookHtml);
     
     // Apply our custom styling to the professional output with copy buttons
     return `
@@ -139,7 +197,7 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             min-width: 4rem;
           }
           .professional-notebook .nb-output {
-            background-color: rgba(36, 40, 46, 0.8);
+            background-color: #1f2123 !important;
             border: 1px solid rgba(75, 85, 99, 0.3);
             border-radius: 8px;
             margin-top: 0.5rem;
@@ -360,12 +418,15 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             min-width: 0;
           }
           .professional-notebook .nb-output-text {
-            color: #22c55e;
+            color: #e5e7eb;
             font-family: ui-monospace, monospace;
             font-size: 0.875rem;
             padding: 1rem;
             white-space: pre-wrap;
-            overflow-x: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: visible;
+            background: none;
             scrollbar-width: thin;
             scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
           }
@@ -389,7 +450,8 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             font-size: 0.875rem;
             padding: 1rem;
             white-space: pre-wrap;
-            background-color: rgba(220, 38, 38, 0.1);
+            background-color: rgba(220, 38, 38, 0.15);
+            border-radius: 6px;
             overflow-x: auto;
             scrollbar-width: thin;
             scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
@@ -537,6 +599,91 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
           .cell-content.prose {
             background-color: transparent !important;
           }
+          
+          /* Force output cells to have the new background color */
+          .professional-notebook .nb-output,
+          .output-display-data,
+          .output-stream,
+          .output-plain,
+          .cell-output,
+          .notebook-cell .cell-output {
+            background-color: #1f2123 !important;
+          }
+          
+          /* Ensure code blocks within output cells have no background and wrap text */
+          .professional-notebook .nb-output .code-block,
+          .output-display-data .code-block,
+          .output-stream .code-block,
+          .output-plain .code-block,
+          .cell-output .code-block,
+          .notebook-cell .cell-output .code-block,
+          .markdown-output .code-block,
+          .professional-notebook .nb-output pre,
+          .output-display-data pre,
+          .markdown-output pre {
+            background: none !important;
+            background-color: transparent !important;
+            color: #e5e7eb !important;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            overflow-x: visible !important;
+            border: none !important;
+          }
+          
+          /* Also apply to code elements within output cells */
+          .professional-notebook .nb-output code,
+          .output-display-data code,
+          .output-stream code,
+          .output-plain code,
+          .cell-output code,
+          .notebook-cell .cell-output code,
+          .markdown-output code {
+            background: none !important;
+            background-color: transparent !important;
+            color: #e5e7eb !important;
+            padding: 0 !important;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+          }
+          
+          /* Override the general pre/code rules specifically for output cells */
+          .professional-notebook .nb-output pre,
+          .professional-notebook .nb-output code,
+          .output-display-data pre,
+          .output-display-data code,
+          .output-stream pre,
+          .output-stream code,
+          .output-plain pre,
+          .output-plain code,
+          .cell-output pre,
+          .cell-output code,
+          .notebook-cell .cell-output pre,
+          .notebook-cell .cell-output code,
+          .markdown-output pre,
+          .markdown-output code {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            word-break: break-word !important;
+            overflow-x: visible !important;
+            max-width: 100% !important;
+          }
+          
+          /* Ensure output cell containers allow text wrapping */
+          .professional-notebook .nb-output,
+          .output-display-data,
+          .output-stream,
+          .output-plain,
+          .cell-output,
+          .notebook-cell .cell-output,
+          .markdown-output {
+            max-width: 100% !important;
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+            white-space: pre-wrap !important;
+          }
         </style>
         ${notebookHtml}
       </div>
@@ -596,7 +743,7 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
   
   let markdownHtml = contentWithoutFirstTitle
     // Handle code blocks first
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
     // Handle headers with proper spacing and consistent font sizes
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
@@ -700,6 +847,58 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
   `;
 }
 
+// Function to process markdown content and highlight code blocks
+function processMarkdownWithCodeHighlighting(markdown: string): string {
+  if (!markdown) return '';
+  
+  // Process markdown and extract code blocks for highlighting
+  let processedMarkdown = markdown
+    // Handle headers
+    .replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold text-white mb-3 mt-6">$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2 class="text-xl font-semibold text-white mb-4 mt-8">$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold text-white mb-4 mt-8">$1</h1>')
+    // Handle bold and italic
+    .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
+    // Handle links
+    .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
+
+  // Handle code blocks with syntax highlighting
+  processedMarkdown = processedMarkdown.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, language, code) => {
+    const lang = language || 'python';
+    const highlightedCode = highlightPythonCode(code.trim());
+    
+    return `
+      <div class="code-block border border-gray-600 rounded-lg overflow-hidden my-4" style="background-color: #1f2123;">
+        <div class="flex items-center justify-between px-4 py-2 bg-gray-700/30 border-b border-gray-600">
+          <span class="text-xs text-gray-400 font-mono">${lang}</span>
+        </div>
+        <div class="p-4 overflow-x-auto">
+          <pre class="text-sm"><code>${highlightedCode}</code></pre>
+        </div>
+      </div>
+    `;
+  });
+
+  // Handle inline code
+  processedMarkdown = processedMarkdown.replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>');
+
+  // Handle paragraphs
+  const lines = processedMarkdown.split('\n');
+  const processedLines = [];
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine === '' || trimmedLine.startsWith('<')) {
+      processedLines.push(line);
+    } else {
+      processedLines.push(`<p class="mb-4 text-gray-300 leading-relaxed">${line}</p>`);
+    }
+  }
+  
+  return processedLines.join('\n');
+}
+
 function renderCodeCellFallback(source: string | string[], cellId: string, executionCount: number | null, outputs: any[]): string {
   const sourceText = Array.isArray(source) ? source.join('\n') : source || '';
   const highlightedCode = highlightPython(sourceText);
@@ -710,10 +909,36 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
       if (output.output_type === 'stream') {
         const text = Array.isArray(output.text) ? output.text.join('') : output.text || '';
         return `
-          <div class="output-stream bg-gray-900/60 border border-gray-600 rounded-lg p-4 mt-2">
+          <div class="output-stream border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
             <pre class="text-green-300 font-mono text-sm whitespace-pre-wrap">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
           </div>
         `;
+      } else if (output.output_type === 'display_data' || output.output_type === 'execute_result') {
+        // Handle display_data and execute_result outputs that might contain markdown with code blocks
+        if (output.data && output.data['text/markdown']) {
+          const markdownText = Array.isArray(output.data['text/markdown']) 
+            ? output.data['text/markdown'].join('') 
+            : output.data['text/markdown'];
+          
+          // Process markdown and highlight code blocks
+          const processedMarkdown = processMarkdownWithCodeHighlighting(markdownText);
+          
+          return `
+            <div class="output-display-data border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
+              <div class="markdown-output">${processedMarkdown}</div>
+            </div>
+          `;
+        } else if (output.data && output.data['text/plain']) {
+          const plainText = Array.isArray(output.data['text/plain']) 
+            ? output.data['text/plain'].join('') 
+            : output.data['text/plain'];
+          
+          return `
+            <div class="output-plain border border-gray-600 rounded-lg p-4 mt-2" style="background-color: #1f2123;">
+              <pre class="text-gray-300 font-mono text-sm whitespace-pre-wrap">${plainText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+            </div>
+          `;
+        }
       }
       return '';
     }).join('\n');
@@ -772,7 +997,7 @@ function renderMarkdownSSR(markdown: string): string {
   
   let markdownHtml = contentWithoutFirstTitle
     // First handle code blocks to preserve them
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-gray-900/50 border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-4 my-6 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
         // Handle headers with improved spacing and consistent font sizes
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
@@ -1225,6 +1450,40 @@ function getNbviewerUrl(filePath: string): string {
         element.style.backgroundColor = 'transparent';
         element.style.setProperty('background-color', 'transparent', 'important');
       });
+      
+      // Force output cells to have the new background color
+      const outputElements = document.querySelectorAll([
+        '.professional-notebook .nb-output',
+        '.output-display-data',
+        '.output-stream',
+        '.output-plain',
+        '.cell-output',
+        '.notebook-cell .cell-output'
+      ].join(', '));
+      
+      outputElements.forEach(element => {
+        element.style.backgroundColor = '#1f2123';
+        element.style.setProperty('background-color', '#1f2123', 'important');
+      });
+      
+      // Force code blocks within output cells to also use the output background color
+      const outputCodeBlocks = document.querySelectorAll([
+        '.professional-notebook .nb-output .code-block',
+        '.output-display-data .code-block',
+        '.output-stream .code-block', 
+        '.output-plain .code-block',
+        '.cell-output .code-block',
+        '.notebook-cell .cell-output .code-block',
+        '.markdown-output .code-block',
+        '.professional-notebook .nb-output pre',
+        '.output-display-data pre',
+        '.markdown-output pre'
+      ].join(', '));
+      
+      outputCodeBlocks.forEach(element => {
+        element.style.backgroundColor = '#1f2123';
+        element.style.setProperty('background-color', '#1f2123', 'important');
+      });
     }
     
     // Apply immediately and after notebook rendering
@@ -1360,6 +1619,20 @@ function getNbviewerUrl(filePath: string): string {
           }
         }
       });
+      
+      // Also highlight code blocks in output cells
+      const outputCodeBlocks = document.querySelectorAll('.output-display-data .code-block code, .output-display-data pre code, .markdown-output pre code, .markdown-output .code-block code');
+      
+      outputCodeBlocks.forEach((codeElement) => {
+        if (!codeElement.hasAttribute('data-highlighted')) {
+          const originalCode = codeElement.textContent || codeElement.innerText || '';
+          if (originalCode.trim()) {
+            const highlightedCode = highlightPythonCode(originalCode);
+            codeElement.innerHTML = highlightedCode;
+            codeElement.setAttribute('data-highlighted', 'true');
+          }
+        }
+      });
     }, 2000);
     
     // Add IDs to headings for proper navigation in both notebook and markdown content
@@ -1388,6 +1661,25 @@ function getNbviewerUrl(filePath: string): string {
       
       // Final pass to ensure code cell backgrounds are correct
       forceCodeCellBackgrounds();
+      
+      // Also highlight any code blocks that might be in notebook outputs (from notebookjs or fallback renderer)
+      const allCodeBlocks = document.querySelectorAll('pre code, .code-block code, .output-display-data code, .markdown-output code, .nb-output pre, .nb-output code');
+      
+      allCodeBlocks.forEach((codeElement) => {
+        if (!codeElement.hasAttribute('data-highlighted')) {
+          const originalCode = codeElement.textContent || codeElement.innerText || '';
+          if (originalCode.trim()) {
+            // Check if it looks like Python code (more comprehensive check)
+            const looksLikePython = /(?:import\s+\w+|from\s+\w+\s+import|def\s+\w+|class\s+\w+|print\s*\(|=\s*[\[\{]|if\s+\w+|for\s+\w+\s+in|with\s+open\(|pd\.|csv\.|np\.)/i.test(originalCode);
+            
+            if (looksLikePython) {
+              const highlightedCode = highlightPythonCode(originalCode);
+              codeElement.innerHTML = highlightedCode;
+              codeElement.setAttribute('data-highlighted', 'true');
+            }
+          }
+        }
+      });
     }, 500); // Run earlier to ensure headings have IDs before other scripts
     
     // Also run after a longer delay to catch any late-loading elements
