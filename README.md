@@ -1,4 +1,4 @@
-![AI Builders Tutorial Banner](/github_banner.png)
+![AI Builders Tutorial Banner](https://raw.githubusercontent.com/devonsunml/ai_builders_tutorial/main/public/github_banner.png)
 
 # AI Builders Tutorial
 
