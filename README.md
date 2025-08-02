@@ -1,3 +1,5 @@
+![AI Builders Tutorial Banner](public/github_banner.png)
+
 # AI Builders Tutorial
 
 A comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools. Learn through interactive Jupyter notebooks with step-by-step explanations and practical examples.
@@ -12,6 +14,10 @@ Each tutorial is designed to be practical and immediately applicable:
 - **Progressive Complexity**: Start with basics and advance to sophisticated implementations
 
 All tutorials are interactive Jupyter notebooks with detailed explanations and code examples you can run yourself.
+
+## 🚀 Access the Tutorials
+
+Visit our tutorial platform: **[https://tutorial.theaibuilders.dev/](https://tutorial.theaibuilders.dev/)**
 
 ### Frameworks
 
@@ -28,3 +34,7 @@ All tutorials are interactive Jupyter notebooks with detailed explanations and c
 ### Observability
 
 - **[Traceloop Tutorial: Complete Guide to LLM Monitoring](https://tutorial.theaibuilders.dev/tutorials/Observarbility/traceloop_tutorial)** - Monitor and trace your LLM applications with comprehensive observability
+
+---
+
+Made with ❤️ by AI Builders Team
