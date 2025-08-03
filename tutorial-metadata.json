@@ -4,38 +4,42 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-04-15"
     },
-    "Frameworks/litellm_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-05-12"
-    },
     "Frameworks/llamaindex_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-06-07"
-    },
-    "ModelProviders/claude_api_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-06-12"
-    },
-    "ModelProviders/openai_api_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-05-25"
     },
     "Observarbility/traceloop_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-06-30"
     },
-    "ModelProviders/nosana_tutorial_openai_sdk.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-08-01"
-    },
     "Observarbility/langfuse_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-03"
+    },
+    "Gateways/litellm_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-07-20"
+    },
+    "UI Framework/gradio_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-07-15"
+    },
+    "Model Providers/claude_api_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-05-03"
+    },
+    "Model Providers/nosana_tutorial_openai_sdk.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-01"
+    },
+    "Model Providers/openai_api_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-04-20"
     }
   },
   "_instructions": {
-    "description": "This file allows you to manually override author and lastUpdated metadata for tutorials.",
-    "usage": "Add entries using the tutorial path (relative to tutorials directory) as the key. Use authorId to reference authors from author-metadata.json.",
+    "description": "This file allows you to manually override authorId and lastUpdated metadata for tutorials.",
+    "usage": "Add entries using the tutorial path (relative to tutorials directory) as the key. Use authorId to reference authors from authorId-metadata.json.",
     "example": {
       "SectionName/tutorial_file.ipynb": {
         "authorId": "devon-sun",
