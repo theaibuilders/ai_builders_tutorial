@@ -1,0 +1,12 @@
+# GitHub Copilot Instructions
+
+## Token Limits for LLM Interactions
+
+When interacting with LLM models from groq in Copilot Chat:
+
+- **Maximum input tokens**: 80,000
+- **Maximum output tokens**: 4,000
+
+Ensure all prompts and responses stay within these limits to prevent truncation or errors.
+
+- in the prompt message, make sure input is no more than input token limit also specify the output token response message should be within output token limit to prevent errors.

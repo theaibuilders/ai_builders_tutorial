@@ -1,0 +1,736 @@
+<!DOCTYPE html><html lang="en" class="dark" data-astro-cid-ds6ctzq3> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>LangChain Tutorial: From Fundamentals to Advanced RAG | AI Builders Tutorial</title><meta name="description" content="Learn AI development with comprehensive tutorials and hands-on examples."><!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet"><!-- Theme Script (runs before page load) --><script>
+      // Always use dark mode
+      document.documentElement.classList.add('dark');
+    </script><link rel="stylesheet" href="/_astro/index.CrkmVMKo.css">
+<link rel="stylesheet" href="/_astro/_slug_.DEyIeVva.css"><script type="module" src="/_astro/hoisted.DfVNLMZe.js"></script></head> <body class="bg-dark-bg text-dark-text font-sans antialiased" data-astro-cid-ds6ctzq3> <!-- Main Layout Container --> <div class="flex min-h-screen" data-astro-cid-ds6ctzq3> <!-- Left Sidebar --> <aside class="w-80 flex-shrink-0 border-r border-dark-border" data-astro-cid-ds6ctzq3> <div class="h-screen flex flex-col" data-astro-cid-ryjzjgvk> <!-- Header --> <div class="flex-shrink-0 p-6 border-b border-dark-border" data-astro-cid-ryjzjgvk> <div class="flex items-center justify-between mb-4" data-astro-cid-ryjzjgvk> <h1 class="text-xl font-bold text-dark-text" data-astro-cid-ryjzjgvk>
+AI Builders Tutorial
+</h1> </div> <!-- Search Bar --> <div class="relative" id="search-container" data-astro-cid-mjrxwznw> <div class="relative" data-astro-cid-mjrxwznw> <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none" data-astro-cid-mjrxwznw> <svg class="h-4 w-4 text-dark-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24" data-astro-cid-mjrxwznw> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" data-astro-cid-mjrxwznw></path> </svg> </div> <input type="text" id="search-input" placeholder="Search tutorials..." class="w-full pl-10 pr-4 py-2 text-sm border border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-dark-text placeholder-dark-secondary" style="background-color: #24282e;" data-astro-cid-mjrxwznw> <div id="search-loading" class="absolute inset-y-0 right-0 pr-3 flex items-center hidden" data-astro-cid-mjrxwznw> <div class="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full" data-astro-cid-mjrxwznw></div> </div> </div> <!-- Search Results Dropdown --> <div id="search-results" class="absolute z-50 w-full mt-2 bg-dark-bg border border-dark-border rounded-lg shadow-lg max-h-80 overflow-y-auto hidden" data-astro-cid-mjrxwznw> <!-- Results will be populated by JavaScript --> </div> </div>   </div> <!-- Navigation Content --> <div class="flex-1 overflow-y-auto" data-astro-cid-ryjzjgvk> <nav class="p-4" data-astro-cid-ryjzjgvk> <div class="mb-6" data-astro-cid-ryjzjgvk> <!-- Section Header --> <button class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-dark-hover transition-colors group" data-section="Overview" onclick="toggleSection(this)" data-astro-cid-ryjzjgvk> <span class="font-semibold text-dark-text capitalize" data-astro-cid-ryjzjgvk> Overview </span> <svg class="w-4 h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90" fill="currentColor" viewBox="0 0 20 20" data-astro-cid-ryjzjgvk> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" data-astro-cid-ryjzjgvk></path> </svg> </button> <!-- Section Files --> <div class="ml-4 mt-2 space-y-1 section-content" data-section-content="Overview" style="display: block;" data-astro-cid-ryjzjgvk> <a href="/tutorials/Overview/tutorial_overview" class="block p-2 rounded-lg text-sm transition-colors text-dark-secondary hover:bg-dark-hover hover:text-dark-text" data-astro-cid-ryjzjgvk> <div class="flex items-center" data-astro-cid-ryjzjgvk> <!-- File Name --> <span class="truncate" data-astro-cid-ryjzjgvk> AI Builders Tutorial Overview </span> </div> <!-- File Description (if available) -->  </a> </div> </div><div class="mb-6" data-astro-cid-ryjzjgvk> <!-- Section Header --> <button class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-dark-hover transition-colors group" data-section="Frameworks" onclick="toggleSection(this)" data-astro-cid-ryjzjgvk> <span class="font-semibold text-dark-text capitalize" data-astro-cid-ryjzjgvk> Frameworks </span> <svg class="w-4 h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90" fill="currentColor" viewBox="0 0 20 20" data-astro-cid-ryjzjgvk> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" data-astro-cid-ryjzjgvk></path> </svg> </button> <!-- Section Files --> <div class="ml-4 mt-2 space-y-1 section-content" data-section-content="Frameworks" style="display: block;" data-astro-cid-ryjzjgvk> <a href="/tutorials/Frameworks/langchain" class="block p-2 rounded-lg text-sm transition-colors bg-blue-500/10 text-blue-400 border-l-2 border-blue-400" data-astro-cid-ryjzjgvk> <div class="flex items-center" data-astro-cid-ryjzjgvk> <!-- File Name --> <span class="truncate" data-astro-cid-ryjzjgvk> LangChain Tutorial: From Fundamentals to Advanced RAG </span> </div> <!-- File Description (if available) -->  </a><a href="/tutorials/Frameworks/litellm_tutorial" class="block p-2 rounded-lg text-sm transition-colors text-dark-secondary hover:bg-dark-hover hover:text-dark-text" data-astro-cid-ryjzjgvk> <div class="flex items-center" data-astro-cid-ryjzjgvk> <!-- File Name --> <span class="truncate" data-astro-cid-ryjzjgvk> LiteLLM Tutorial: Unified API for 100+ LLMs </span> </div> <!-- File Description (if available) -->  </a><a href="/tutorials/Frameworks/llamaindex_tutorial" class="block p-2 rounded-lg text-sm transition-colors text-dark-secondary hover:bg-dark-hover hover:text-dark-text" data-astro-cid-ryjzjgvk> <div class="flex items-center" data-astro-cid-ryjzjgvk> <!-- File Name --> <span class="truncate" data-astro-cid-ryjzjgvk> LlamaIndex Tutorial: Building RAG Applications </span> </div> <!-- File Description (if available) -->  </a> </div> </div><div class="mb-6" data-astro-cid-ryjzjgvk> <!-- Section Header --> <button class="flex items-center justify-between w-full text-left p-2 rounded-lg hover:bg-dark-hover transition-colors group" data-section="ModelProviders" onclick="toggleSection(this)" data-astro-cid-ryjzjgvk> <span class="font-semibold text-dark-text capitalize" data-astro-cid-ryjzjgvk> ModelProviders </span> <svg class="w-4 h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90" fill="currentColor" viewBox="0 0 20 20" data-astro-cid-ryjzjgvk> <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" data-astro-cid-ryjzjgvk></path> </svg> </button> <!-- Section Files --> <div class="ml-4 mt-2 space-y-1 section-content" data-section-content="ModelProviders" style="display: block;" data-astro-cid-ryjzjgvk>  </div> </div> </nav> </div> </div>   </aside> <!-- Main Content Area --> <main class="flex-1 min-w-0" data-astro-cid-ds6ctzq3> <div class="flex" data-astro-cid-ds6ctzq3> <!-- Tutorial Content --> <div class="flex-1 min-w-0" data-astro-cid-ds6ctzq3> <div class="h-screen overflow-y-auto"> <div class="max-w-4xl mx-auto p-8"> <!-- Tutorial Header --> <header class="mb-8"> <h1 class="text-4xl font-bold text-dark-text mb-2"> LangChain Tutorial: From Fundamentals to Advanced RAG </h1> <!-- Metadata --> <div class="flex items-center gap-6 text-sm text-dark-secondary"> <div class="flex items-center gap-2"> <span>Devon Sun</span> </div> <div class="flex items-center gap-2"> <span>Last updated: 7/30/2025</span> </div> </div> </header> <!-- Tutorial Content --> <div class="tutorial-content"> <div>
+      <div class="professional-notebook">
+        <style>
+          /* Enhanced notebook styling with working copy buttons and scrolling */
+          .professional-notebook .nb-cell {
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: visible;
+            position: relative;
+          }
+          .professional-notebook .nb-input {
+            background-color: #24282e !important;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            position: relative;
+            overflow: visible;
+          }
+          
+          /* Code cells - target cells that have nb-input (which are code cells) */
+          .professional-notebook .nb-cell:has(.nb-input) {
+            background-color: #24282e !important;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 8px;
+            position: relative;
+          }
+          
+          /* Fallback for browsers without :has() support */
+          .professional-notebook .nb-input {
+            background-color: #24282e !important;
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            position: relative;
+          }
+          
+          /* Force background on all code-related elements */
+          .professional-notebook .nb-cell .nb-input,
+          .professional-notebook .nb-input,
+          .nb-input {
+            background-color: #24282e !important;
+          }
+          
+          /* Additional comprehensive selectors for code cells */
+          .professional-notebook .nb-cell[data-cell-type="code"],
+          .professional-notebook .nb-cell.nb-cell-type-code,
+          .professional-notebook .nb-cell:has(pre),
+          .professional-notebook .nb-cell:has(code),
+          .professional-notebook div[class*="nb-input"],
+          .professional-notebook div[class*="code"],
+          .professional-notebook pre,
+          .professional-notebook .nb-source {
+            background-color: #24282e !important;
+          }
+          
+          /* Force background on any element containing code */
+          .professional-notebook * {
+            --code-bg: #24282e;
+          }
+          
+          .professional-notebook [style*="background"] {
+            background-color: #24282e !important;
+          }
+          
+          /* Copy button for code cells */
+          .professional-notebook .nb-input::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="%23a1a1aa"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>') center/16px no-repeat;
+            border-radius: 4px;
+            background-color: rgba(55, 65, 81, 0.8);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            z-index: 10;
+          }
+          .professional-notebook .nb-input:hover::before {
+            opacity: 1;
+            background-color: rgba(75, 85, 99, 0.8);
+          }
+          .professional-notebook .nb-input::after {
+            content: 'Copy code';
+            position: absolute;
+            top: 45px;
+            right: 8px;
+            background: rgba(17, 24, 39, 0.95);
+            color: #d1d5db;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: ui-sans-serif, system-ui;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            white-space: nowrap;
+          }
+          .professional-notebook .nb-input:hover::after {
+            opacity: 1;
+          }
+          .copy-success::after {
+            content: 'Copied!' !important;
+            color: #22c55e !important;
+          }
+          .professional-notebook .nb-input-prompt {
+            background-color: rgba(29, 78, 216, 0.1);
+            color: #60a5fa;
+            padding: 0.5rem;
+            font-family: ui-monospace, monospace;
+            font-size: 0.75rem;
+            border-right: 1px solid rgba(75, 85, 99, 0.5);
+            min-width: 4rem;
+          }
+          .professional-notebook .nb-output {
+            background-color: rgba(36, 40, 46, 0.8);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+          }
+          .professional-notebook .nb-output-prompt {
+            background-color: rgba(220, 38, 38, 0.1);
+            color: #fca5a5;
+            padding: 0.5rem;
+            font-family: ui-monospace, monospace;
+            font-size: 0.75rem;
+            border-right: 1px solid rgba(75, 85, 99, 0.5);
+            min-width: 4rem;
+          }
+          .professional-notebook .nb-markdown {
+            color: #e5e7eb;
+            padding: 1.5rem;
+            line-height: 1.8;
+          }
+          /* Universal heading styles based on markdown hierarchy - applies to all content */
+          .professional-notebook h1, h1 {
+            color: #ffffff;
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 800; /* font-extrabold */
+            margin-bottom: 2rem;
+            margin-top: 3rem;
+            padding-bottom: 1rem;
+            line-height: 1.2;
+          }
+          .professional-notebook h2, h2 {
+            color: #ffffff;
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            margin-bottom: 1.5rem;
+            margin-top: 2.5rem;
+            padding-bottom: 0.75rem;
+            line-height: 1.3;
+          }
+          .professional-notebook h3, h3 {
+            color: #ffffff;
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            padding-bottom: 0.5rem;
+            line-height: 1.4;
+          }
+          .professional-notebook h4, h4 {
+            color: #ffffff;
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+            line-height: 1.4;
+          }
+          .professional-notebook h5, h5 {
+            color: #ffffff;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem;
+            margin-top: 1.25rem;
+            line-height: 1.5;
+          }
+          .professional-notebook h6, h6 {
+            color: #ffffff;
+            font-size: 1rem; /* text-base */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+            line-height: 1.5;
+          }
+          /* Universal paragraph and text styles */
+          .professional-notebook p, p {
+            margin-bottom: 1.25rem;
+            color: #d1d5db;
+            line-height: 1.7;
+            font-size: 1rem;
+          }
+          
+          /* Universal list styles based on markdown syntax */
+          .professional-notebook ul, ul,
+          .professional-notebook ol, ol {
+            margin: 1.5rem 0;
+            padding-left: 0;
+            list-style: none;
+          }
+          .professional-notebook li, li {
+            margin-bottom: 0.75rem;
+            color: #d1d5db;
+            line-height: 1.7;
+            position: relative;
+            padding-left: 1.5rem;
+            font-size: 1rem;
+          }
+          
+          /* Bullet point styling for unordered lists */
+          .professional-notebook ul li::before, ul li::before {
+            content: "•";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.1rem;
+          }
+          
+          /* Numbered list styling */
+          .professional-notebook ol, ol {
+            counter-reset: list-counter;
+          }
+          .professional-notebook ol li, ol li {
+            counter-increment: list-counter;
+          }
+          .professional-notebook ol li::before, ol li::before {
+            content: counter(list-counter) ".";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1rem;
+          }
+          
+          /* Nested list styles with different bullet types */
+          .professional-notebook ul ul li::before, ul ul li::before {
+            content: "◦";
+            color: #93c5fd;
+            font-size: 1rem;
+          }
+          .professional-notebook ul ul ul li::before, ul ul ul li::before {
+            content: "▪";
+            color: #ddd6fe;
+            font-size: 0.9rem;
+          }
+          .professional-notebook .nb-markdown code {
+            background-color: rgba(55, 65, 81, 0.6);
+            color: #93c5fd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
+          }
+          .professional-notebook .nb-markdown pre {
+            background-color: #24282e !important;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+          }
+          .professional-notebook .nb-markdown pre::-webkit-scrollbar {
+            height: 8px;
+          }
+          .professional-notebook .nb-markdown pre::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-markdown pre::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-markdown pre::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.7);
+          }
+          .professional-notebook .nb-markdown pre code {
+            background: none;
+            padding: 0;
+            border-radius: 0;
+            color: #e5e7eb;
+          }
+          /* Enhanced code styling with comprehensive horizontal scrolling */
+          .professional-notebook .nb-source {
+            color: #e5e7eb;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            padding: 1rem;
+            white-space: pre;
+            overflow-x: auto;
+            overflow-y: visible;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+            word-wrap: normal;
+            word-break: normal;
+            min-width: 0;
+            background-color: transparent !important;
+          }
+          }
+          .professional-notebook .nb-source::-webkit-scrollbar {
+            height: 8px;
+          }
+          .professional-notebook .nb-source::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-source::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-source::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.7);
+          }
+          
+          /* Ensure all code elements can scroll horizontally */
+          .professional-notebook pre,
+          .professional-notebook code {
+            overflow-x: auto;
+            white-space: pre;
+            word-wrap: normal;
+            word-break: normal;
+          }
+          
+          /* Fix any containers that might prevent scrolling */
+          .professional-notebook .nb-input,
+          .professional-notebook .nb-cell {
+            overflow: visible;
+            min-width: 0;
+          }
+          .professional-notebook .nb-output-text {
+            color: #22c55e;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
+            padding: 1rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+          }
+          .professional-notebook .nb-output-text::-webkit-scrollbar {
+            height: 8px;
+          }
+          .professional-notebook .nb-output-text::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-output-text::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-output-text::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.7);
+          }
+          .professional-notebook .nb-output-error {
+            color: #ef4444;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
+            padding: 1rem;
+            white-space: pre-wrap;
+            background-color: rgba(220, 38, 38, 0.1);
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+          }
+          .professional-notebook .nb-output-error::-webkit-scrollbar {
+            height: 8px;
+          }
+          .professional-notebook .nb-output-error::-webkit-scrollbar-track {
+            background: rgba(220, 38, 38, 0.2);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-output-error::-webkit-scrollbar-thumb {
+            background: rgba(220, 38, 38, 0.5);
+            border-radius: 4px;
+          }
+          .professional-notebook .nb-output-error::-webkit-scrollbar-thumb:hover {
+            background: rgba(220, 38, 38, 0.7);
+          }
+          .professional-notebook .nb-cell-type-markdown {
+            border: none;
+            background: none;
+          }
+          .professional-notebook a {
+            color: #60a5fa;
+          }
+          .professional-notebook a:hover {
+            color: #93c5fd;
+          }
+          .professional-notebook ul, .professional-notebook ol {
+            margin: 1.5rem 0;
+            padding-left: 0;
+            list-style: none;
+          }
+          .professional-notebook li {
+            margin-bottom: 0.75rem;
+            color: #d1d5db;
+            line-height: 1.7;
+            position: relative;
+            padding-left: 1.5rem;
+          }
+          .professional-notebook ul li::before {
+            content: "•";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+          }
+          .professional-notebook ol {
+            counter-reset: list-counter;
+          }
+          .professional-notebook ol li {
+            counter-increment: list-counter;
+          }
+          .professional-notebook ol li::before {
+            content: counter(list-counter) ".";
+            color: #60a5fa;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+          }
+          /* Nested list spacing */
+          .professional-notebook ul ul, ul ul,
+          .professional-notebook ol ol, ol ol {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+          }
+          .professional-notebook ul ul li, ul ul li,
+          .professional-notebook ol ol li, ol ol li {
+            margin-bottom: 0.5rem;
+          }
+          /* Universal text formatting styles */
+          .professional-notebook strong, strong,
+          .professional-notebook .nb-markdown strong {
+            font-weight: 600;
+            color: #ffffff;
+          }
+          .professional-notebook em, em,
+          .professional-notebook .nb-markdown em {
+            font-style: italic;
+            color: #93c5fd;
+          }
+          
+          /* Universal code styling */
+          .professional-notebook code, code {
+            background-color: rgba(55, 65, 81, 0.6);
+            color: #93c5fd;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: ui-monospace, monospace;
+            font-size: 0.875rem;
+          }
+          
+          /* Ultra-specific overrides to ensure code cell background is correct */
+          .professional-notebook .nb-cell.nb-cell-type-code,
+          .professional-notebook .nb-input,
+          .professional-notebook .nb-cell:has(.nb-input),
+          .professional-notebook [class*="nb-input"],
+          .professional-notebook [class*="code-cell"],
+          .professional-notebook pre,
+          div[class*="nb-input"],
+          div[class*="nb-cell"]:has(pre),
+          div[class*="nb-cell"]:has(code) {
+            background-color: #24282e !important;
+          }
+          
+          /* Force via CSS custom properties */
+          :root {
+            --notebook-code-bg: #24282e;
+          }
+          
+          /* Re-apply transparent backgrounds to markdown elements to match app background */
+          .professional-notebook .nb-markdown,
+          .professional-notebook .nb-markdown p,
+          .professional-notebook .nb-markdown span,
+          .professional-notebook .nb-markdown div,
+          .professional-notebook .nb-markdown h1,
+          .professional-notebook .nb-markdown h2,
+          .professional-notebook .nb-markdown h3,
+          .professional-notebook .nb-markdown h4,
+          .professional-notebook .nb-markdown h5,
+          .professional-notebook .nb-markdown h6,
+          .professional-notebook .nb-markdown ul,
+          .professional-notebook .nb-markdown ol,
+          .professional-notebook .nb-markdown li,
+          .professional-notebook .nb-markdown blockquote,
+          .professional-notebook .nb-cell-type-markdown,
+          .professional-notebook .nb-cell:not(:has(.nb-input)),
+          .professional-notebook .nb-cell .nb-markdown {
+            background-color: transparent !important;
+          }
+          
+          /* Ensure markdown cells match app background */
+          .professional-notebook .nb-cell-type-markdown,
+          .professional-notebook .nb-cell:not(.nb-cell-type-code),
+          .notebook-cell.markdown-cell,
+          .notebook-cell .cell-content,
+          .markdown-cell {
+            background-color: #1f2123 !important;
+          }
+          
+          /* Also ensure fallback markdown cells are transparent */
+          .notebook-cell.markdown-cell .cell-content,
+          .cell-content.prose {
+            background-color: transparent !important;
+          }
+        </style>
+        <div class="nb-notebook"><div class="nb-worksheet"><div class="nb-cell nb-markdown-cell">
+<p>This tutorial provides a comprehensive overview of LangChain, covering the essential concepts from basic setup to building a sophisticated Retrieval-Augmented Generation (RAG) system.</p>
+</div><div class="nb-cell nb-markdown-cell"><h2>1. Introduction and Setup</h2>
+<h3>What is LangChain?</h3>
+<p>LangChain is a framework for developing applications powered by large language models (LLMs). It simplifies the entire lifecycle of LLM application development, including development, productionization, and deployment.</p>
+<h3>Core Concepts:</h3>
+<ul>
+<li><p><strong>LangChain Expression Language (LCEL):</strong> A declarative way to compose chains, offering features like streaming, batching, and async support. The <code>|</code> (pipe) operator is central to LCEL, allowing you to chain components together.</p>
+</li>
+<li><p><strong>Components:</strong> LangChain provides modular components for building applications, including:</p>
+<ul>
+<li><strong>Models:</strong> Interfaces to various language models (e.g., OpenAI, Anthropic, Google).</li>
+<li><strong>Prompts:</strong> Templates for generating prompts for LLMs.</li>
+<li><strong>Output Parsers:</strong> Tools to structure the output from LLMs.</li>
+</ul>
+</li>
+<li><p><strong>Retrieval-Augmented Generation (RAG):</strong> A powerful technique to connect LLMs to external data sources, enhancing their knowledge and providing more accurate, up-to-date responses.</p>
+</li>
+</ul>
+<h3>Installation</h3>
+<p>First, let's install the necessary packages.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python"># Install core LangChain and provider-specific packages
+!pip install langchain langchain-core langchain-community langchain-openai langchain-chroma faiss-cpu pypdf sentence-transformers tiktoken -q
+
+# Install environment management and web request libraries
+!pip install python-dotenv requests beautifulsoup4 -q</code></pre></div></div><div class="nb-cell nb-markdown-cell"><h3>Environment Setup</h3>
+<p>Configure your API keys. It's recommended to use environment variables for security.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input" data-prompt-number="3"><pre class=""><code class="lang-python" data-language="python">import os
+import getpass
+from dotenv import load_dotenv
+
+# Load environment variables from a .env file if it exists
+load_dotenv()
+
+# Set up your OpenAI API key
+if "OPENAI_API_KEY" not in os.environ:
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter your OpenAI API key: ")
+
+print("✅ API keys configured!")</code></pre></div><div class="nb-output" data-prompt-number="3"><pre class="nb-stdout">✅ API keys configured!
+</pre></div></div><div class="nb-cell nb-markdown-cell"><h2>2. Building Your First Chain with LCEL</h2>
+<p>A "chain" in LangChain is a sequence of calls to components. We'll use the LangChain Expression Language (LCEL) to build a simple chain.</p>
+<h3>Initialize the Model</h3>
+<p>We'll start by initializing a chat model.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input" data-prompt-number="4"><pre class=""><code class="lang-python" data-language="python">from langchain.chat_models import init_chat_model
+
+# Initialize a chat model from OpenAI
+model = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.7)
+
+print(f"✅ Initialized model: {model.__class__.__name__}")</code></pre></div><div class="nb-output" data-prompt-number="4"><pre class="nb-stdout">✅ Initialized model: ChatOpenAI
+</pre></div></div><div class="nb-cell nb-markdown-cell"><h3>Work with Prompt Templates</h3>
+<p>Prompt templates allow you to create reusable and parameterized prompts.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# Create a prompt template
+prompt_template = ChatPromptTemplate.from_messages([
+    ("system", "You are an expert in {expertise}."),
+    ("human", "Explain {topic} in a simple and concise way.")
+])
+
+# Create a simple chain using LCEL
+# The chain will:
+# 1. Take user input for 'expertise' and 'topic'.
+# 2. Format the prompt using the prompt_template.
+# 3. Pass the formatted prompt to the model.
+# 4. Parse the model's output to a string.
+simple_chain = prompt_template | model | StrOutputParser()
+
+# Invoke the chain
+response = simple_chain.invoke({
+    "expertise": "physics",
+    "topic": "quantum entanglement"
+})
+
+print(response)</code></pre></div></div><div class="nb-cell nb-markdown-cell"><h3>Streaming Responses</h3>
+<p>For a better user experience, you can stream the model's response as it's generated.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">print("🌊 Streaming response:")
+for chunk in simple_chain.stream({
+    "expertise": "culinary arts",
+    "topic": "the Maillard reaction"
+}):
+    print(chunk, end="", flush=True)</code></pre></div></div><div class="nb-cell nb-markdown-cell"><h2>3. Structured Output and Advanced Chains</h2>
+<p>LangChain can parse model outputs into structured formats and build more complex, conditional chains.</p>
+<h3>Pydantic Output Parser</h3>
+<p>Use Pydantic models to define the desired output structure.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from typing import List
+from pydantic import BaseModel, Field
+from langchain_core.output_parsers import PydanticOutputParser
+
+# Define a Pydantic model for structured output
+class Recipe(BaseModel):
+    name: str = Field(description="The name of the recipe")
+    ingredients: List[str] = Field(description="A list of ingredients")
+    steps: List[str] = Field(description="The steps to prepare the recipe")
+
+# Create a Pydantic output parser
+pydantic_parser = PydanticOutputParser(pydantic_object=Recipe)
+
+# Create a prompt that includes format instructions
+structured_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a world-class chef. Generate a recipe based on the user's request and format it as requested."),
+    ("human", "I want a simple recipe for {dish}.\n\n{format_instructions}")
+])
+
+# Create the structured output chain
+structured_chain = structured_prompt | model | pydantic_parser
+
+# Invoke the chain
+recipe_request = {
+    "dish": "scrambled eggs",
+    "format_instructions": pydantic_parser.get_format_instructions()
+}
+recipe_output = structured_chain.invoke(recipe_request)
+
+print(f"Recipe for: {recipe_output.name}")
+print("\nIngredients:")
+for ingredient in recipe_output.ingredients:
+    print(f"- {ingredient}")</code></pre></div></div><div class="nb-cell nb-markdown-cell"><p><strong>Conditional Chains with <code>RunnableBranch</code></strong></p>
+<p>Create dynamic chains that change their behavior based on input conditions.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from langchain_core.runnables import RunnableBranch
+
+# Define different prompts for different levels
+beginner_prompt = ChatPromptTemplate.from_template("Explain {topic} to a complete beginner.")
+expert_prompt = ChatPromptTemplate.from_template("Provide a detailed, technical explanation of {topic}.")
+
+# Create a conditional chain using RunnableBranch
+# This chain checks the 'level' input and routes to the appropriate prompt
+conditional_chain = (
+    RunnableBranch(
+        (lambda x: x.get("level") == "expert", expert_prompt),
+        beginner_prompt  # Default prompt
+    )
+    | model
+    | StrOutputParser()
+)
+
+# Test the beginner path
+beginner_response = conditional_chain.invoke({"topic": "black holes", "level": "beginner"})
+print("--- Beginner Explanation ---")
+print(beginner_response)
+
+# Test the expert path
+expert_response = conditional_chain.invoke({"topic": "black holes", "level": "expert"})
+print("\n--- Expert Explanation ---")
+print(expert_response)</code></pre></div></div><div class="nb-cell nb-markdown-cell"><h3><strong>4. Retrieval-Augmented Generation (RAG)</strong></h3>
+<p>RAG connects your LLM to external data, allowing it to answer questions about information it wasn't trained on.</p>
+<p><strong>Step 1: Document Loading and Splitting</strong></p>
+<p>Load data from a source (like a website) and split it into smaller chunks for processing.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from langchain_community.document_loaders import WebBaseLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# Load documents from a web page
+loader = WebBaseLoader("https://python.langchain.com/docs/modules/model_io/prompts/")
+docs = loader.load()
+
+# Initialize a text splitter
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+
+# Split the documents into chunks
+splits = text_splitter.split_documents(docs)
+
+print(f"Loaded {len(docs)} documents and split them into {len(splits)} chunks.")</code></pre></div></div><div class="nb-cell nb-markdown-cell"><p><strong>Step 2: Embeddings and Vector Stores</strong></p>
+<p>Convert the text chunks into numerical representations (embeddings) and store them in a vector database for efficient searching.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from langchain_openai import OpenAIEmbeddings
+from langchain_chroma import Chroma
+
+# Initialize OpenAI embeddings
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+
+# Create a Chroma vector store from the document splits
+vectorstore = Chroma.from_documents(documents=splits, embedding=embeddings)
+
+print("✅ Vector store created.")</code></pre></div></div><div class="nb-cell nb-markdown-cell"><p><strong>Step 3: Creating a Retriever</strong></p>
+<p>A retriever is responsible for finding the most relevant document chunks based on a user's query.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python"># Create a retriever from the vector store
+retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+# Test the retriever
+query = "What are prompt templates?"
+retrieved_docs = retriever.invoke(query)
+
+print(f"Retrieved {len(retrieved_docs)} documents for the query: '{query}'")</code></pre></div></div><div class="nb-cell nb-markdown-cell"><p><strong>Step 4: Building the RAG Chain</strong></p>
+<p>Now, let's combine the retriever with a prompt and the LLM to create a complete RAG chain.</p>
+</div><div class="nb-cell nb-code-cell"><div class="nb-input"><pre class=""><code class="lang-python" data-language="python">from langchain_core.runnables import RunnablePassthrough
+
+# Define a RAG prompt template
+rag_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant. Use the following context to answer the user's question.\n\nContext:\n{context}"),
+    ("human", "{question}")
+])
+
+# Helper function to format the retrieved documents
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+# Create the RAG chain
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | rag_prompt
+    | model
+    | StrOutputParser()
+)
+
+# Test the RAG chain
+rag_question = "How can I use few-shot examples in my prompts?"
+rag_answer = rag_chain.invoke(rag_question)
+
+print(f"\n❓ Question: {rag_question}")
+print(f"🎯 Answer: {rag_answer}")</code></pre></div></div></div></div>
+      </div>
+    </div> </div> </div> </div> <!-- Copy Button Component --> <copy-button class="hidden"> <button class="px-3 py-1 bg-dark-surface hover:bg-dark-hover border border-dark-border rounded text-xs text-dark-secondary transition-colors">
+Copy
+</button> </copy-button>  </div> <!-- Right Sidebar (On This Page) --> <aside class="w-64 flex-shrink-0 border-l border-dark-border" data-astro-cid-ds6ctzq3> <div class="h-screen overflow-y-auto p-6" data-astro-cid-zujyv34g> <div class="sticky top-0 bg-dark-bg" data-astro-cid-zujyv34g> <h2 class="text-sm font-semibold text-dark-text mb-4 pb-2 border-b border-dark-border" data-astro-cid-zujyv34g>
+On This Page
+</h2> </div> <nav class="space-y-1" data-astro-cid-zujyv34g> <a href="#1-introduction-and-setup" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary font-medium" data-heading-link="1-introduction-and-setup" data-astro-cid-zujyv34g> 1. Introduction and Setup </a><a href="#what-is-langchain" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="what-is-langchain" data-astro-cid-zujyv34g> What is LangChain? </a><a href="#core-concepts" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="core-concepts" data-astro-cid-zujyv34g> Core Concepts: </a><a href="#installation" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="installation" data-astro-cid-zujyv34g> Installation </a><a href="#environment-setup" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="environment-setup" data-astro-cid-zujyv34g> Environment Setup </a><a href="#2-building-your-first-chain-with-lcel" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary font-medium" data-heading-link="2-building-your-first-chain-with-lcel" data-astro-cid-zujyv34g> 2. Building Your First Chain with LCEL </a><a href="#initialize-the-model" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="initialize-the-model" data-astro-cid-zujyv34g> Initialize the Model </a><a href="#work-with-prompt-templates" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="work-with-prompt-templates" data-astro-cid-zujyv34g> Work with Prompt Templates </a><a href="#streaming-responses" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="streaming-responses" data-astro-cid-zujyv34g> Streaming Responses </a><a href="#3-structured-output-and-advanced-chains" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary font-medium" data-heading-link="3-structured-output-and-advanced-chains" data-astro-cid-zujyv34g> 3. Structured Output and Advanced Chains </a><a href="#pydantic-output-parser" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="pydantic-output-parser" data-astro-cid-zujyv34g> Pydantic Output Parser </a><a href="#4-retrieval-augmented-generation-rag" class="block py-1 text-sm transition-colors hover:text-dark-text text-dark-secondary pl-4" data-heading-link="4-retrieval-augmented-generation-rag" data-astro-cid-zujyv34g> 4. Retrieval-Augmented Generation (RAG) </a> </nav> </div>   </aside> </div> </main> </div> <!-- Copy to Clipboard Script -->  </body> </html> 
