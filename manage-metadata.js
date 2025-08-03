@@ -66,8 +66,10 @@ function getAllTutorials() {
     
     for (const item of items) {
       const fullPath = path.join(dir, item);
+      if (!fs.existsSync(fullPath)) {
+        continue;
+      }
       const stat = fs.statSync(fullPath);
-      
       if (stat.isDirectory()) {
         scanDirectory(fullPath, prefix + item + '/');
       } else if (item.endsWith('.md') || item.endsWith('.ipynb')) {
