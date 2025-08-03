@@ -5,4 +5,10 @@ node_modules
 dist
 .vercel
 tutorial_draft
-.github
+
+# Large model files
+tutorials/Fine Tuning/results/
+*.safetensors
+*.pt
+*.pth
+*.bin
