@@ -20,10 +20,6 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-20"
     },
-    "UI Framework/gradio_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-07-15"
-    },
     "Model Providers/claude_api_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-05-03"
@@ -35,8 +31,24 @@
     "Model Providers/openai_api_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-04-20"
+    },
+    "Chat UI Framework/gradio_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-03"
+    },
+    "Fine Tuning/huggingface_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-03"
     }
   },
+  "folderOrder": [
+    "Model Providers",
+    "Gateways",
+    "Frameworks",
+    "Chat UI Framework",
+    "Observarbility",
+    "Fine Tuning"
+  ],
   "_instructions": {
     "description": "This file allows you to manually override authorId and lastUpdated metadata for tutorials.",
     "usage": "Add entries using the tutorial path (relative to tutorials directory) as the key. Use authorId to reference authors from authorId-metadata.json.",

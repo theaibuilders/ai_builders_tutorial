@@ -155,31 +155,34 @@ export function extractNotebookMetadata(notebook: any, filePath?: string): any {
 
 export function scanTutorialsDirectory(): TutorialSection[] {
   const sections: TutorialSection[] = [];
-  
+  let folderOrder: string[] | undefined = undefined;
   try {
+    // Load folderOrder from tutorial-metadata.json if present
+    if (fs.existsSync(METADATA_CONFIG_PATH)) {
+      const content = fs.readFileSync(METADATA_CONFIG_PATH, 'utf-8');
+      const config = JSON.parse(content);
+      if (Array.isArray(config.folderOrder)) {
+        folderOrder = config.folderOrder;
+      }
+    }
     const sectionDirs = fs.readdirSync(TUTORIALS_DIR).filter(item => {
       const fullPath = path.join(TUTORIALS_DIR, item);
       return fs.statSync(fullPath).isDirectory();
     });
-    
     for (const sectionDir of sectionDirs) {
       const sectionPath = path.join(TUTORIALS_DIR, sectionDir);
       const files: TutorialFile[] = [];
-      
-      const fileNames = fs.readdirSync(sectionPath).filter(file => 
+      const fileNames = fs.readdirSync(sectionPath).filter(file =>
         file.endsWith('.md') || file.endsWith('.ipynb')
       );
-      
       for (const fileName of fileNames) {
         const filePath = path.join(sectionPath, fileName);
         const relativePath = `${sectionDir}/${fileName}`;
-        
         try {
           if (fileName.endsWith('.md')) {
             const content = readMarkdownFile(filePath);
             if (content) {
               const metadata = extractMarkdownMetadata(content, relativePath);
-              
               files.push({
                 path: relativePath,
                 name: fileName,
@@ -192,7 +195,6 @@ export function scanTutorialsDirectory(): TutorialSection[] {
             const notebook = readNotebookFile(filePath);
             if (notebook) {
               const metadata = extractNotebookMetadata(notebook, relativePath);
-              
               files.push({
                 path: relativePath,
                 name: fileName,
@@ -204,17 +206,14 @@ export function scanTutorialsDirectory(): TutorialSection[] {
           }
         } catch (error) {
           console.error(`Error processing file ${filePath}:`, error);
-          // Skip this file and continue with others
         }
       }
-      
       // Sort files within each section, prioritizing tutorial_overview.md
       files.sort((a, b) => {
         if (a.name === 'tutorial_overview.md') return -1;
         if (b.name === 'tutorial_overview.md') return 1;
         return a.name.localeCompare(b.name);
       });
-      
       sections.push({
         name: sectionDir.charAt(0).toUpperCase() + sectionDir.slice(1),
         path: sectionDir,
@@ -224,15 +223,24 @@ export function scanTutorialsDirectory(): TutorialSection[] {
   } catch (error) {
     console.error('Error scanning tutorials directory:', error);
   }
-  
-  // Sort sections to put Overview first, then alphabetically
-  sections.sort((a, b) => {
-    if (a.name === 'Overview') return -1;
-    if (b.name === 'Overview') return 1;
-    return a.name.localeCompare(b.name);
-  });
-  
-  return sections;
+  // If folderOrder is present, use it to order sections
+  if (folderOrder) {
+    // Map section names to section objects
+    const sectionMap = Object.fromEntries(sections.map(s => [s.name, s]));
+    // Build ordered array, only including sections that exist
+    const orderedSections = folderOrder.map(name => sectionMap[name]).filter(Boolean);
+    // Add any sections not in folderOrder at the end (preserve their original order)
+    const remainingSections = sections.filter(s => !folderOrder!.includes(s.name));
+    return [...orderedSections, ...remainingSections];
+  } else {
+    // Fallback: Overview first, then alphabetical
+    sections.sort((a, b) => {
+      if (a.name === 'Overview') return -1;
+      if (b.name === 'Overview') return 1;
+      return a.name.localeCompare(b.name);
+    });
+    return sections;
+  }
 }
 
 export function findTutorialFile(sections: TutorialSection[], targetPath: string): TutorialFile | undefined {

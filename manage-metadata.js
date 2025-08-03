@@ -94,7 +94,7 @@ function autoUpdateMetadata() {
     if (!metadata.tutorials[tutorial]) {
       console.log(`📝 Found new tutorial: ${tutorial}`);
       metadata.tutorials[tutorial] = {
-        author: "Devon Sun",
+        authorId: "devon-sun",
         lastUpdated: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
       };
       updated = true;
