@@ -38,7 +38,11 @@
     },
     "Fine Tuning/huggingface_tutorial.ipynb": {
       "authorId": "devon-sun",
-      "lastUpdated": "2025-08-03"
+      "lastUpdated": "2025-07-10"
+    },
+    "Gateways/openrouter_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-05-25"
     }
   },
   "folderOrder": [

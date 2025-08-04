@@ -2,6 +2,15 @@
 import type { TutorialFile } from '../types/tutorial';
 import nb from 'notebookjs';
 
+// Format date as 'Month Day Year' (e.g., May 25 2025)
+function formatDateMDY(dateString) {
+  const date = new Date(dateString);
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const day = date.getDate();
+  const year = date.getFullYear();
+  return `${month} ${day} ${year}`;
+}
+
 interface Props {
   currentFile?: TutorialFile;
 }
@@ -1261,7 +1270,7 @@ function getNbviewerUrl(filePath: string): string {
             )}
             
             <div class="flex items-center gap-2">
-              <span>Last updated: {new Date(currentFile.metadata.lastUpdated).toLocaleDateString()}</span>
+              <span>Last updated: {formatDateMDY(currentFile.metadata.lastUpdated)}</span>
             </div>
           </div>
           
