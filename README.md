@@ -21,34 +21,36 @@ Visit our tutorial platform: **[https://tutorial.theaibuilders.dev/](https://tut
 
 ## Tutorials Overview
 
+
 ### Model Providers
 
-- **[OpenAI API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/openai_api_tutorial)** – Master OpenAI's APIs including GPT models, Assistants, and advanced features
-- **[Claude API Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/claude_api_tutorial)** – Learn Anthropic's Claude API with practical examples and best practices
-- **[Nosana Tutorial (OpenAI SDK)](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/nosana_tutorial_openai_sdk)** – Decentralized GPU network with advanced open source models
+- **[OpenAI Responses API: Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/openai_api_tutorial)** — Master OpenAI's APIs including GPT models, Assistants, and advanced features
+- **[Anthropic Claude API Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/claude_api_tutorial)** — Learn Anthropic's Claude API with practical examples and best practices
+- **[Nosana AI Inference with OpenAI SDK](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/nosana_tutorial_openai_sdk)** — Decentralized GPU network with advanced open source models
 
 ### Gateways
 
-- **[LiteLLM Tutorial: Unified API for 100+ LLMs](https://tutorial.theaibuilders.dev/tutorials/Gateways/litellm_tutorial)** – Use a single interface to work with any LLM provider
-- **[OpenRouter Tutorial](https://tutorial.theaibuilders.dev/tutorials/Gateways/openrouter_tutorial)** – Route OpenAI-compatible calls to many models via OpenRouter
+- **[LiteLLM Tutorial: Unified API for 100+ LLMs](https://tutorial.theaibuilders.dev/tutorials/Gateways/litellm_tutorial)** — Use a single interface to work with any LLM provider
+- **[OpenRouter: Quick Start Tutorial](https://tutorial.theaibuilders.dev/tutorials/Gateways/openrouter_tutorial)** — Route OpenAI-compatible calls to many models via OpenRouter
 
 ### Frameworks
 
-- **[LangChain Tutorial: From Fundamentals to Advanced RAG](https://tutorial.theaibuilders.dev/tutorials/Frameworks/langchain)** – Master LangChain from basic chains to sophisticated RAG systems
-- **[LlamaIndex Tutorial: Building RAG Applications](https://tutorial.theaibuilders.dev/tutorials/Frameworks/llamaindex_tutorial)** – Learn to build powerful document retrieval systems with LlamaIndex
+- **[CrewAI Tutorial: Building Multi-Agent AI Systems](https://tutorial.theaibuilders.dev/tutorials/Frameworks/crewai_tutorial)** — Build multi-agent systems with CrewAI for collaborative AI workflows
+- **[LangChain Tutorial: From Fundamentals to Advanced RAG](https://tutorial.theaibuilders.dev/tutorials/Frameworks/langchain)** — Master LangChain from basic chains to sophisticated RAG systems
+- **[LlamaIndex Tutorial: Building RAG Applications](https://tutorial.theaibuilders.dev/tutorials/Frameworks/llamaindex_tutorial)** — Learn to build powerful document retrieval systems with LlamaIndex
 
 ### Fine Tuning
 
-- **[HuggingFace Fine-Tuning Tutorial](https://tutorial.theaibuilders.dev/tutorials/Fine%20Tuning/huggingface_tutorial)** – Step-by-step guide to fine-tuning transformer models with HuggingFace
+- **[Hugging Face: From Zero to Fine-tuning](https://tutorial.theaibuilders.dev/tutorials/Fine%20Tuning/huggingface_tutorial)** — Step-by-step guide to fine-tuning transformer models with HuggingFace
 
 ### Chat UI Framework
 
-- **[Gradio: From Interface to Chatbots](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/gradio_tutorial)** – Build modern chat UIs and interactive apps with Gradio
+- **[Gradio: From Interface to Chatbots](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/gradio_tutorial)** — Build modern chat UIs and interactive apps with Gradio
 
 ### Observability
 
-- **[Traceloop Tutorial: Complete Guide to LLM Monitoring](https://tutorial.theaibuilders.dev/tutorials/Observarbility/traceloop_tutorial)** – Monitor and trace your LLM applications with comprehensive observability
-- **[Langfuse Tutorial: LLM Observability](https://tutorial.theaibuilders.dev/tutorials/Observarbility/langfuse_tutorial)** – End-to-end observability and analytics for LLM apps
+- **[Traceloop Tutorial: Complete Guide to LLM Observability](https://tutorial.theaibuilders.dev/tutorials/Observarbility/traceloop_tutorial)** — Monitor and trace your LLM applications with comprehensive observability
+- **[Langfuse Tutorial: LLM Observability & Evaluation](https://tutorial.theaibuilders.dev/tutorials/Observarbility/langfuse_tutorial)** — End-to-end observability and analytics for LLM apps
 
 ---
 
