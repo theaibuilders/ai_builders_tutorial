@@ -4,8 +4,8 @@
 
 When interacting with LLM models from groq in Copilot Chat:
 
-- **Maximum input tokens**: 80,000
-- **Maximum output tokens**: 4,000
+- **Maximum input tokens**: 130,000
+- **Maximum output tokens**: 130,000
 
 Ensure all prompts and responses stay within these limits to prevent truncation or errors.
 
