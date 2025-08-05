@@ -48,13 +48,17 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-04"
     },
-    "Observarbility/deepeval_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-08-05"
-    },
     "Frameworks/haystack.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-15"
+    },
+    "Model Providers/groq_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-05"
+    },
+    "Chat UI Framework/streamlit_llm_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-06-05"
     }
   },
   "folderOrder": [

@@ -46,6 +46,7 @@ Visit our tutorial platform: **[https://tutorial.theaibuilders.dev/](https://tut
 ### Chat UI Framework
 
 - **[Gradio: From Interface to Chatbots](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/gradio_tutorial)** — Build modern chat UIs and interactive apps with Gradio
+- **[Streamlit: LLM Chatbot in a Notebook](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/streamlit_llm_tutorial)** — Build a streaming LLM chatbot UI with Streamlit, including ngrok tunneling for notebook/cloud access
 
 ### Observability
 
