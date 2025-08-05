@@ -71,6 +71,10 @@
     "Model Providers/togetherai_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-02"
+    },
+    "Fine Tuning/finetuning_togetherai.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-05"
     }
   },
   "folderOrder": [
