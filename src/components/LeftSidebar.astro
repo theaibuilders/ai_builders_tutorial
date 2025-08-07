@@ -12,22 +12,33 @@ const { sections, currentFile } = Astro.props;
 
 <div class="h-screen flex flex-col lg:pt-0">
 
-  <!-- Header -->
-  <div class="flex-shrink-0 p-6 border-b border-dark-border lg:block hidden">
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-xl font-bold">
-        <a href="/" class="text-white hover:text-gray-300 transition-colors cursor-pointer !text-white">
-          AI Builders Tutorial
-        </a>
-      </h1>
+
+  <!-- Header with Logo -->
+  <div class="flex-shrink-0 border-b border-dark-border lg:block hidden" style="padding: 24px 24px 24px 24px;">
+    <div class="flex items-center mb-4" style="height: 80px; margin-left: 0; padding-left: 0;">
+      <a href="https://theaibuilders.dev/" target="_blank" rel="noopener noreferrer">
+        <img 
+          src="/full_logo_white_text_transparent_2.png" 
+          alt="AI Builders Tutorial Logo" 
+          class="h-20 w-auto opacity-90 max-w-full"
+          style="min-height: 80px; margin-left: 0; padding-left: 0;"
+        />
+      </a>
     </div>
-    
     <!-- Search Bar -->
     <SearchBar sections={sections} id="desktop" />
   </div>
 
-  <!-- Mobile Search Bar -->
-  <div class="lg:hidden p-3 border-b border-dark-border">
+  <!-- Mobile Logo and Search Bar -->
+  <div class="lg:hidden p-3 border-b border-dark-border flex flex-col items-start">
+    <a href="https://theaibuilders.dev/" target="_blank" rel="noopener noreferrer" class="mb-2">
+      <img 
+        src="/full_logo_white_text_transparent_2.png" 
+        alt="AI Builders Tutorial Logo" 
+        class="h-12 w-auto opacity-90 max-w-full"
+        style="min-height: 48px; margin-left: 0; padding-left: 0;"
+      />
+    </a>
     <SearchBar sections={sections} id="mobile" />
   </div>
   
@@ -97,29 +108,15 @@ const { sections, currentFile } = Astro.props;
     </nav>
   </div>
 
-  <!-- Logo at Bottom Left -->
-  <div class="flex-shrink-0 border-t border-dark-border bg-dark-bg sticky bottom-0">
-    <!-- Logo Section with Close Button -->
+
+  <!-- Mobile Close Button (if needed, keep only the button for mobile) -->
+  <!--
+  <div class="flex-shrink-0 border-t border-dark-border bg-dark-bg sticky bottom-0 lg:hidden">
     <div class="p-4">
       <div class="flex items-center justify-center relative">
-        <a 
-          href="https://www.theaibuilders.dev/" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="block transition-opacity duration-300 hover:opacity-100"
-        >
-          <img 
-            src="/full_logo_white_text_transparent_2.png" 
-            alt="AI Builders Tutorial Logo" 
-            class="h-14 w-auto opacity-90 hover:opacity-100 transition-opacity duration-300 max-w-full"
-            style="min-height: 56px;"
-          />
-        </a>
-        
-        <!-- Mobile Close Button -->
         <button
           onclick="closeMobileNav()"
-          class="lg:hidden absolute right-0 p-2 rounded-lg hover:bg-dark-hover transition-colors"
+          class="absolute right-0 p-2 rounded-lg hover:bg-dark-hover transition-colors"
           aria-label="Close navigation"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,6 +126,7 @@ const { sections, currentFile } = Astro.props;
       </div>
     </div>
   </div>
+  -->
 </div>
 
 <script>

@@ -6,7 +6,7 @@ interface Props {
 const { headings } = Astro.props;
 ---
 
-<div class="h-screen overflow-y-auto">
+<div class="h-screen flex flex-col">
   <!-- Mobile Close Button -->
   <div class="lg:hidden flex items-center justify-between p-4 border-b border-dark-border">
     <h2 class="text-lg font-bold text-white">Table of Contents</h2>
@@ -21,15 +21,17 @@ const { headings } = Astro.props;
     </button>
   </div>
 
-  <div class="p-6">
-    <div class="sticky top-0 bg-dark-bg lg:block hidden">
-      <h2 class="text-sm font-semibold text-dark-text mb-4 pb-2 border-b border-dark-border">
-        On This Page
-      </h2>
-    </div>
-    
+  <!-- Fixed Header Section -->
+  <div class="flex-shrink-0 lg:block hidden p-6 pb-4">
+    <h2 class="text-sm font-semibold text-dark-text">
+      On This Page
+    </h2>
+  </div>
+  
+  <!-- Scrollable Content Section -->
+  <div class="flex-1 overflow-y-auto min-h-0 p-6 pt-4 lg:pt-6">
     {headings.length > 0 ? (
-      <nav class="space-y-1">
+      <nav class="space-y-1" style="padding-bottom: 240px;">
         {headings.map((heading) => (
           <a
             href={`#${heading.id}`}
@@ -54,6 +56,23 @@ const { headings } = Astro.props;
       </div>
     )}
   </div>
+
+</div>
+
+<!-- Community Call to Action Fixed at Bottom -->
+<div class="fixed right-0 bottom-0 w-[340px] max-w-full px-6 pb-6 z-[9999]">
+  <!-- Opaque Background Backdrop -->
+  <div class="absolute inset-0 bg-dark-bg -z-10"></div>
+  
+  <!-- Section Breaker -->
+  <div class="mb-4 border-t border-dark-border"></div>
+  
+  <div class="rounded-lg bg-dark-hover p-4 text-center border border-dark-border">
+    <div class="text-sm text-white font-semibold mb-2">Interested in more tutorials and connect with other AI Builders?</div>
+    <div class="text-sm text-dark-secondary mb-2">Join our community now</div>
+  <a href="https://community.theaibuilders.dev" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-300 underline break-all">community.theaibuilders.dev</a>
+  </div>
+</div>
 </div>
 
 <script>
