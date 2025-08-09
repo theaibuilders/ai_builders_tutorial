@@ -79,6 +79,10 @@
     "Model Providers/replicate_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-09"
+    },
+    "Fine Tuning/replicate_fine_tuning.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-09"
     }
   },
   "folderOrder": [
