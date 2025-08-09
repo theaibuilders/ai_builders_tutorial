@@ -5,6 +5,7 @@ node_modules
 dist
 .vercel
 tutorial_draft
+tutorial_member
 
 # Large model files
 tutorials/Fine Tuning/results/

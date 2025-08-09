@@ -1,0 +1,9 @@
+
+Together AI offers a cloud platform for building and running generative AI. It provides access to over 100 open-source models.
+The platform is designed for high-performance inference, leveraging techniques like speculative decoding.
+For Retrieval-Augmented Generation, Together AI offers both embedding models and reranker models.
+The BAAI/bge-large-en-v1.5 is a popular and powerful model for generating text embeddings.
+Reranking is a crucial step in a RAG pipeline to improve the quality of retrieved documents before sending them to the language model.
+The Together AI Python client is compatible with the OpenAI API, making it easy for developers to switch.
+Users can fine-tune models on their own data to create specialized, expert models.
+Together AI offers both serverless, pay-as-you-go endpoints and dedicated instances for large-scale applications.

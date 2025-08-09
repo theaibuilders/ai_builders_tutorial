@@ -1,0 +1,28 @@
+{
+  "os":  "macOS-14.7.2-x86_64-i386-64bit",
+  "python":  "CPython 3.10.14",
+  "startedAt":  "2025-08-03T20:55:37.886909Z",
+  "program":  "/Users/devon/ai_builders_tutorial/tutorials/Model Providers/huggingface_tutorial.ipynb",
+  "codePath":  "tutorials/Model Providers/huggingface_tutorial.ipynb",
+  "codePathLocal":  "huggingface_tutorial.ipynb",
+  "git":  {
+    "remote":  "https://github.com/devonsunml/ai_builders_tutorial.git",
+    "commit":  "b7a689634f31b84f2245b75184b46c2645151eb7"
+  },
+  "email":  "devonsun@hotmail.com",
+  "root":  "/Users/devon/ai_builders_tutorial/tutorials/Model Providers",
+  "host":  "tap.local",
+  "executable":  "/Users/devon/.pyenv/versions/3.10.14/bin/python",
+  "cpu_count":  8,
+  "cpu_count_logical":  16,
+  "disk":  {
+    "/":  {
+      "total":  "1000240963584",
+      "used":  "784802746368"
+    }
+  },
+  "memory":  {
+    "total":  "68719476736"
+  },
+  "writerId":  "s40bq4yh17rkd4thsr51gzpuok56y5jy"
+}

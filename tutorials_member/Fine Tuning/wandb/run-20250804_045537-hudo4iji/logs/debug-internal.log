@@ -1,0 +1,7 @@
+{"time":"2025-08-04T04:55:39.217816+08:00","level":"INFO","msg":"stream: starting","core version":"0.21.0"}
+{"time":"2025-08-04T04:55:39.255503+08:00","level":"ERROR","msg":"monitor: failed to initialize GPU resource: monitor: could not start GPU binary: fork/exec /Users/devon/.pyenv/versions/3.10.14/lib/python3.10/site-packages/wandb/bin/gpu_stats: bad CPU type in executable"}
+{"time":"2025-08-04T04:55:39.588279+08:00","level":"INFO","msg":"stream: created new stream","id":"hudo4iji"}
+{"time":"2025-08-04T04:55:39.588366+08:00","level":"INFO","msg":"stream: started","id":"hudo4iji"}
+{"time":"2025-08-04T04:55:39.5884+08:00","level":"INFO","msg":"handler: started","stream_id":"hudo4iji"}
+{"time":"2025-08-04T04:55:39.588447+08:00","level":"INFO","msg":"sender: started","stream_id":"hudo4iji"}
+{"time":"2025-08-04T04:55:39.588468+08:00","level":"INFO","msg":"writer: Do: started","stream_id":"hudo4iji"}
