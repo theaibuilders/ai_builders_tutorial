@@ -4,8 +4,8 @@ node_modules
 .astro
 dist
 .vercel
-tutorial_draft
-tutorial_member
+tutorials_draft
+tutorials_member
 
 # Large model files
 tutorials/Fine Tuning/results/
