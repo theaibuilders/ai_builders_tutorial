@@ -8,10 +8,6 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-06-07"
     },
-    "Observarbility/traceloop_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-06-30"
-    },
     "Observarbility/langfuse_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-03"
@@ -87,6 +83,18 @@
     "Model Providers/nosana_gpt_oss_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-10"
+    },
+    "Observarbility/deepeval_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-12"
+    },
+    "Observarbility/traceloop_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-12"
+    },
+    "Image and Video/nosana_stable_diffusion_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-12"
     }
   },
   "folderOrder": [
