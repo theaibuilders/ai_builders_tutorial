@@ -1,0 +1,19 @@
+# AI crawling policy for AI Builders Tutorial
+# This file is informational for AI crawlers and consumers.
+
+site: https://tutorial.theaibuilders.dev/
+owner: AI Builders Team
+contact: https://github.com/devonsunml/ai_builders_tutorial
+license: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+commercial-use: allowed
+transformations: allowed with attribution
+rate-limit: reasonable
+last-updated: 2025-08-13
+
+# Coverage
+includes: /
+excludes: /api/, /admin/
+
+# Topics
+topics: AI Engineering, LLMs, RAG, AI Agents, LangChain, LlamaIndex, OpenAI, Claude, Observability
+

@@ -1,0 +1,7 @@
+# LLM crawling policy
+site: https://tutorial.theaibuilders.dev/
+policy: allow
+usage: research, indexing, non-malicious only
+license: CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+rate-limit: 1 rps
+last-updated: 2025-08-13

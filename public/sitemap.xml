@@ -9,7 +9,7 @@
     <!-- Homepage - Highest Priority -->
     <url>
         <loc>https://tutorial.theaibuilders.dev/</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -17,43 +17,43 @@
     <!-- Framework Tutorials - High Priority -->
     <url>
         <loc>https://tutorial.theaibuilders.dev/tutorials/Frameworks/langchain</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
         <loc>https://tutorial.theaibuilders.dev/tutorials/Frameworks/llamaindex_tutorial</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
         <loc>https://tutorial.theaibuilders.dev/tutorials/Frameworks/litellm_tutorial</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
 
     <!-- Model Provider Tutorials - High Priority -->
     <url>
-        <loc>https://tutorial.theaibuilders.dev/tutorials/ModelProviders/openai_api_tutorial</loc>
-        <lastmod>2025-08-02</lastmod>
+        <loc>https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/openai_api_tutorial</loc>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
-        <loc>https://tutorial.theaibuilders.dev/tutorials/ModelProviders/claude_api_tutorial</loc>
-        <lastmod>2025-08-02</lastmod>
+        <loc>https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/claude_api_tutorial</loc>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
-        <loc>https://tutorial.theaibuilders.dev/tutorials/ModelProviders/nosana_tutorial_openai_sdk</loc>
-        <lastmod>2025-08-02</lastmod>
+        <loc>https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/nosana_tutorial_openai_sdk</loc>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -69,21 +69,21 @@
     <!-- Tutorial Section Pages -->
     <url>
         <loc>https://tutorial.theaibuilders.dev/tutorials/Frameworks/</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     
     <url>
-        <loc>https://tutorial.theaibuilders.dev/tutorials/ModelProviders/</loc>
-        <lastmod>2025-08-02</lastmod>
+        <loc>https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/</loc>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     
     <url>
         <loc>https://tutorial.theaibuilders.dev/tutorials/Observarbility/</loc>
-        <lastmod>2025-08-02</lastmod>
+        <lastmod>2025-08-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>

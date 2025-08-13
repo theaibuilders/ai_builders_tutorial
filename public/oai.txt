@@ -1,0 +1,16 @@
+# OpenAI crawler policy
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+# Anthropic
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Common Crawl
+User-agent: CCBot
+Allow: /

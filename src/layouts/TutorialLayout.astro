@@ -33,11 +33,16 @@ const finalDescription = description || defaultDescription;
 
 // Enhanced keywords based on the current page
 const baseKeywords = [
-  "AI Engineering Tutorial",
-  "AI Engineer Tutorial", 
+  "AI Engineering tutorial",
+  "AI Engineering course",
+  "AI Engineer tutorial",
   "Artificial Intelligence course",
+  "LLM tutorial",
   "LLM course",
-  "AI Agent course",
+  "AI agent tutorial",
+  "AI agent course",
+  "Free AI development course",
+  "Free AI model course",
   "Machine Learning tutorial",
   "LangChain tutorial",
   "OpenAI API tutorial",
@@ -100,6 +105,8 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     
     <!-- Canonical URL -->
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="en" href={canonicalUrl} />
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content={type} />
@@ -107,6 +114,7 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={finalDescription} />
     <meta property="og:image" content="https://tutorial.theaibuilders.dev/github_banner.png" />
+    <meta property="og:updated_time" content={currentFile?.metadata?.lastUpdated || new Date().toISOString()} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="AI Builders Tutorial" />
@@ -137,6 +145,8 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     <meta name="msapplication-TileColor" content="#1f2937" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -184,6 +194,35 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
       "license": "https://creativecommons.org/licenses/by/4.0/"
     }
     </script>
+
+    <!-- Structured Data: WebSite with SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://tutorial.theaibuilders.dev/",
+      "name": "AI Builders Tutorial",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://tutorial.theaibuilders.dev/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- Structured Data: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "AI Builders",
+      "url": "https://tutorial.theaibuilders.dev/",
+      "logo": "https://tutorial.theaibuilders.dev/full_logo_white_text_transparent_2.png",
+      "sameAs": [
+        "https://github.com/devonsunml/ai_builders_tutorial"
+      ]
+    }
+    </script>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,6 +236,7 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     
     <!-- Preload critical resources -->
     <link rel="preload" href="/github_banner.png" as="image" type="image/png">
+    <link rel="search" type="application/opensearchdescription+xml" title="Search AI Builders Tutorial" href="/opensearch.xml">
     
     <!-- Additional SEO Meta Tags -->
     <meta name="generator" content="Astro" />
@@ -243,6 +283,24 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
       }
       </script>
     )}
+
+    {currentFile && (
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": title,
+        "description": finalDescription,
+        "provider": {
+          "@type": "Organization",
+          "name": "AI Builders",
+          "sameAs": "https://tutorial.theaibuilders.dev/"
+        },
+        "isAccessibleForFree": true,
+        "inLanguage": "en"
+      }
+      </script>
+    )}
     
     <!-- Theme Script (runs before page load) -->
     <script is:inline>
@@ -281,7 +339,7 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         <!-- Mobile Icons -->
         <div class="flex items-center gap-2">
           <a
-            href="https://theaibuilders.dev/"
+            href="https://www.theaibuilders.dev/"
             target="_blank"
             rel="noopener noreferrer"
             class="w-8 h-8 flex items-center justify-center transition-colors hover:text-gray-100"
@@ -299,6 +357,15 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-gray-300">
               <path d="M12 0C5.37 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.565 21.796 24 17.298 24 12c0-6.627-5.373-12-12-12z"/>
             </svg>
+          </a>
+          <a
+            href="https://www.linkedin.com/company/theaibuilders/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-8 h-8 flex items-center justify-center transition-colors hover:text-gray-100"
+            aria-label="View on LinkedIn"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-300"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
           </a>
         </div>
       </div>
@@ -360,7 +427,7 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         <!-- Bottom Icons -->
         <div class="flex flex-col items-center gap-3 mt-auto">
           <a
-            href="https://theaibuilders.dev/"
+            href="https://www.theaibuilders.dev/"
             target="_blank"
             rel="noopener noreferrer"
             class="w-8 h-8 flex items-center justify-center transition-colors hover:text-gray-100"
@@ -378,6 +445,15 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
             <svg viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-300">
               <path d="M12 0C5.37 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.6.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.565 21.796 24 17.298 24 12c0-6.627-5.373-12-12-12z"/>
             </svg>
+          </a>
+          <a
+            href="https://www.linkedin.com/company/theaibuilders/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-8 h-8 flex items-center justify-center transition-colors hover:text-gray-100"
+            aria-label="View on LinkedIn"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-gray-300"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
           </a>
         </div>
       </aside>

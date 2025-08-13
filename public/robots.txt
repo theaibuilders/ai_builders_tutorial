@@ -23,18 +23,40 @@ Allow: /*.svg$
 Allow: /*.ico$
 Allow: /manifest.json
 Allow: /humans.txt
+Allow: /ai.txt
+Allow: /llm.txt
+Allow: /oai.txt
 
 # High priority pages for crawlers
 # Main tutorial sections
 Allow: /tutorials/Frameworks/
-Allow: /tutorials/ModelProviders/
+Allow: /tutorials/Model%20Providers/
 Allow: /tutorials/Observarbility/
 
 # Specific important tutorials
 Allow: /tutorials/Frameworks/langchain
 Allow: /tutorials/Frameworks/llamaindex_tutorial
 Allow: /tutorials/Frameworks/litellm_tutorial
-Allow: /tutorials/ModelProviders/openai_api_tutorial
-Allow: /tutorials/ModelProviders/claude_api_tutorial
-Allow: /tutorials/ModelProviders/nosana_tutorial_openai_sdk
+Allow: /tutorials/Model%20Providers/openai_api_tutorial
+Allow: /tutorials/Model%20Providers/claude_api_tutorial
+Allow: /tutorials/Model%20Providers/nosana_tutorial_openai_sdk
 Allow: /tutorials/Observarbility/traceloop_tutorial
+
+# AI-specific crawlers
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
