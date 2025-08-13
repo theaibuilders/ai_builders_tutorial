@@ -15,13 +15,13 @@ const { sections, currentFile } = Astro.props;
 
   <!-- Header with Logo -->
   <div class="flex-shrink-0 border-b border-dark-border lg:block hidden" style="padding: 24px 24px 24px 24px;">
-    <div class="flex items-center mb-4" style="height: 80px; margin-left: 0; padding-left: 0;">
-      <a href="https://theaibuilders.dev/" target="_blank" rel="noopener noreferrer">
+    <div class="flex items-center mb-4" style="height: 60px; margin-left: 0; padding-left: 0;">
+      <a href="https://tutorial.theaibuilders.dev/" target="_blank" rel="noopener noreferrer">
         <img 
-          src="/full_logo_white_text_transparent_2.png" 
+          src="/ai-builders-tutorial-logo.png" 
           alt="AI Builders Tutorial Logo" 
-          class="h-20 w-auto opacity-90 max-w-full"
-          style="min-height: 80px; margin-left: 0; padding-left: 0;"
+          class="h-14 w-auto opacity-90 max-w-full object-contain"
+          style="margin-left: 0; padding-left: 0;"
         />
       </a>
     </div>
@@ -31,14 +31,25 @@ const { sections, currentFile } = Astro.props;
 
   <!-- Mobile Logo and Search Bar -->
   <div class="lg:hidden p-3 border-b border-dark-border flex flex-col items-start">
-    <a href="https://theaibuilders.dev/" target="_blank" rel="noopener noreferrer" class="mb-2">
-      <img 
-        src="/full_logo_white_text_transparent_2.png" 
-        alt="AI Builders Tutorial Logo" 
-        class="h-12 w-auto opacity-90 max-w-full"
-        style="min-height: 48px; margin-left: 0; padding-left: 0;"
-      />
-    </a>
+    <div class="w-full flex items-center justify-between mb-2">
+      <a href="https://tutorial.theaibuilders.dev/" target="_blank" rel="noopener noreferrer" class="py-2">
+        <img 
+          src="/ai-builders-tutorial-logo.png" 
+          alt="AI Builders Tutorial Logo" 
+          class="h-10 w-auto opacity-90 max-w-full object-contain"
+          style="margin-left: 0; padding-left: 0;"
+        />
+      </a>
+      <!-- Close Panel Button -->
+      <button
+        id="mobile-sidebar-close"
+        class="p-2 rounded-lg hover:bg-dark-hover transition-colors"
+        aria-label="Close sidebar"
+        onclick="closeMobileNav()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+      </button>
+    </div>
     <SearchBar sections={sections} id="mobile" />
   </div>
   

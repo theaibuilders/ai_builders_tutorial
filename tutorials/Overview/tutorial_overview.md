@@ -1,6 +1,6 @@
 # AI Builders Tutorial
 
-Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools 🚀
+Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for building AI applications using modern tools 🚀
 
 ## What You'll Learn
 
