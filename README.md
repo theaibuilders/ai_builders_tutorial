@@ -1,58 +1,58 @@
-![AI Builders Tutorial Banner](https://raw.githubusercontent.com/devonsunml/ai_builders_tutorial/main/public/github_banner.png)
-
 # AI Builders Tutorial
 
-A comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools. Learn through interactive Jupyter notebooks with step-by-step explanations and practical examples.
+Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools 🚀
 
 ## What You'll Learn
 
 Each tutorial is designed to be practical and immediately applicable:
 
-- **Hands-on Examples**: Every concept includes working code you can run and modify
-- **Real-world Applications**: Build actual projects, not just toy examples
-- **Best Practices**: Learn industry-standard approaches and common pitfalls to avoid
-- **Progressive Complexity**: Start with basics and advance to sophisticated implementations
+• **Concise and To-the-point**: We cover the most important concepts of each tool for you to get started quickly
+• **Hands-on Examples**: Every concept includes working code you can run and modify 
+• **Best Practices**: Learn industry-standard approaches and common pitfalls to avoid
+• **Progressive Complexity**: Start with basics and advance to sophisticated implementations
 
-All tutorials are interactive Jupyter notebooks with detailed explanations and code examples you can run yourself.
+Tutorials are written with Python or Typescript with detailed explanations and code examples you can run yourself.
 
-## Access the Tutorials
-
-Visit our tutorial platform: **[https://tutorial.theaibuilders.dev/](https://tutorial.theaibuilders.dev/)**
-
-## Tutorials Overview
-
+## Tutorial Categories
 
 ### Model Providers
-
-- **[OpenAI Responses API: Complete Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/openai_api_tutorial)** — Master OpenAI's APIs including GPT models, Assistants, and advanced features
-- **[Anthropic Claude API Tutorial](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/claude_api_tutorial)** — Learn Anthropic's Claude API with practical examples and best practices
-- **[Nosana AI Inference with OpenAI SDK](https://tutorial.theaibuilders.dev/tutorials/Model%20Providers/nosana_tutorial_openai_sdk)** — Decentralized GPU network with advanced open source models
+Learn to integrate with various AI model providers like OpenAI, Claude, Groq, and more.
 
 ### Gateways
-
-- **[LiteLLM Tutorial: Unified API for 100+ LLMs](https://tutorial.theaibuilders.dev/tutorials/Gateways/litellm_tutorial)** — Use a single interface to work with any LLM provider
-- **[OpenRouter: Quick Start Tutorial](https://tutorial.theaibuilders.dev/tutorials/Gateways/openrouter_tutorial)** — Route OpenAI-compatible calls to many models via OpenRouter
+Understand how to use API gateways and unified interfaces for multiple model providers.
 
 ### Frameworks
-
-- **[CrewAI Tutorial: Building Multi-Agent AI Systems](https://tutorial.theaibuilders.dev/tutorials/Frameworks/crewai_tutorial)** — Build multi-agent systems with CrewAI for collaborative AI workflows
-- **[LangChain Tutorial: From Fundamentals to Advanced RAG](https://tutorial.theaibuilders.dev/tutorials/Frameworks/langchain)** — Master LangChain from basic chains to sophisticated RAG systems
-- **[LlamaIndex Tutorial: Building RAG Applications](https://tutorial.theaibuilders.dev/tutorials/Frameworks/llamaindex_tutorial)** — Learn to build powerful document retrieval systems with LlamaIndex
-
-### Fine Tuning
-
-- **[Hugging Face: From Zero to Fine-tuning](https://tutorial.theaibuilders.dev/tutorials/Fine%20Tuning/huggingface_tutorial)** — Step-by-step guide to fine-tuning transformer models with HuggingFace
+Master popular AI frameworks like LangChain, LlamaIndex, CrewAI, and Haystack.
 
 ### Chat UI Framework
+Build interactive chat interfaces using Gradio and Streamlit.
 
-- **[Gradio: From Interface to Chatbots](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/gradio_tutorial)** — Build modern chat UIs and interactive apps with Gradio
-- **[Streamlit: LLM Chatbot in a Notebook](https://tutorial.theaibuilders.dev/tutorials/Chat%20UI%20Framework/streamlit_llm_tutorial)** — Build a streaming LLM chatbot UI with Streamlit, including ngrok tunneling for notebook/cloud access
+### MCP (Model Context Protocol)
+Explore the Model Context Protocol and tools like Composio.
 
 ### Observability
+Monitor and debug your AI applications with tools like LangFuse and Traceloop.
 
-- **[Traceloop Tutorial: Complete Guide to LLM Observability](https://tutorial.theaibuilders.dev/tutorials/Observarbility/traceloop_tutorial)** — Monitor and trace your LLM applications with comprehensive observability
-- **[Langfuse Tutorial: LLM Observability & Evaluation](https://tutorial.theaibuilders.dev/tutorials/Observarbility/langfuse_tutorial)** — End-to-end observability and analytics for LLM apps
+### Fine Tuning
+Learn how to fine-tune models using various platforms and techniques.
 
----
+### Image and Video
+Work with visual AI models for image generation and processing.
 
-Made with ❤️ by AI Builders Team
+## Ready to Take Your AI Journey Further?
+
+### Visit AI Builders
+
+Ready to dive deeper into the world of AI development? Visit **[AI Builders](https://theaibuilders.dev/)** for more resources, advanced tutorials, and the latest insights in AI development.
+
+### Join Our Community
+
+Connect with fellow AI builders from around the world! Join our vibrant community at **[AI Builders Community](https://community.theaibuilders.dev)** where you can:
+
+- Share your projects and get feedback
+- Ask questions and get help from experienced developers
+- Collaborate on exciting AI projects
+- Stay updated with the latest AI trends and technologies
+- Network with AI enthusiasts and professionals globally
+
+Whether you're just starting out or you're an experienced developer, our community welcomes everyone who's passionate about building with AI. Come join us and be part of the future of AI development!

@@ -1,17 +1,17 @@
 # AI Builders Tutorial
 
-A comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools. Learn through interactive Jupyter notebooks with step-by-step explanations and practical examples.
+Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for building AI applications using modern frameworks and tools 🚀
 
 ## What You'll Learn
 
 Each tutorial is designed to be practical and immediately applicable:
 
-• **Hands-on Examples**: Every concept includes working code you can run and modify
-• **Real-world Applications**: Build actual projects, not just toy examples  
+• **Concise and To-the-point**: We cover the most important concepts of each tool for you to get started quickly
+• **Hands-on Examples**: Every concept includes working code you can run and modify 
 • **Best Practices**: Learn industry-standard approaches and common pitfalls to avoid
 • **Progressive Complexity**: Start with basics and advance to sophisticated implementations
 
-All tutorials are interactive Jupyter notebooks with detailed explanations and code examples you can run yourself.
+Tutorials are written with Python or Typescript with detailed explanations and code examples you can run yourself.
 
 ## Tutorial Categories
 
@@ -38,21 +38,6 @@ Learn how to fine-tune models using various platforms and techniques.
 
 ### Image and Video
 Work with visual AI models for image generation and processing.
-
-## Getting Started
-
-1. Choose a tutorial category from the sidebar
-2. Select a specific tutorial that interests you
-3. Follow the step-by-step instructions
-4. Run the code examples and experiment
-5. Build upon the examples for your own projects
-
-Each tutorial includes:
-- Clear learning objectives
-- Prerequisites and setup instructions
-- Hands-on code examples
-- Practical exercises
-- Next steps and advanced topics
 
 ## Ready to Take Your AI Journey Further?
 
