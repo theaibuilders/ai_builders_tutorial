@@ -1,0 +1,114 @@
+# Mastra: Build AI Agents with TypeScript
+
+Welcome to this tutorial on Mastra, a powerful TypeScript framework for building AI agents and workflows. This guide will walk you through the essential concepts and provide you with a solid foundation to start building your own AI-powered applications. 🚀
+
+## Core Concepts
+
+Mastra revolves around a few key concepts that work together to create sophisticated AI systems.
+
+  * **Agents**: Think of agents as the "brains" of your application. They are AI entities that can understand instructions, use tools, and complete tasks. You can configure them with specific models (like GPT-4o mini), give them a persistent memory, and define their personality and capabilities.
+
+  * **Tools**: Tools are functions that you can provide to your agents, allowing them to interact with the outside world. This could be anything from fetching data from an API, to sending an email, or even interacting with a database. Mastra uses `zod` for schema validation, ensuring that the data passed to and from your tools is always correctly structured.
+
+  * **Workflows**: Workflows allow you to orchestrate complex, multi-step processes. You can define a sequence of steps, including calling agents, using tools, and even waiting for human input. This is perfect for building robust and reliable AI applications.
+
+  * **Memory**: Mastra provides a memory system that allows your agents to retain information across conversations. This is crucial for creating agents that can have more natural and context-aware interactions.
+
+## Getting Started
+
+Let's dive into some code and build a simple weather agent.
+
+### 1. Project Setup
+
+First, let's set up a new Mastra project. Open your terminal and run the following commands:
+
+```bash
+npx create-mastra@latest my-mastra-app
+cd my-mastra-app
+```
+
+This will create a new Mastra project in a directory called `my-mastra-app`.
+
+### 2. Environment Variables
+
+Mastra uses a `.env` file to manage API keys and other sensitive information. Create a `.env` file in the root of your project and add your OpenAI API key:
+
+```
+OPENAI_API_KEY=your_openai_api_key
+```
+
+### 3. Creating a Tool
+
+Now, let's create a tool that can fetch the current weather for a given location. Create a new file at `src/mastra/tools/weather.ts`:
+
+```typescript
+import { createTool } from '@mastra/core';
+import { z } from 'zod';
+
+export const weatherTool = createTool({
+  id: 'getWeather',
+  description: 'Gets the current weather for a specific location',
+  inputSchema: z.object({
+    city: z.string().describe('The city to get the weather for'),
+  }),
+  outputSchema: z.object({
+    temperature: z.number(),
+    description: z.string(),
+  }),
+  execute: async ({ input }) => {
+    // In a real application, you would fetch this data from a weather API
+    return {
+      temperature: 25,
+      description: 'Sunny',
+    };
+  },
+});
+```
+
+### 4. Creating an Agent
+
+Next, let's create an agent that can use our new weather tool. Create a file at `src/mastra/agents/weather.ts`:
+
+```typescript
+import { Agent } from '@mastra/core';
+import { openai } from '@ai-sdk/openai';
+import { weatherTool } from '../tools/weather';
+
+export const weatherAgent = new Agent({
+  name: 'Weather Agent',
+  instructions: 'You are a helpful weather assistant. Use the provided tools to get the current weather for a location.',
+  model: openai('gpt-4o-mini'),
+  tools: {
+    weatherTool,
+  },
+});
+```
+
+### 5. Bringing It All Together
+
+Finally, let's register our agent with Mastra. Open `src/mastra/index.ts` and add the following:
+
+```typescript
+import { Mastra } from '@mastra/core';
+import { weatherAgent } from './agents/weather';
+
+export const mastra = new Mastra({
+  agents: {
+    weatherAgent,
+  },
+});
+```
+
+### 6. Running the Agent
+
+Now you can start the Mastra development server:
+
+```bash
+npm run dev
+```
+
+This will start a local server, and you can interact with your new weather agent at `http://localhost:4111`.
+
+## Conclusion
+
+This tutorial has covered the basic concepts of Mastra and walked you through creating a simple AI agent. From here, you can explore more advanced features like workflows, memory, and integrations with other tools and services. The possibilities are endless, so go ahead and start building your own amazing AI applications with Mastra\!

@@ -1,48 +1,14 @@
 ---
-import TutorialLayout from '../layouts/TutorialLayout.astro';
-import { extractMarkdownHeadings } from '../utils/notebook';
-import { scanTutorialsDirectory } from '../utils/fileSystem';
-import fs from 'fs';
-import path from 'path';
-
-// Load sections for sidebar
-const sections = scanTutorialsDirectory();
-
-// Load README.md content
-const readmePath = path.join(process.cwd(), 'README.md');
-let readmeContent = '';
-
-try {
-  readmeContent = fs.readFileSync(readmePath, 'utf-8');
-} catch (error) {
-  console.error('Error reading README.md:', error);
-  readmeContent = '# Welcome to AI Builders Tutorial\n\nWelcome to the comprehensive AI development tutorial platform!';
-}
-
-// Extract headings for table of contents
-const headings = extractMarkdownHeadings(readmeContent);
-
-// Create a tutorial file object for the README
-const readmeFile = {
-  path: 'README.md',
-  name: 'README.md',
-  type: 'markdown' as const,
-  content: readmeContent,
-  metadata: {
-    title: 'AI Builders Tutorial',
-    author: 'AI Builders Team',
-    lastUpdated: new Date().toISOString(),
-    difficulty: 'beginner',
-    tags: ['overview', 'getting-started']
-  }
-};
-
-const title = 'AI Builders Tutorial';
+// Redirect to the Overview tutorial
 ---
 
-<TutorialLayout 
-  title={title}
-  sections={sections}
-  headings={headings}
-  currentFile={readmeFile}
-/>
+<script>
+  window.location.href = '/tutorials/Overview/tutorial_overview';
+</script>
+
+<!-- Fallback for browsers with JavaScript disabled -->
+<meta http-equiv="refresh" content="0; url=/tutorials/Overview/tutorial_overview">
+
+<div class="flex items-center justify-center min-h-screen">
+  <p class="text-gray-400">Redirecting to Overview...</p>
+</div>

@@ -69,12 +69,12 @@ const { sections, currentFile } = Astro.props;
           <div 
             class="ml-4 mt-2 space-y-1 section-content" 
             data-section-content={section.path}
-            style="display: block;"
+            style="display: none;"
           >
             {section.files.map((file) => {
               const isActive = currentFile && currentFile.path === file.path;
               // Remove file extension from path for URL
-              const cleanPath = file.path.replace(/\.(md|ipynb)$/, '');
+              const cleanPath = file.path.replace(/\.(md|mdx|ipynb)$/, '');
               
               return (
                 <a
@@ -155,7 +155,8 @@ const { sections, currentFile } = Astro.props;
   
   // Initialize section states
   document.addEventListener('DOMContentLoaded', () => {
-    // Expand the section containing the current file
+    // All sections start collapsed by default
+    // Only expand the section containing the current file
     const currentFileLink = document.querySelector('a[href*="/tutorials/"].bg-blue-500\\/10');
     if (currentFileLink) {
       const section = currentFileLink.closest('.mb-6');

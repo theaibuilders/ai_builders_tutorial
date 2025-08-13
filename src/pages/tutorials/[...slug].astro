@@ -13,7 +13,7 @@ export async function getStaticPaths() {
     for (const section of sections) {
       for (const file of section.files) {
         // Remove file extension for clean URLs
-        const cleanPath = file.path.replace(/\.(md|ipynb)$/, '');
+  const cleanPath = file.path.replace(/\.(md|mdx|ipynb)$/, '');
         staticPaths.push({ params: { slug: cleanPath } });
       }
     }

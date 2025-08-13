@@ -72,7 +72,7 @@ function getAllTutorials() {
       const stat = fs.statSync(fullPath);
       if (stat.isDirectory()) {
         scanDirectory(fullPath, prefix + item + '/');
-      } else if (item.endsWith('.md') || item.endsWith('.ipynb')) {
+      } else if (item.endsWith('.md') || item.endsWith('.mdx') || item.endsWith('.ipynb')) {
         tutorials.push(prefix + item);
       }
     }

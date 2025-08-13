@@ -95,16 +95,26 @@
     "Image and Video/nosana_stable_diffusion_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-12"
+    },
+    "Frameworks/mastra_tutorial.mdx": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-13"
+    },
+    "Overview/tutorial_overview.md": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-13"
     }
   },
   "folderOrder": [
+    "Overview",
     "Model Providers",
     "Gateways",
     "Frameworks",
     "Chat UI Framework",
     "MCP",
     "Observarbility",
-    "Fine Tuning"
+    "Fine Tuning",
+    "Image and Video"
   ],
   "_instructions": {
     "description": "This file allows you to manually override authorId and lastUpdated metadata for tutorials.",

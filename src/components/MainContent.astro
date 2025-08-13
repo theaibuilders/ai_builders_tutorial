@@ -1,6 +1,7 @@
 ---
 import type { TutorialFile } from '../types/tutorial';
 import nb from 'notebookjs';
+import { getHighlighter } from 'shiki';
 
 // Format date as 'Month Day Year' (e.g., May 25 2025)
 function formatDateMDY(dateString) {
@@ -824,7 +825,21 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
   
   let markdownHtml = contentWithoutFirstTitle
     // Handle code blocks first
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-2 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
+      .replace(/```(\w+)?\n([\s\S]*?)```/g, (match, language, code) => {
+        const lang = language || 'typescript';
+        const highlightedCode = highlightPythonCode(code.trim());
+      
+        return `
+          <div class="code-block border border-gray-600 rounded-lg overflow-hidden my-4" style="background-color: #1f2123;">
+            <div class="flex items-center justify-between px-4 py-2 bg-gray-700/30 border-b border-gray-600">
+              <span class="text-xs text-gray-400 font-mono">${lang}</span>
+            </div>
+            <div class="p-2 overflow-x-auto">
+              <pre class="text-sm"><code>${highlightedCode}</code></pre>
+            </div>
+          </div>
+        `;
+      })
     // Handle headers with proper spacing and consistent font sizes
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
@@ -851,7 +866,7 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
       return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white pb-4">${text}</h1>`;
     })
     // Handle inline elements
-    .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
+  .replace(/`([^`]+)`/g, '<code class="text-blue-300 text-sm font-mono" style="background:none;padding:0;border-radius:0">$1</code>')
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
     .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300">$1</a>');
@@ -1029,7 +1044,12 @@ function renderCodeCellFallback(source: string | string[], cellId: string, execu
     }
   }
   
-  const escapedSource = sourceText.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  const escapedSource = sourceText
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
   
   return `
     <div class="notebook-cell code-cell mb-4" data-cell-id="${cellId}">
@@ -1059,8 +1079,29 @@ function highlightPython(code: string): string {
     .replace(/&/g, '&amp;');
 }
 
-// Server-side markdown rendering function
-function renderMarkdownSSR(markdown: string): string {
+// Cache a Shiki highlighter for MD/MDX code blocks
+let mdxHighlighter: any | null = null;
+async function ensureMdxHighlighter() {
+  if (!mdxHighlighter) {
+    mdxHighlighter = await getHighlighter({
+      themes: ['github-dark'],
+      langs: ['bash', 'shell', 'sh', 'typescript', 'javascript', 'ts', 'js', 'python', 'py', 'json', 'markdown']
+    });
+  }
+  return mdxHighlighter;
+}
+
+function normalizeLang(lang?: string): string {
+  const l = (lang || '').toLowerCase();
+  if (l === 'ts') return 'typescript';
+  if (l === 'js') return 'javascript';
+  if (l === 'sh' || l === 'shell') return 'bash';
+  if (l === 'py') return 'python';
+  return l || 'text';
+}
+
+// Enhanced markdown/MDX rendering with Shiki syntax highlighting and copy buttons
+async function renderEnhancedMarkdown(markdown: string): Promise<string> {
   if (!markdown) return '<div class="text-center text-gray-400 py-8"><p>No content available</p></div>';
   
   // Function to generate heading ID
@@ -1072,14 +1113,128 @@ function renderMarkdownSSR(markdown: string): string {
       .trim();
   }
   
-  // Enhanced markdown parsing with improved spacing and bullet points
-  // First, remove the first # heading since it's already shown in the page header
-  let contentWithoutFirstTitle = markdown.replace(/^# .*$/m, '');
+  // Function to generate highlighted code block using Shiki (prevents style text leakage)
+  async function createCodeBlock(language: string, code: string): Promise<string> {
+    const lang = normalizeLang(language);
+    const highlighter = await ensureMdxHighlighter();
+    let html = '';
+    try {
+  html = highlighter.codeToHtml(code, { lang: lang === 'text' ? 'plaintext' : lang, theme: 'github-dark' });
+  // Strip ALL background colors from the entire HTML (including theme backgrounds)
+  html = html.replace(/background-color:\s*[^;]+;?/g, '');
+  html = html.replace(/background:\s*[^;]+;?/g, '');
+  // Remove any CSS classes that might contain background colors
+  html = html.replace(/class="[^"]*"/g, '');
+  // Wrap everything in a div that forces our background
+  html = `<div style="background-color: #252830 !important; padding: 0; margin: 0;">${html}</div>`;
+  // Tighten line height and force our custom background color for the generated <pre>
+  html = html.replace(/<pre[^>]*>/g, '<pre style="line-height:1.25;background-color:#252830!important;background:none!important;margin:0;padding:1rem;overflow-x:auto"');
+  // Ensure the inner <code> has no background or padding (remove pill effect on text)
+  html = html.replace(/<code[^>]*>/g, '<code style="background:none!important;background-color:transparent!important;padding:0;border-radius:0;color:inherit"');
+    } catch (_) {
+      // Fallback to escaped plain text
+      const safe = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      html = `<pre style="line-height:1.25"><code>${safe}</code></pre>`;
+    }
+    // Escape for the copy attribute
+    const escapeAttr = (str: string) => (str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+    const escapedAttrCode = escapeAttr(code);
+    return `
+  <div class="code-block relative border border-gray-600 rounded-lg overflow-hidden my-6" style="background-color: #252830 !important;">
+        <div class="flex items-center px-4 py-2 bg-gray-700/30 border-b border-gray-600">
+          <span class="text-xs text-gray-400 font-mono">${lang || 'text'}</span>
+        </div>
+        <div class="relative overflow-x-auto p-0" style="--reset:0; background-color: #252830 !important;">
+          ${html}
+          <copy-button class="copy-btn absolute top-2 right-2 z-10" data-content="${escapedAttrCode}">
+            <button class="px-2 py-1 bg-gray-700/70 hover:bg-gray-600/70 border border-gray-600 rounded text-xs text-gray-200 transition-colors flex items-center gap-1 shadow">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span class="copy-text">Copy</span>
+            </button>
+          </copy-button>
+        </div>
+      </div>`;
+  }
   
-  let markdownHtml = contentWithoutFirstTitle
-    // First handle code blocks to preserve them
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="border border-gray-700 rounded-lg p-2 overflow-x-auto" style="background-color: #1f2123;"><code class="text-gray-200 font-mono text-sm">$2</code></pre>')
-        // Handle headers with improved spacing and consistent font sizes
+  // Simple syntax highlighting function
+  function highlightCode(code: string, language: string): string {
+    // Escape HTML entities
+    let safeCode = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    
+    // Apply basic highlighting based on language
+    if (language === 'typescript' || language === 'javascript' || language === 'ts' || language === 'js') {
+      return highlightTypeScript(safeCode);
+    } else if (language === 'python' || language === 'py') {
+      return highlightPythonCodeServerSide(safeCode);
+    } else if (language === 'bash' || language === 'shell' || language === 'sh') {
+      return highlightBash(safeCode);
+    }
+    
+    return safeCode;
+  }
+  
+  // TypeScript syntax highlighting
+  function highlightTypeScript(code: string): string {
+    return code
+      // Keywords
+      .replace(/\b(const|let|var|function|class|interface|type|import|export|from|default|async|await|return|if|else|for|while|try|catch|finally|throw|new|this|super|extends|implements|public|private|protected|static|readonly)\b/g, '<span style="color: #c586c0; font-weight: 600;">$1</span>')
+      // Types
+      .replace(/\b(string|number|boolean|object|array|void|any|unknown|never)\b/g, '<span style="color: #4ec9b0; font-weight: 600;">$1</span>')
+      // Strings
+      .replace(/(["'`])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span style="color: #ce9178;">$1$2$1</span>')
+      // Numbers
+      .replace(/\b(\d+\.?\d*)\b/g, '<span style="color: #b5cea8;">$1</span>')
+      // Comments
+      .replace(/(\/\/.*$)/gm, '<span style="color: #6a9955; font-style: italic;">$1</span>')
+      .replace(/(\/\*[\s\S]*?\*\/)/g, '<span style="color: #6a9955; font-style: italic;">$1</span>');
+  }
+  
+  // Bash syntax highlighting
+  function highlightBash(code: string): string {
+    return code
+      // Commands
+      .replace(/\b(npm|yarn|pnpm|git|cd|ls|mkdir|rm|cp|mv|cat|grep|find|chmod|sudo|curl|wget)\b/g, '<span style="color: #dcdcaa; font-weight: 600;">$1</span>')
+      // Flags and options
+      .replace(/(\s|^)(-+[a-zA-Z0-9-]+)/g, '$1<span style="color: #9cdcfe;">$2</span>')
+      // Strings
+      .replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, '<span style="color: #ce9178;">$1$2$1</span>')
+      // Comments
+      .replace(/(#.*$)/gm, '<span style="color: #6a9955; font-style: italic;">$1</span>');
+  }
+  
+  // Remove first heading since it's shown in page header
+  let contentWithoutFirstTitle = markdown.replace(/^# .*$/m, '');
+
+  // Extract fenced code blocks and replace with placeholders
+  const CODE_PLACEHOLDER_PREFIX = '%%CODEBLOCK_';
+  const codeSpecs: Array<{ lang: string; code: string }> = [];
+  const fencedRegex = /```(\w+)?\n([\s\S]*?)```/g;
+  let i = 0;
+  const placeholderMarkdown = contentWithoutFirstTitle.replace(fencedRegex, (_m, lang, code) => {
+    codeSpecs.push({ lang: lang || 'text', code: (code || '').trim() });
+    return `${CODE_PLACEHOLDER_PREFIX}${i++}%%`;
+  });
+  // Render code blocks with Shiki
+  const codeBlocks: string[] = [];
+  for (const spec of codeSpecs) {
+    codeBlocks.push(await createCodeBlock(spec.lang, spec.code));
+  }
+  
+  let markdownHtml = placeholderMarkdown
+    // Handle headers with IDs
     .replace(/^###### (.*$)/gim, (match, text) => {
       const id = generateHeadingId(text);
       return `<h6 id="${id}" class="text-base font-semibold mb-2 mt-4 text-white">${text}</h6>`;
@@ -1105,11 +1260,11 @@ function renderMarkdownSSR(markdown: string): string {
       return `<h1 id="${id}" class="text-4xl font-extrabold mb-8 mt-6 text-white pb-4">${text}</h1>`;
     })
     // Handle inline code
-    .replace(/`([^`]+)`/g, '<code class="bg-gray-800/60 text-blue-300 px-2 py-1 rounded text-sm font-mono">$1</code>')
+  .replace(/`([^`]+)`/g, '<code class="text-blue-300 text-sm font-mono" style="background:none;padding:0;border-radius:0">$1</code>')
     // Handle bold and italic
     .replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-white">$1</strong>')
     .replace(/\*(.*?)\*/gim, '<em class="italic text-blue-200">$1</em>')
-    // Handle images (must come before links)
+    // Handle images
     .replace(/!\[([^\]]*)\]\(([^)]*)\)/gim, '<img src="$2" alt="$1" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" />')
     // Handle links
     .replace(/\[([^\]]*)\]\(([^)]*)\)/gim, '<a href="$2" class="text-blue-400 hover:text-blue-300 underline">$1</a>');
@@ -1123,6 +1278,18 @@ function renderMarkdownSSR(markdown: string): string {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.trim();
+    // Preserve code block placeholders verbatim
+    if (/^%%CODEBLOCK_\d+%%$/.test(trimmedLine)) {
+      if (inList) {
+        while (listStack.length > 0) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        inList = false;
+      }
+      processedLines.push(trimmedLine);
+      continue;
+    }
     
     // Check for list items
     const bulletMatch = line.match(/^(\s*)([-*+])\s+(.+)$/);
@@ -1131,28 +1298,21 @@ function renderMarkdownSSR(markdown: string): string {
     if (bulletMatch || numberMatch) {
       const match = bulletMatch || numberMatch;
       const indent = match[1].length;
-      const marker = match[2];
       const content = match[3];
       const isNumbered = !!numberMatch;
-      
-      // Determine nesting level
       const level = Math.floor(indent / 2);
       
-      // Handle list opening/closing based on nesting
       if (!inList) {
-        // Starting a new list
         inList = true;
         listStack = [{ level, isNumbered }];
         processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mb-6 space-y-2">`);
       } else {
-        // Check if we need to open/close nested lists
         while (listStack.length > 0 && listStack[listStack.length - 1].level >= level) {
           const lastList = listStack.pop();
           processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
         }
         
         if (listStack.length === 0 || listStack[listStack.length - 1].level < level) {
-          // Open new nested list
           listStack.push({ level, isNumbered });
           processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mt-2 space-y-1">`);
         }
@@ -1160,9 +1320,7 @@ function renderMarkdownSSR(markdown: string): string {
       
       processedLines.push(`<li class="text-gray-300 leading-relaxed">${content}</li>`);
     } else {
-      // Not a list item
       if (inList) {
-        // Close all open lists
         while (listStack.length > 0) {
           const lastList = listStack.pop();
           processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
@@ -1170,7 +1328,6 @@ function renderMarkdownSSR(markdown: string): string {
         inList = false;
       }
       
-      // Handle regular paragraphs
       if (trimmedLine === '') {
         processedLines.push('');
       } else if (!trimmedLine.startsWith('<')) {
@@ -1181,13 +1338,15 @@ function renderMarkdownSSR(markdown: string): string {
     }
   }
   
-  // Close any remaining open lists
   while (listStack.length > 0) {
     const lastList = listStack.pop();
     processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
   }
   
-  return processedLines.join('\n');
+  // Restore placeholders with actual code block HTML
+  let finalHtml = processedLines.join('\n');
+  finalHtml = finalHtml.replace(/%%CODEBLOCK_(\d+)%%/g, (_m, idx) => codeBlocks[Number(idx)] || '');
+  return finalHtml;
 }
 
 // Content rendering logic
@@ -1198,8 +1357,8 @@ if (currentFile) {
     // Use professional notebook rendering with notebookjs
     renderedContent = renderNotebookWithProfessionalTools(currentFile.notebook);
   } else if (currentFile.type === 'markdown' && currentFile.content) {
-    // Use enhanced markdown rendering
-    renderedContent = renderMarkdownSSR(currentFile.content);
+    // Use enhanced markdown rendering for both .md and .mdx files
+    renderedContent = await renderEnhancedMarkdown(currentFile.content);
   }
 }
 
@@ -1307,6 +1466,31 @@ function getNbviewerUrl(filePath: string): string {
       </header>
       
       <!-- Tutorial Content -->
+      <style>
+        /* Force MDX code blocks to use the correct background color */
+        .tutorial-content .code-block,
+        .tutorial-content .code-block *,
+        .tutorial-content pre,
+        .tutorial-content pre *,
+        .tutorial-content code {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+        
+        /* Override any Shiki theme backgrounds */
+        .tutorial-content [style*="background"] {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+        
+        /* Force specific overrides for common Shiki classes */
+        .tutorial-content .shiki,
+        .tutorial-content .shiki *,
+        .tutorial-content [class*="shiki"] {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+      </style>
       <div class="tutorial-content">
         <div set:html={renderedContent}></div>
       </div>
@@ -1347,38 +1531,56 @@ function getNbviewerUrl(filePath: string): string {
 </copy-button>
 
 <script>
-  // Custom element for copy buttons
+  // Custom element for copy buttons (enhanced version)
   class CopyButton extends HTMLElement {
     constructor() {
       super();
       
       const content = this.getAttribute('data-content') || '';
       
-      this.innerHTML = `
-        <button class="px-2 py-1 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 rounded text-xs text-gray-300 transition-colors flex items-center gap-1">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          <span class="copy-text">Copy</span>
-        </button>
-      `;
+      // Check if button HTML is already present
+      if (!this.querySelector('button')) {
+        this.innerHTML = `
+          <button class="px-2 py-1 bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 rounded text-xs text-gray-300 transition-colors flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span class="copy-text">Copy</span>
+          </button>
+        `;
+      }
       
       const button = this.querySelector('button');
       const copyText = this.querySelector('.copy-text');
       
       if (button && copyText) {
-        button.addEventListener('click', async () => {
+        button.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
           try {
-            await navigator.clipboard.writeText(content);
+            // Decode HTML entities in the content
+            const decodedContent = content
+              .replace(/&quot;/g, '"')
+              .replace(/&#39;/g, "'")
+              .replace(/&amp;/g, '&')
+              .replace(/&lt;/g, '<')
+              .replace(/&gt;/g, '>');
+              
+            await navigator.clipboard.writeText(decodedContent);
             copyText.textContent = 'Copied!';
+            copyText.classList.add('text-green-400');
             setTimeout(() => {
               copyText.textContent = 'Copy';
+              copyText.classList.remove('text-green-400');
             }, 2000);
           } catch (err) {
             console.error('Failed to copy:', err);
             copyText.textContent = 'Failed';
+            copyText.classList.add('text-red-400');
             setTimeout(() => {
               copyText.textContent = 'Copy';
+              copyText.classList.remove('text-red-400');
             }, 2000);
           }
         });

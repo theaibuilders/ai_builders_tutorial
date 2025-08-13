@@ -173,13 +173,13 @@ export function scanTutorialsDirectory(): TutorialSection[] {
       const sectionPath = path.join(TUTORIALS_DIR, sectionDir);
       const files: TutorialFile[] = [];
       const fileNames = fs.readdirSync(sectionPath).filter(file =>
-        file.endsWith('.md') || file.endsWith('.ipynb')
+        file.endsWith('.md') || file.endsWith('.mdx') || file.endsWith('.ipynb')
       );
       for (const fileName of fileNames) {
         const filePath = path.join(sectionPath, fileName);
         const relativePath = `${sectionDir}/${fileName}`;
         try {
-          if (fileName.endsWith('.md')) {
+          if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
             const content = readMarkdownFile(filePath);
             if (content) {
               const metadata = extractMarkdownMetadata(content, relativePath);
@@ -208,10 +208,12 @@ export function scanTutorialsDirectory(): TutorialSection[] {
           console.error(`Error processing file ${filePath}:`, error);
         }
       }
-      // Sort files within each section, prioritizing tutorial_overview.md
+      // Sort files within each section, prioritizing tutorial_overview.(md|mdx)
       files.sort((a, b) => {
-        if (a.name === 'tutorial_overview.md') return -1;
-        if (b.name === 'tutorial_overview.md') return 1;
+        const isOverviewA = /^tutorial_overview\.(md|mdx)$/.test(a.name);
+        const isOverviewB = /^tutorial_overview\.(md|mdx)$/.test(b.name);
+        if (isOverviewA && !isOverviewB) return -1;
+        if (!isOverviewA && isOverviewB) return 1;
         return a.name.localeCompare(b.name);
       });
       sections.push({
@@ -246,7 +248,7 @@ export function scanTutorialsDirectory(): TutorialSection[] {
 export function findTutorialFile(sections: TutorialSection[], targetPath: string): TutorialFile | undefined {
   for (const section of sections) {
     const file = section.files.find(f => {
-      const pathWithoutExt = f.path.replace(/\.(md|ipynb)$/, '');
+  const pathWithoutExt = f.path.replace(/\.(md|mdx|ipynb)$/, '');
       return pathWithoutExt === targetPath || f.path.includes(targetPath);
     });
     if (file) {
