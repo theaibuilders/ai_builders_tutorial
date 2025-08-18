@@ -111,6 +111,14 @@
     "Audio/deepgram_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-14"
+    },
+    "Observarbility/traceloop_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-18"
+    },
+    "Storage and Memory/qdrant_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-07-18"
     }
   },
   "folderOrder": [
