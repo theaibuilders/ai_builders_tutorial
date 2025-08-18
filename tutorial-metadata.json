@@ -119,6 +119,10 @@
     "Storage and Memory/qdrant_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-18"
+    },
+    "Storage and Memory/weaviate_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-07-21"
     }
   },
   "folderOrder": [
