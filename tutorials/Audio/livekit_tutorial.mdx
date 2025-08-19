@@ -1,0 +1,339 @@
+# LiveKit Agents: Build Voice AI Agents from Scratch
+
+Welcome to this tutorial on **LiveKit Agents**! We'll walk you through building your first AI-powered voice agent, covering the essential concepts and advanced features to get you started and productive with LiveKit. This version uses a modular code structure for clarity and extensibility.
+
+## 1. Introduction to LiveKit Agents
+
+**LiveKit Agents** is a powerful framework for building **real-time, multimodal AI agents**. These agents can interact with users through voice, video, and text, making them perfect for applications like customer support bots, interactive games, and more.
+
+At its core, a LiveKit Agent is a stateful, long-running process that connects to the LiveKit network using **WebRTC**. This allows for the low-latency communication that's crucial for creating natural and engaging user experiences.
+
+## 2. Prerequisites
+
+Before we begin, make sure you have the following:
+
+  * **Python 3.9+** installed on your system.
+  * A **LiveKit Cloud account**. You can sign up for free at [cloud.livekit.io](https://cloud.livekit.io).
+  * **API keys** for the services you'll use. For this tutorial, we'll use OpenAI.
+  * The **LiveKit CLI** installed. You can install it with `brew install livekit-cli` on macOS, `winget install LiveKit.LiveKitCLI` on Windows, or `curl -sSL https://get.livekit.io/cli | bash` on Linux.
+
+## 3. Setup
+
+Let's get your project environment set up.
+
+### Create a Project Directory
+
+First, create a new directory for your project and navigate into it.
+
+```bash
+mkdir livekit-agent-tutorial
+cd livekit-agent-tutorial
+```
+
+### Set Up a Virtual Environment
+
+It's a good practice to use a virtual environment to manage your project's dependencies. Create and activate one now.
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Install Dependencies
+
+Next, install the necessary Python libraries.
+
+```bash
+pip install livekit-agents "livekit-plugins-openai" python-dotenv requests
+```
+
+### Configure Your Environment Variables
+
+Create a file named `.env` in your project directory. This file will securely store and load your credentials. You can find your LiveKit credentials in your LiveKit Cloud project settings.
+
+```
+# .env
+LIVEKIT_URL=wss://YOUR_PROJECT_URL.livekit.cloud
+LIVEKIT_API_KEY=YOUR_AGENT_API_KEY
+LIVEKIT_API_SECRET=YOUR_AGENT_API_SECRET
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+# Optional defaults
+# OPENAI_REALTIME_MODEL=gpt-4o-realtime-preview-2024-12-17
+# DEFAULT_WEATHER_CITY=London
+```
+
+> **Note:** Make sure to use an **Agent** API key/secret from your LiveKit Cloud dashboard, not an Admin key.
+
+## 4. Modular Project Structure
+
+To keep your codebase clean and extensible, we'll split advanced features into separate files:
+
+- `agent.py`: Main orchestration and agent logic.
+- `tools.py`: Functions the agent can call (e.g., get_time, get_weather).
+- `memory.py`: User context/memory management.
+- `logging_config.py`: Advanced logging setup.
+- `events.py`: Custom event handling (e.g., user join/leave).
+
+This modular approach makes it easy to add new features and keep your code organized.
+
+## 5. Implementing the Modules
+
+### agent.py
+
+```python
+from dotenv import load_dotenv
+import os
+import logging
+import asyncio
+import re
+
+from livekit import agents
+from livekit.agents import AgentSession, Agent, RoomInputOptions, RoomOutputOptions
+from livekit.agents.llm.tool_context import function_tool
+from livekit.plugins import (
+    openai,
+)
+
+from tools import TOOLS
+from memory import UserMemory
+from logging_config import setup_logging
+import events
+
+load_dotenv()
+logger = setup_logging()
+user_memory = UserMemory()
+
+class Assistant(Agent):
+    def __init__(self) -> None:
+        super().__init__(instructions="You are a helpful voice AI assistant. You can use tools like get_time and get_weather. Always respond in English only.")
+
+    @function_tool
+    async def get_weather(self, location: str) -> str:
+        """Get real-time weather for a given city name."""
+        try:
+            clean_loc = (location or "").strip() or os.getenv("DEFAULT_WEATHER_CITY", "London")
+            logger.info(f"Tool get_weather called with location='{clean_loc}'")
+            return TOOLS["get_weather"](clean_loc)
+        except Exception as e:
+            logger.exception(f"Error in tool get_weather: {e}")
+            return f"Sorry, I couldn't get the weather right now. Error: {str(e)}"
+
+    @function_tool
+    async def get_time(self) -> str:
+        """Get the current local time as a string."""
+        try:
+            logger.info("Tool get_time called")
+            return TOOLS["get_time"]()
+        except Exception as e:
+            logger.exception(f"Error in tool get_time: {e}")
+            return f"Sorry, I couldn't get the time right now. Error: {str(e)}"
+
+    async def on_user_message(self, message, context):
+        user_id = context.get("user_id", "default")
+        logger.info(f"User message received: '{message}' from user {user_id}")
+        # Example of simple pattern handling (LLM can still call tools above)
+        if "weather" in message.lower():
+            m = re.search(r"weather[^\n]*?\bin\s+([\w\s\-,'\.]+)", message, flags=re.IGNORECASE)
+            if m:
+                location = re.sub(r"^[\s,'\"-]+|[\s\?\.!,\'\"-]+$", "", m.group(1)).strip()
+                return TOOLS["get_weather"](location)
+        if "time" in message.lower():
+            return TOOLS["get_time"]()
+        return None
+
+async def entrypoint(ctx: agents.JobContext):
+    await ctx.connect()
+
+    # Provide a TTS fallback and configure the Realtime model for text-only output.
+    tts = openai.TTS(model="tts-1", voice="alloy")
+    session = AgentSession(
+        llm=openai.realtime.RealtimeModel(
+            model=os.getenv("OPENAI_REALTIME_MODEL", "gpt-4o-realtime-preview-2024-12-17"),
+            modalities=["text"],
+        ),
+        tts=tts,
+    )
+
+    assistant = Assistant()
+
+    room_input_options = RoomInputOptions(
+        close_on_disconnect=True,
+    )
+    room_output_options = RoomOutputOptions()
+
+    await session.start(
+        agent=assistant,
+        room=ctx.room,
+        room_input_options=room_input_options,
+        room_output_options=room_output_options,
+    )
+
+    await session.generate_reply(
+        instructions="Greet the user and offer your assistance. IMPORTANT: You must respond in English only, not Spanish."
+    )
+
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except asyncio.CancelledError:
+        pass
+
+if __name__ == "__main__":
+    agents.cli.run_app(agents.WorkerOptions(entrypoint_fnc=entrypoint))
+```
+
+### tools.py
+
+```python
+from datetime import datetime
+import requests
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_current_time():
+    """Returns the current time as a string."""
+    return datetime.now().strftime("%H:%M:%S")
+
+def get_weather(location="London"):
+    """Get real-time weather from open-meteo API."""
+    logger.info(f"Weather request received for location: {location}")
+    try:
+        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={location}&count=1&language=en&format=json"
+        geo_response = requests.get(geo_url, timeout=5)
+        geo_data = geo_response.json()
+        if not geo_data.get("results"):
+            return f"Sorry, I couldn't find weather data for '{location}'."
+        result = geo_data["results"][0]
+        lat = result["latitude"]
+        lon = result["longitude"]
+        name = result["name"]
+        weather_url = (
+            f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current="
+            "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto"
+        )
+        weather_response = requests.get(weather_url, timeout=5)
+        weather_data = weather_response.json()
+        current = weather_data["current"]
+        temp = current["temperature_2m"]
+        humidity = current["relative_humidity_2m"]
+        wind_speed = current["wind_speed_10m"]
+        weather_descriptions = {0: "clear sky", 1: "mainly clear", 2: "partly cloudy", 3: "overcast",
+                                45: "foggy", 48: "depositing rime fog", 51: "light drizzle",
+                                53: "moderate drizzle", 55: "dense drizzle", 61: "slight rain",
+                                63: "moderate rain", 65: "heavy rain", 71: "slight snow",
+                                73: "moderate snow", 75: "heavy snow", 95: "thunderstorm"}
+        weather_desc = weather_descriptions.get(current["weather_code"], "unknown")
+        return (
+            f"The weather in {name} is {weather_desc} with a temperature of {temp}°C, "
+            f"{humidity}% humidity, and wind speed of {wind_speed} km/h."
+        )
+    except requests.RequestException as e:
+        return f"Sorry, I couldn't fetch weather data for '{location}'. Error: {str(e)}"
+    except Exception as e:
+        return f"Sorry, there was an error getting weather for '{location}': {str(e)}"
+
+TOOLS = {
+    "get_time": get_current_time,
+    "get_weather": get_weather,
+}
+```
+
+**How to extend:** Add more functions to `tools.py` and register them in the `TOOLS` dictionary. The agent can then call them by name.
+
+### memory.py
+
+```python
+class UserMemory:
+    def __init__(self):
+        self._store = {}
+
+    def set(self, user_id, key, value):
+        if user_id not in self._store:
+            self._store[user_id] = {}
+        self._store[user_id][key] = value
+
+    def get(self, user_id, key, default=None):
+        return self._store.get(user_id, {}).get(key, default)
+
+    def clear(self, user_id):
+        if user_id in self._store:
+            del self._store[user_id]
+```
+
+**How to extend:** Store more user attributes (preferences, history, etc.) for personalized conversations.
+
+### logging_config.py
+
+```python
+import logging
+import os
+
+def setup_logging(log_file="agent.log", level=logging.INFO):
+    logger = logging.getLogger()
+    logger.setLevel(level)
+    formatter = logging.Formatter('[%(asctime)s] %(levelname)s %(name)s: %(message)s')
+
+    # Console handler
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    # File handler
+    fh = logging.FileHandler(log_file)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    return logger
+```
+
+**How to extend:** Adjust log level, log to different files, or add more handlers as needed.
+
+### events.py
+
+```python
+def on_user_join(user_id, context):
+    # Custom logic for when a user joins the room
+    print(f"User {user_id} joined the room.")
+
+
+def on_user_leave(user_id, context):
+    # Custom logic for when a user leaves the room
+    print(f"User {user_id} left the room.")
+```
+
+**How to extend:** Add more event handlers for room events, user actions, etc.
+
+## 6. Running the Agent
+
+To run your agent, execute the following command in your terminal. This will start the agent, making it ready to accept connections.
+
+```bash
+python agent.py start
+```
+
+To test your agent, use the **LiveKit Agents Playground** at [agents-playground.livekit.io](https://agents-playground.livekit.io/). Connect the playground to your LiveKit project, and you can start talking with your new agent in real-time!
+
+![LiveKit](/products/livekit.png)
+
+## 7. Debugging Common Issues
+
+- **401 Unauthorized:** Make sure you are using an **Agent** API key/secret, not an Admin key. Double-check your `.env` file and LiveKit Cloud dashboard.
+- **Connection Refused:** Ensure your `LIVEKIT_URL` is correct and your project is active.
+- **No Audio/No Response:** Check your OpenAI API key and ensure your agent is running and connected.
+- **Tool not called:** Ensure your functions are decorated with `@function_tool` in `agent.py`. The SDK auto-discovers these on the `Agent` instance.
+
+## 8. Next Steps and Advanced Concepts
+
+Congratulations! 🎉 You've successfully built and run an advanced, modular **LiveKit Agent**.
+
+From here, you can explore:
+
+  * **Different plugins:** Try out other STT, LLM, and TTS providers.
+  * **Function calling:** Enable your agent to interact with external APIs and tools.
+  * **Multimodal agents:** Build agents that can understand and generate video as well as audio.
+  * **Context and memory:** Store and use user context for more personalized conversations.
+  * **Custom event handling:** Respond to room events, user join/leave, etc.
+  * **Production deployment:** Use Docker, cloud hosting, and monitoring for robust deployments.
+
+For more information and advanced examples, check out the official LiveKit Agents documentation.
