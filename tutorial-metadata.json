@@ -147,6 +147,10 @@
     "Frameworks/pydantic_ai.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-23"
+    },
+    "Model Providers/cerebras_tutorial.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-07-24"
     }
   },
   "folderOrder": [
