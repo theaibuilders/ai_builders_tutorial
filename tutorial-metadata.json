@@ -56,10 +56,6 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-06-05"
     },
-    "Fine Tuning/finetuning_openai.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-07-05"
-    },
     "MCP/composio_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-05"
@@ -111,10 +107,6 @@
     "Audio/deepgram_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-14"
-    },
-    "Observarbility/traceloop_tutorial.ipynb": {
-      "authorId": "devon-sun",
-      "lastUpdated": "2025-08-18"
     },
     "Storage and Memory/qdrant_tutorial.ipynb": {
       "authorId": "devon-sun",

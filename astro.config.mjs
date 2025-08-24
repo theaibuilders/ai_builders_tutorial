@@ -10,7 +10,16 @@ export default defineConfig({
   markdown: {
     shikiConfig: {
       theme: 'github-dark',
-      wrap: true
+      wrap: true,
+      // Explicitly add languages we need highlighted in tutorials
+      // (Shiki has many built-ins but we ensure yaml & dockerfile are loaded)
+      langs: [
+        'bash',
+        'json',
+        'python',
+        'yaml',
+        'dockerfile'
+      ]
     }
   }
 });
