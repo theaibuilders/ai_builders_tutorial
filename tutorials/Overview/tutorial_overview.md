@@ -7,37 +7,65 @@ Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial seri
 Each tutorial is designed to be practical and immediately applicable:
 
 • **Concise and To-the-point**: We cover the most important concepts of each tool for you to get started quickly
-• **Hands-on Examples**: Every concept includes working code you can run and modify 
+• **Hands-on Examples**: Every concept includes working code you can run and modify
 • **Best Practices**: Learn industry-standard approaches and common pitfalls to avoid
 • **Progressive Complexity**: Start with basics and advance to sophisticated implementations
 
 Tutorials are written with Python or Typescript with detailed explanations and code examples you can run yourself.
 
+
+
 ## Tutorial Categories
 
+Short descriptions of each category to help you navigate. Browse the folders to dive into specific tools.
+
 ### Model Providers
-Learn to integrate with various AI model providers like OpenAI, Claude, Groq, and more.
+
+How to call, configure, and get the best out of major and emerging LLM / generative model APIs.
 
 ### Gateways
-Understand how to use API gateways and unified interfaces for multiple model providers.
+
+Use abstraction layers that unify multiple providers behind a single interface (rate limiting, retries, model routing).
 
 ### Frameworks
-Master popular AI frameworks like LangChain, LlamaIndex, CrewAI, and Haystack.
+
+Build end‑to‑end AI app workflows: retrieval, agents, orchestration, structured output, evaluation loops.
 
 ### Chat UI Framework
-Build interactive chat interfaces using Gradio and Streamlit.
+
+Rapidly create interactive chat and assistant UIs for demos and production apps.
 
 ### MCP (Model Context Protocol)
-Explore the Model Context Protocol and tools like Composio.
+
+Standardize secure, capability-based tool access for models (bring external data, actions, and services safely in-context).
 
 ### Observability
-Monitor and debug your AI applications with tools like LangFuse and Traceloop.
+
+Instrument, trace, evaluate, and debug LLM applications in production.
 
 ### Fine Tuning
-Learn how to fine-tune models using various platforms and techniques.
 
-### Image and Video
-Work with visual AI models for image generation and processing.
+Customize and specialize models for domain, style, or task improvements beyond prompt engineering.
+
+### Storage and Memory
+
+Embed, store, and retrieve context using vector databases and semantic memory patterns.
+
+### Web Search
+
+Augment model responses with fresh, authoritative web data via search and crawling.
+
+### Browser Use / Automation
+
+Enable agents to navigate, extract, and act within live web pages and browser-like environments.
+
+### Audio / Realtime
+
+Speech recognition, streaming, and low-latency bidirectional experiences.
+
+### Image & Video
+
+Generate and manipulate visual media (images, diffusion, and foundational media workflows).
 
 ## Ready to Take Your AI Journey Further?
 
