@@ -1493,6 +1493,57 @@ function getNbviewerUrl(filePath: string): string {
           background-color: #252830 !important;
           background: #252830 !important;
         }
+
+        /* ================= DataFrame / Wide Table Horizontal Scroll Fix ================= */
+        /* Prevent overall page horizontal scroll while allowing per-output scroll */
+        html, body { overflow-x: hidden; }
+
+        /* Wrap applied via JS to avoid altering notebook HTML directly */
+        .professional-notebook .nb-output .df-scroll-wrapper {
+          max-width: 100%;
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          border: 1px solid rgba(75,85,99,0.35);
+          border-radius: 6px;
+          padding: 4px 2px 6px 2px;
+          margin: 0.35rem 0 0.85rem 0;
+          background: #1f2123;
+          position: relative;
+        }
+        .professional-notebook .nb-output .df-scroll-wrapper::-webkit-scrollbar { height: 10px; }
+        .professional-notebook .nb-output .df-scroll-wrapper::-webkit-scrollbar-track { background: rgba(31,41,55,0.5); border-radius: 6px; }
+        .professional-notebook .nb-output .df-scroll-wrapper::-webkit-scrollbar-thumb { background: rgba(75,85,99,0.55); border-radius: 6px; }
+        .professional-notebook .nb-output .df-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(107,114,128,0.7); }
+
+        /* DataFrame table styling inside scroll wrapper */
+        .professional-notebook .nb-output .df-scroll-wrapper table.dataframe {
+          width: max-content;        /* natural width enables horizontal scroll */
+          min-width: 100%;           /* ensures wrapper gets scrollbar even if narrow */
+          margin: 0;
+          border-collapse: collapse;
+          white-space: nowrap;       /* keep columns on one line */
+        }
+        .professional-notebook .nb-output table.dataframe { border-collapse: collapse; }
+        .professional-notebook .nb-output table.dataframe th,
+        .professional-notebook .nb-output table.dataframe td {
+          padding: 6px 10px;
+          border: 1px solid rgba(75,85,99,0.4);
+          font-size: 13px;
+        }
+        .professional-notebook .nb-output table.dataframe thead th {
+          position: sticky; top: 0; z-index: 2; background: #1f2123; backdrop-filter: blur(2px);
+        }
+        .professional-notebook .nb-output table.dataframe tbody tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+        .professional-notebook .nb-output table.dataframe tbody tr:hover { background: rgba(255,255,255,0.04); }
+
+        /* Allow text wrapping for very verbose JSON-like columns on hover to inspect content */
+        .professional-notebook .nb-output .df-scroll-wrapper td { max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+        .professional-notebook .nb-output .df-scroll-wrapper td:hover { white-space: normal; max-width: 520px; }
+
+        /* Guard against nested tables expanding width */
+        .professional-notebook .nb-output .df-scroll-wrapper table table { width: auto; }
+        /* ============================================================================= */
       </style>
       <div class="tutorial-content">
         <div set:html={renderedContent}></div>
@@ -1688,6 +1739,55 @@ function getNbviewerUrl(filePath: string): string {
   
   // Add copy functionality and syntax highlighting to professional notebook code cells
   document.addEventListener('DOMContentLoaded', function() {
+    /* ================= DataFrame Scroll Wrapper Injection ================= */
+    function wrapDataFrames(scope=document) {
+      const tables = scope.querySelectorAll('.professional-notebook .nb-output table.dataframe:not([data-wrapped])');
+      tables.forEach(table => {
+        // Skip if already inside our wrapper
+        if (table.closest('.df-scroll-wrapper')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'df-scroll-wrapper';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+        table.setAttribute('data-wrapped', 'true');
+      });
+    }
+
+    function reflowIfOverflow() {
+      // Minor layout tweak to ensure parent containers don't expand
+      const notebookRoot = document.querySelector('.professional-notebook');
+      if (notebookRoot) {
+        notebookRoot.style.maxWidth = '100%';
+        notebookRoot.style.overflowX = 'hidden';
+      }
+    }
+
+    // Initial attempt
+    wrapDataFrames();
+    reflowIfOverflow();
+    // Secondary passes (notebook rendering may be async)
+    setTimeout(() => { wrapDataFrames(); reflowIfOverflow(); }, 600);
+    setTimeout(() => { wrapDataFrames(); reflowIfOverflow(); }, 1500);
+
+    // Observe future mutations (e.g., dynamic notebook rerenders)
+    const observer = new MutationObserver(mutations => {
+      let needsWrap = false;
+      for (const m of mutations) {
+        if (m.addedNodes && m.addedNodes.length) {
+          m.addedNodes.forEach(n => {
+            if (n.nodeType === 1 && (n.matches?.('table.dataframe') || n.querySelector?.('table.dataframe'))) {
+              needsWrap = true;
+            }
+          });
+        }
+      }
+      if (needsWrap) {
+        wrapDataFrames();
+        reflowIfOverflow();
+      }
+    });
+    observer.observe(document.body, { subtree: true, childList: true });
+    /* ====================================================================== */
     
     // Force background colors on all code-related elements
     function forceCodeCellBackgrounds() {
