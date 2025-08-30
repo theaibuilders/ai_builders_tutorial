@@ -12,7 +12,8 @@ const { sections, id = 'main' } = Astro.props;
 const searchableData = sections.flatMap(section => 
   section.files.map(file => ({
     title: file.metadata.title,
-    path: file.path.replace(/\.(md|ipynb)$/, ''),
+    // Normalize path: drop .md, .mdx, .ipynb extensions for routing
+    path: file.path.replace(/\.(md|mdx|ipynb)$/i, ''),
     type: file.type === 'notebook' ? 'notebook' : 'markdown',
     description: file.metadata.description || '',
     section: section.name,
@@ -107,10 +108,12 @@ const searchableData = sections.flatMap(section =>
         return;
       }
       
-      searchResultsElement.innerHTML = results.map(result => `
+      searchResultsElement.innerHTML = results.map(result => {
+        const safePath = (result.path || '').replace(/\.(md|mdx|ipynb)$/i, '');
+        return `
         <button
           class="w-full px-4 py-3 text-left hover:bg-dark-hover transition-colors border-b border-dark-border last:border-b-0"
-          onclick="window.location.href='/tutorials/${result.path}'"
+          onclick="window.location.href='/tutorials/${safePath.replace(/'/g, "%27")}'"
         >
           <div class="flex items-start gap-3">
             <div class="flex-shrink-0 mt-0.5">
@@ -136,8 +139,8 @@ const searchableData = sections.flatMap(section =>
               </p>
             </div>
           </div>
-        </button>
-      `).join('');
+        </button>`;
+      }).join('');
     }
 
     // Initialize all search instances on the page
