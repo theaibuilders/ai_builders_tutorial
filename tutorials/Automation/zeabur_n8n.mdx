@@ -1,0 +1,77 @@
+# Self-Host n8n on Zeabur for $5/Month
+
+In this tutorial, you'll learn how to deploy a self-hosted n8n instance on [Zeabur](https://zeabur.com), a cloud platform that simplifies the deployment process. We'll use a pre-built template to get you up and running in minutes, all for about **$5 per month**.
+
+## Why Self-Host n8n?
+
+- **Cost-Effective**: Significantly cheaper than paid automation platforms.
+- **Full Control**: You own your data and can customize your n8n instance.
+- **Unlimited Workflows**: No limits on the number of workflows or executions.
+
+## Getting Started with Zeabur
+
+First, you'll need a Zeabur account.
+
+1. Go to the [Zeabur](https://zeabur.com) and sign up for a new account.
+2. Connect your GitHub account to Zeabur. This is how Zeabur will deploy your n8n instance.
+![Zeabur1](/public/products/zeabur/zeabur1.png)
+
+## One-Click Deployment
+
+Zeabur provides a one-click template to deploy n8n.
+
+1. Go to the [n8n template on Zeabur](https://zeabur.com/templates/JP88UN).
+![Zeabur2](/public/products/zeabur/zeabur2.png)
+2. Click the **Deploy** button.
+3. Give your self-hosted n8n instance a name and configure cloud provider settings.
+4. This will create a new n8n project in your Zeabur account and automatically start the deployment.
+
+## Using Your Self-Hosted n8n
+
+You can now access your n8n instance using the domain you configured.
+
+1.  Open your n8n domain in your browser.
+2.  You'll be prompted to create an owner account.
+![Zeabur3](/public/products/zeabur/zeabur3.png)
+3.  Then, you'll see the n8n dashboard, ready for you to create workflows.
+![Zeabur4](/public/products/zeabur/zeabur4.png)
+
+Done! You now have a self-hosted n8n instance running on Zeabur. 🎉
+
+## Additional Configurations for Your n8n Instance
+
+You can also configure your n8n instance further with the following options:
+
+### Custom Domain Binding
+
+1.  In your Zeabur dashboard, navigate to your n8n project.
+2.  Go to the **Networking** tab.
+3.  Add your own custom domain.
+
+### Setting Up Environment Variables
+
+To keep your API keys and other secrets secure, use environment variables.
+
+1.  In your Zeabur project, go to the **Variables** tab.
+2.  Add your environment variables. For example, to add an OpenAI API key:
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+```
+Now you can access these variables in your n8n workflows using an expression: `{{ $env.OPENAI_API_KEY }}`.
+
+## Get Your FREE Credits 💰
+
+You can claim **FREE $5 USD Zeabur credits** through the AI Builders community (enough to cover a basic n8n instance for about a month):
+
+1. Visit the AI Builders Zeabur perk page: [https://theaibuilders.org/zeabur](https://theaibuilders.org/zeabur).
+2. Follow the instructions (join the community if you haven't already & submit the short form).
+3. Receive your credit code / automatic credit application from Zeabur (processing can take a short while—check your email or Zeabur billing dashboard).
+
+> Tip: Apply the credit before scaling up resources so you maximize the free usage window.
+
+Zeabur's pricing is pay-as-you-go. Without credits, a basic n8n instance typically costs approximately **$5 per month**, making this a very affordable way to self-host n8n—especially with the starter credits applied.
+
+## Conclusion
+
+By following this tutorial, you've successfully deployed a self-hosted n8n instance on Zeabur. You now have a powerful and affordable automation platform at your fingertips.

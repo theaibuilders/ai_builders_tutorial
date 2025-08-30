@@ -896,7 +896,9 @@ function renderMarkdownCellFallback(source: string | string[], cellId: string, i
         listStack = [{ level, isNumbered }];
         processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mb-6 space-y-2">`);
       } else {
-        while (listStack.length > 0 && listStack[listStack.length - 1].level >= level) {
+        // Only close lists that are deeper (greater level). Using >= caused a new <ol>
+        // to be created for every sibling item, resetting numbering to 1 each time.
+        while (listStack.length > 0 && listStack[listStack.length - 1].level > level) {
           const lastList = listStack.pop();
           processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
         }
@@ -1310,7 +1312,8 @@ async function renderEnhancedMarkdown(markdown: string): Promise<string> {
         listStack = [{ level, isNumbered }];
         processedLines.push(`<${isNumbered ? 'ol' : 'ul'} class="mb-6 space-y-2">`);
       } else {
-        while (listStack.length > 0 && listStack[listStack.length - 1].level >= level) {
+        // Only close deeper nested lists, not siblings; prevents counter reset.
+        while (listStack.length > 0 && listStack[listStack.length - 1].level > level) {
           const lastList = listStack.pop();
           processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
         }
@@ -1544,6 +1547,56 @@ function getNbviewerUrl(filePath: string): string {
         /* Guard against nested tables expanding width */
         .professional-notebook .nb-output .df-scroll-wrapper table table { width: auto; }
         /* ============================================================================= */
+        /* Ordered List Numbering Fix for MDX/Tutorial Content */
+        /* The earlier global rules removed native list-style and applied counters, which
+           caused all items to appear as '1.' in some MDX-rendered lists. We restore
+           native numbering specifically inside .tutorial-content while keeping the
+           custom styling for notebook-rendered (.professional-notebook) content. */
+        .tutorial-content ol {
+          list-style: decimal outside !important;
+          counter-reset: none !important;
+          margin: 1rem 0 1.25rem 1.5rem !important;
+          padding-left: 0 !important;
+        }
+        .tutorial-content ol li {
+          counter-increment: none !important;
+          position: static !important;
+          padding-left: 0 !important;
+        }
+        .tutorial-content ol li::before {
+          content: none !important;
+        }
+        /* Defensive fallback: if some global script removes list-style, reintroduce numbers */
+        .tutorial-content ol.fallback-counter,
+        .tutorial-content .force-ol-counter {
+          counter-reset: item;
+          list-style: none !important;
+          margin-left: 0 !important;
+        }
+        .tutorial-content ol.fallback-counter > li,
+        .tutorial-content .force-ol-counter > li {
+          counter-increment: item;
+          position: relative;
+          padding-left: 1.75rem !important;
+        }
+        .tutorial-content ol.fallback-counter > li::before,
+        .tutorial-content .force-ol-counter > li::before {
+          content: counter(item) '.';
+          position: absolute;
+          left: 0;
+          color: #60a5fa;
+          font-weight: 500;
+        }
+        /* Ensure unordered lists still look clean without interfering with numbering */
+        .tutorial-content ul {
+          list-style: disc outside !important;
+          margin: 1rem 0 1.25rem 1.5rem !important;
+          padding-left: 0 !important;
+        }
+        .tutorial-content ul li {
+          position: static !important;
+          padding-left: 0 !important;
+        }
       </style>
       <div class="tutorial-content">
         <div set:html={renderedContent}></div>
@@ -1739,6 +1792,40 @@ function getNbviewerUrl(filePath: string): string {
   
   // Add copy functionality and syntax highlighting to professional notebook code cells
   document.addEventListener('DOMContentLoaded', function() {
+    // Force all hyperlinks in tutorial & notebook content to open in a new tab
+    function externalizeLinks() {
+      const scopeSelectors = ['.tutorial-content', '.professional-notebook'];
+      scopeSelectors.forEach(sel => {
+        document.querySelectorAll(sel + ' a[href]')?.forEach((a) => {
+          // Skip if it's an anchor link to same page id
+          const href = a.getAttribute('href') || '';
+          if (href.startsWith('#')) return;
+          a.setAttribute('target', '_blank');
+          // Preserve existing rel parts, ensure security tokens present
+            const relExisting = (a.getAttribute('rel') || '').split(/\s+/).filter(Boolean);
+            ['noopener','noreferrer'].forEach(r => { if (!relExisting.includes(r)) relExisting.push(r); });
+            a.setAttribute('rel', relExisting.join(' '));
+        });
+      });
+    }
+    externalizeLinks();
+    // Re-run after any dynamic injections
+    setTimeout(externalizeLinks, 500);
+    setTimeout(externalizeLinks, 1500);
+    // Ordered list numbering sanity check & fallback application
+    function fixOrderedLists() {
+      const ols = document.querySelectorAll('.tutorial-content ol');
+      ols.forEach(ol => {
+        // If browser computed style says 'list-style-type: none', apply fallback counter
+        const style = window.getComputedStyle(ol);
+        if (style.listStyleType === 'none') {
+          ol.classList.add('fallback-counter');
+        }
+      });
+    }
+    fixOrderedLists();
+    setTimeout(fixOrderedLists, 500);
+    setTimeout(fixOrderedLists, 1500);
     /* ================= DataFrame Scroll Wrapper Injection ================= */
     function wrapDataFrames(scope=document) {
       const tables = scope.querySelectorAll('.professional-notebook .nb-output table.dataframe:not([data-wrapped])');

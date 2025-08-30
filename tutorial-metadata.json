@@ -163,6 +163,10 @@
     "Storage and Memory/bright_data_dataset.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-29"
+    },
+    "Automation/zeabur_n8n.mdx": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-30"
     }
   },
   "folderOrder": [
@@ -171,12 +175,14 @@
     "Web Search",
     "Storage and Memory",
     "Gateways",
+    "Automation",
     "Frameworks",
     "Chat UI Framework",
     "MCP",
     "Observarbility",
     "Fine Tuning",
     "Image and Video"
+    
   ],
   "_instructions": {
     "description": "This file allows you to manually override authorId and lastUpdated metadata for tutorials.",
