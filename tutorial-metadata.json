@@ -167,6 +167,10 @@
     "Automation/zeabur_n8n.mdx": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-30"
+    },
+    "Vibe Coding/zeabur_cursor.mdx": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2025-08-31"
     }
   },
   "folderOrder": [
@@ -176,13 +180,13 @@
     "Storage and Memory",
     "Gateways",
     "Automation",
+    "Vibe Coding",
     "Frameworks",
     "Chat UI Framework",
     "MCP",
     "Observarbility",
     "Fine Tuning",
     "Image and Video"
-    
   ],
   "_instructions": {
     "description": "This file allows you to manually override authorId and lastUpdated metadata for tutorials.",
