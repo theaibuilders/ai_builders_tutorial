@@ -75,7 +75,7 @@ Ready to dive deeper into the world of AI development? Visit **[AI Builders](htt
 
 ### Join Our Community
 
-Connect with fellow AI builders from around the world! Join our vibrant community at **[AI Builders Community](https://community.theaibuilders.dev)** where you can:
+Connect with fellow AI builders from around the world! Join our vibrant community at **[AI Builders Community](https://theaibuilders.dev/community)** where you can:
 
 - Share your projects and get feedback
 - Ask questions and get help from experienced developers
