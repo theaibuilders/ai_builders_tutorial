@@ -9,7 +9,7 @@ interface Props {
 const { sections, id = 'main' } = Astro.props;
 
 // Convert sections to searchable format for the client-side script
-const searchableData = sections.flatMap(section => 
+const searchableData = sections.flatMap(section =>
   section.files.map(file => ({
     title: file.metadata.title,
     // Normalize path: drop .md, .mdx, .ipynb extensions for routing
@@ -19,14 +19,20 @@ const searchableData = sections.flatMap(section =>
     section: section.name,
     content: file.content || '',
     // Extract searchable text from notebook cells if it's a notebook
-    notebookText: file.notebook ? 
-      file.notebook.cells
-        .filter((cell: any) => cell.cell_type === 'markdown' || cell.cell_type === 'code')
-        .map((cell: any) => Array.isArray(cell.source) ? cell.source.join('') : cell.source)
-        .join(' ')
+    notebookText: file.notebook
+      ? file.notebook.cells
+          .filter((cell) => cell.cell_type === 'markdown' || cell.cell_type === 'code')
+          .map((cell) => (Array.isArray(cell.source) ? cell.source.join('') : cell.source))
+          .join(' ')
       : ''
   }))
 );
+
+// Serialize safely for embedding inside a <script> tag. Avoid '</script>' early termination.
+function serializeForScript(data) {
+  return JSON.stringify(data).replace(/<\/script>/gi, '<\\/script>');
+}
+const searchableDataJson = serializeForScript(searchableData);
 ---
 
 <div class="relative" id={`search-container-${id}`}>
@@ -66,7 +72,7 @@ const searchableData = sections.flatMap(section =>
 
 <!-- Search data for client-side script (only include once) -->
 {id === 'desktop' && (
-  <script type="application/json" id="search-data" set:html={JSON.stringify(searchableData)}></script>
+  <script type="application/json" id="search-data" set:html={searchableDataJson}></script>
 )}
 
 <script>
@@ -81,9 +87,9 @@ const searchableData = sections.flatMap(section =>
       console.error('Error parsing search data:', error);
     }
 
-    function searchTutorials(query: string) {
+    function searchTutorials(query) {
       const lowercaseQuery = query.toLowerCase();
-      const results = tutorialData.filter((tutorial: any) => {
+      const results = tutorialData.filter((tutorial) => {
         const matches = tutorial.title.toLowerCase().includes(lowercaseQuery) ||
           tutorial.description.toLowerCase().includes(lowercaseQuery) ||
           tutorial.section.toLowerCase().includes(lowercaseQuery) ||
@@ -95,7 +101,7 @@ const searchableData = sections.flatMap(section =>
       return results;
     }
 
-    function renderResults(results: typeof tutorialData, searchResultsElement: HTMLElement, searchInputElement: HTMLInputElement) {
+    function renderResults(results, searchResultsElement, searchInputElement) {
       if (results.length === 0) {
         searchResultsElement.innerHTML = `
           <div class="p-4 text-center text-dark-secondary">
@@ -144,19 +150,19 @@ const searchableData = sections.flatMap(section =>
     }
 
     // Initialize all search instances on the page
-    function initializeSearchInstance(instanceId: string) {
-      const searchInput = document.getElementById(`search-input-${instanceId}`) as HTMLInputElement;
-      const searchResults = document.getElementById(`search-results-${instanceId}`) as HTMLElement;
-      const searchLoading = document.getElementById(`search-loading-${instanceId}`) as HTMLElement;
+    function initializeSearchInstance(instanceId) {
+      const searchInput = document.getElementById(`search-input-${instanceId}`);
+      const searchResults = document.getElementById(`search-results-${instanceId}`);
+      const searchLoading = document.getElementById(`search-loading-${instanceId}`);
       
       if (!searchInput || !searchResults || !searchLoading) {
         return; // Skip if elements don't exist
       }
 
-      let searchTimeout: NodeJS.Timeout;
+  let searchTimeout;
       
       searchInput.addEventListener('input', (e) => {
-        const query = (e.target as HTMLInputElement).value.trim();
+        const query = e.target.value.trim();
         
         clearTimeout(searchTimeout);
         
@@ -185,7 +191,7 @@ const searchableData = sections.flatMap(section =>
       
       // Close search results when clicking outside
       document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target as Node) && !searchResults.contains(e.target as Node)) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
           searchResults.classList.add('hidden');
         }
       });

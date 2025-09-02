@@ -1,0 +1,170 @@
+# Cursor: Go Beyond the AI Chat Panel
+
+## Why this Tutorial?
+Many newcomers install Cursor and only use the right‑hand AI Chat panel to ask for code or bug fixes. Chat is powerful, but it represents only one third of Cursor's productivity stack. This short guide shows you how combining Chat + Inline Edit + AI Autocomplete turns Cursor from a “code generator” into a true pair‑programming environment that helps you ship cleaner, more maintainable software.
+![cursor-cover](/products/cursor/cursor-go-beyond.png)
+### Common Misconception
+"Using Cursor = asking the Chat panel to write files for me."  
+Result: You copy large chunks you only half understand, accumulate inconsistencies, and lose ownership of the codebase.
+
+### What You Should Actually Leverage
+1. **AI Chat (Project‑Aware Exploration)** – Great for high‑level scaffolding, architecture brainstorming, multi‑file refactors, explanations, and generating missing boilerplate *with* repository context.
+2. **Inline Edit (Precise, Local Changes)** – Select a function, block, or test and prompt *in place*. This keeps diffs minimal, encourages you to review each change, and prevents the “big paste” anti‑pattern.
+3. **AI Autocomplete (Flow Acceleration)** – Multi‑line, context‑aware suggestions while you type reduce friction for repetitive patterns (hooks, handlers, error branches) without breaking concentration to open Chat.
+
+### Why This Matters
+* **Deeper Understanding & Code Ownership** – Inline edits + incremental autocomplete mean you *review* and *accept* micro changes intentionally instead of blindly pasting large blobs from Chat.
+* **Higher Code Quality** – Smaller, targeted diffs are easier to test, revert, and iterate on. Autocomplete nudges consistent naming & patterns; inline prompts refactor safely in context.
+* **Fewer Integration Bugs** – Generating isolated improvements in place reduces the chance of mismatched imports, stale symbols, or format drift.
+* **Better Prompt Hygiene** – You naturally write smaller, goal‑focused prompts ("Optimize this loop to O(n)") rather than overstuffed, ambiguous chats.
+
+### Recommended Workflow Pattern
+> Idea → (Chat) generate or explain → (Inline Edit) refine/local change → (Autocomplete) fill routine code → Run tests / preview → Repeat.
+
+By the end of this tutorial you'll have *used all three modes together*, so you can carry that muscle memory into real projects and elevate both speed and craftsmanship.
+
+## Core Features 
+
+Cursor's AI capabilities are seamlessly integrated into the editor. Here are the three main features you'll be using most often.
+
+### 1. AI Chat: Your Project-Aware Assistant
+
+The AI Chat panel is your primary way to have a conversation with the AI about your code. It has context of your entire project, so you can ask it to perform complex tasks.
+
+* **How to use:**
+    * Press `Cmd + L` (Mac) or `Ctrl + L` (Windows/Linux) to open the chat panel.
+    * Type your request in plain English.
+
+* **Example Prompts:**
+    * "Create a new React component called `Button` with a primary and secondary variant."
+    * "Explain how the `useEffect` hook works in `App.js`."
+    * "Find the source of the bug that is causing the page to crash when I click the submit button."
+
+### 2. Inline Edit: Quick Code Modifications
+
+For smaller, more targeted changes, the Inline Edit feature is incredibly powerful. You can select a block of code and instruct the AI to modify it directly.
+
+* **How to use:**
+    * Select the code you want to change.
+    * Press `Cmd + K` (Mac) or `Ctrl + K` (Windows/Linux).
+    * A small prompt will appear. Type your desired changes.
+
+* **Example Prompts:**
+    * "Refactor this function to use `async/await` instead of promises."
+    * "Add error handling to this `try...catch` block."
+    * "Translate these comments to Spanish."
+
+### 3. AI Autocomplete: Supercharged Suggestions
+
+As you type, Cursor will provide intelligent, multi-line code suggestions. This is far more powerful than traditional autocomplete.
+
+* **How to use:**
+    * Simply start typing your code.
+    * AI suggestions will appear in grayed-out text.
+    * Press `Tab` to accept the suggestion.
+
+## Let's Build a Simple To-Do App!
+
+Now, let's put these features into practice by building a simple to-do list application.
+
+### Step 1: Generate the Project Files
+
+Open the AI Chat (`Cmd + L`) and enter the following prompt:
+
+> "Create a simple to-do list application. I need three files: `index.html` for the structure, `style.css` for the design, and `script.js` for the functionality. The app should have an input field, a button to add tasks, and a list to display them."
+
+The AI will generate the code for all three files. Click "Apply" for each one to create them in your workspace.
+
+### Step 2: Review and Run the HTML
+
+Here's the likely `index.html` file that Cursor will generate:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>My To-Do List</h1>
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <button id="addTaskBtn">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+```
+
+### Step 3: Enhance the CSS with an Inline Edit
+
+Let's say the generated `style.css` is a bit plain. We can use Inline Edit to improve it. Open `style.css`, select all the code, press `Cmd + K`, and type:
+
+> "Make this look more modern. Use a clean font, center the content, and add a subtle box shadow to the container."
+
+### Step 4: Add New Functionality with AI Chat
+
+Our to-do list is functional, but what if we want to mark tasks as complete? Let's ask the AI to add this feature. Open the AI Chat (`Cmd + L`) and, with `script.js` open, type:
+
+> "In the `script.js` file, add the functionality to toggle a 'completed' class on a task when it is clicked. Also, add a CSS rule in `style.css` to add a line-through style for completed tasks."
+
+Cursor will now modify both the JavaScript and CSS files to implement this feature.
+
+Here's an example of the updated `script.js`:
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    const taskInput = document.getElementById('taskInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskList = document.getElementById('taskList');
+
+    addTaskBtn.addEventListener('click', addTask);
+
+    function addTask() {
+        const taskText = taskInput.value.trim();
+        if (taskText === '') {
+            alert('Please enter a task.');
+            return;
+        }
+
+        const li = document.createElement('li');
+        li.textContent = taskText;
+
+        // Add event listener to toggle 'completed' class on click
+        li.addEventListener('click', () => {
+            li.classList.toggle('completed');
+        });
+
+        taskList.appendChild(li);
+        taskInput.value = '';
+    }
+});
+```
+
+And the addition to `style.css`:
+
+```css
+.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+```
+
+## Conclusion: Own the Workflow, Not Just the Chat
+
+If you stop at the right‑hand Chat panel, you get occasional bursts of generated code. When you weave Chat + Inline Edit + Autocomplete together, Cursor becomes a continuous acceleration loop: ideate broadly, refine surgically, glide through routine scaffolding — all while keeping authorship and understanding.
+
+### When to Reach for Each Mode (Quick Recall)
+* **Chat:** Architectural shifts, explanations, multi‑file/search reasoning.
+* **Inline Edit:** Local transformation, refactor, targeted enhancement, docstring improvements.
+* **Autocomplete:** Momentum maintenance, expanding obvious patterns, filling symmetrical code.
+
+Mastering Cursor means orchestrating these modes intentionally. Keep iterating with tight loops, and the quality + velocity compounding will be obvious in a few days of real work.
+
+Happy vibe coding — beyond the Chat panel!

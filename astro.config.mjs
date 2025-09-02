@@ -18,7 +18,9 @@ export default defineConfig({
         'json',
         'python',
         'yaml',
-        'dockerfile'
+        'dockerfile',
+        'html',
+        'xml'
       ]
     }
   }

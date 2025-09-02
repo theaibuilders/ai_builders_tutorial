@@ -214,7 +214,8 @@ const { sections, currentFile } = Astro.props;
   document.addEventListener('DOMContentLoaded', () => {
     // All sections start collapsed by default
     // Only expand the section containing the current file
-    const currentFileLink = document.querySelector('a[href*="/tutorials/"].bg-blue-500\\/10');
+  // More robust detection of the active link: look for element with the active background class by attribute selector
+  const currentFileLink = document.querySelector('a.bg-blue-500\\/10, a[class*="bg-blue-500/10"]');
     if (currentFileLink) {
       const section = currentFileLink.closest('.mb-6');
       if (section) {
@@ -238,5 +239,12 @@ const { sections, currentFile } = Astro.props;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  nav a.block { 
+    max-width: 100%;
+  }
+  nav a.block span.truncate { 
+    max-width: 100%;
+    display: inline-block;
   }
 </style>

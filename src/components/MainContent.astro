@@ -1088,7 +1088,7 @@ async function ensureMdxHighlighter() {
     mdxHighlighter = await getHighlighter({
       themes: ['github-dark'],
       // Add yaml & dockerfile so tutorials can highlight config.yml and Dockerfile snippets
-      langs: ['bash', 'shell', 'sh', 'typescript', 'javascript', 'ts', 'js', 'python', 'py', 'json', 'markdown', 'yaml', 'yml', 'dockerfile', 'docker']
+      langs: ['bash', 'shell', 'sh', 'typescript', 'javascript', 'ts', 'js', 'python', 'py', 'json', 'markdown', 'yaml', 'yml', 'dockerfile', 'docker', 'html', 'xml']
     });
   }
   return mdxHighlighter;
@@ -1102,6 +1102,7 @@ function normalizeLang(lang?: string): string {
   if (l === 'py') return 'python';
   if (l === 'yml') return 'yaml';
   if (l === 'docker') return 'dockerfile';
+  if (l === 'htm') return 'html';
   return l || 'text';
 }
 
