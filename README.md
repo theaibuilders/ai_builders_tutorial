@@ -2,7 +2,7 @@
 
 Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for building AI applications using modern tools 🚀
 
-![ai-builders-tutorial-banner](/github_banner.png)
+![AI Builders Tutorial Banner](public/github_banner.png)
 
 ## What You'll Learn
 
