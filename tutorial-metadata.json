@@ -108,11 +108,11 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-08-14"
     },
-    "Storage and Memory/qdrant_tutorial.ipynb": {
+    "Data and Memory/qdrant_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-18"
     },
-    "Storage and Memory/weaviate_tutorial.ipynb": {
+    "Data and Memory/weaviate_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-21"
     },
@@ -156,11 +156,11 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-27"
     },
-    "Storage and Memory/cognee_tutorial.ipynb": {
+    "Data and Memory/cognee_tutorial.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-27"
     },
-    "Storage and Memory/bright_data_dataset.ipynb": {
+    "Data and Memory/bright_data_dataset.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-07-29"
     },
@@ -183,7 +183,7 @@
     "Automation",
     "Web Search",
     "Image and Video",
-    "Storage and Memory",
+    "Data and Memory",
     "Model Providers",
     "Gateways",
     "Frameworks",
