@@ -1131,6 +1131,11 @@ async function renderEnhancedMarkdown(markdown: string): Promise<string> {
   html = html.replace(/background:\s*[^;]+;?/g, '');
   // Remove any CSS classes that might contain background colors
   html = html.replace(/class="[^"]*"/g, '');
+  // If bash/shell: remove inline color styles to show neutral text (no syntax coloring)
+  if (['bash','shell','sh'].includes(lang)) {
+    // Remove style attributes from spans to neutralize syntax coloring
+    html = html.replace(/<span style="[^"]*">/g, (m) => '<span>');
+  }
   // Wrap everything in a div that forces our background
   html = `<div style="background-color: #252830 !important; padding: 0; margin: 0;">${html}</div>`;
   // Tighten line height and force our custom background color for the generated <pre>
@@ -1154,7 +1159,7 @@ async function renderEnhancedMarkdown(markdown: string): Promise<string> {
       .replace(/'/g, '&#39;');
     const escapedAttrCode = escapeAttr(code);
     return `
-  <div class="code-block relative border border-gray-600 rounded-lg overflow-hidden my-6" style="background-color: #252830 !important;">
+  <div class="code-block relative border border-gray-600 rounded-lg overflow-hidden my-6" data-lang="${lang || 'text'}" style="background-color: #252830 !important;">
         <div class="flex items-center px-4 py-2 bg-gray-700/30 border-b border-gray-600">
           <span class="text-xs text-gray-400 font-mono">${lang || 'text'}</span>
         </div>
@@ -1482,6 +1487,18 @@ function getNbviewerUrl(filePath: string): string {
         .tutorial-content code {
           background-color: #252830 !important;
           background: #252830 !important;
+        }
+
+        /* Enable wrapping specifically for bash/shell code blocks */
+        .tutorial-content .code-block[data-lang="bash"] pre,
+        .tutorial-content .code-block[data-lang="bash"] code,
+        .tutorial-content .code-block[data-lang="shell"] pre,
+        .tutorial-content .code-block[data-lang="shell"] code,
+        .tutorial-content .code-block[data-lang="sh"] pre,
+        .tutorial-content .code-block[data-lang="sh"] code {
+          white-space: pre-wrap !important;
+          word-break: break-word !important;
+          overflow-x: hidden !important;
         }
         
         /* Override any Shiki theme backgrounds */
