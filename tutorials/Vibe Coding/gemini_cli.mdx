@@ -1,0 +1,164 @@
+# Gemini CLI:  Powerful Command-line AI Coding Agent
+
+Welcome to the Gemini CLI tutorial! This guide will walk you through the essential concepts and commands to get you up and running with Google's powerful command-line AI agent. Whether you're a seasoned developer or just starting, you'll find Gemini CLI to be an invaluable tool for coding, debugging, and automating tasks right from your terminal.
+
+![gemini-1](/products/gemini/gemini-1.png)
+
+## What is Gemini CLI?
+
+Gemini CLI is a command-line based AI coding tool that brings the power of Gemini models directly to your terminal. It's designed to understand your codebase, help you write and debug code, and even automate complex workflows. With its large context window and powerful reasoning capabilities, Gemini CLI can significantly boost your productivity.
+
+## When to use Gemini CLI
+You can use Gemini CLI for a variety of tasks, but it's particularly powerful in scenarios such as:
+- Automating complex workflows: Use the CLI when an AI agent needs to perform a sequence of complex, multi-step tasks, such as creating a new feature, running tests, and preparing a commit.
+- DevOps and system administration: Ideal for managing cloud resources, interacting with version control (Git), and scripting repetitive infrastructure tasks directly from the terminal.
+- Large-scale refactoring: Gemini CLI is well-suited for understanding and modifying large codebases with its vast context window, such as migrating code from one framework to another.
+- Research without leaving the terminal: Utilize built-in tools like Google Search to get real-time information or documentation for problem-solving, all within your command-line environment. 
+
+## Installation and Setup
+
+You can install Gemini CLI globally using npm:
+
+```bash
+npm install -g @google/gemini-cli
+```
+
+### Create a Fresh Workspace Directory
+
+Let’s spin up a clean scratch folder so Gemini CLI can reason over only what we add (you can delete it later).
+
+```bash
+mkdir -p gemini-cli-test && cd gemini-cli-test
+```
+
+Now you’re inside `gemini-cli-test/` and ready to authenticate & try commands.
+
+### Authentication
+
+After installation, run the `gemini` command to start the interactive setup:
+
+```bash
+gemini
+```
+
+You'll be prompted to choose an authentication method. The easiest way to get started is to log in with your Google account, which gives you access to a generous free tier.
+
+## Basic Usage
+
+Gemini CLI can be used in two main modes: interactive and non-interactive.
+
+### Interactive Mode
+
+Simply run the `gemini` command to start a chat session. You can then ask questions, give commands, and interact with the AI in a conversational manner.
+
+After running `gemini`, you can enter prompts like:
+```bash
+> Write a python function to download a file from a URL.
+```
+
+It will then generate the code and ask for confirmation before writing to your filesystem. You can click Allow once or Always Allow to skip confirmation for future commands.
+
+### Non-Interactive Mode
+
+You can also use Gemini CLI for single, non-interactive prompts using the `-p` or `prompt` flag directly from your shell:
+
+```bash
+gemini -p "Write a git commit message for adding a new feature."
+```
+
+## Core Features
+
+### Built-in Tools
+
+Gemini CLI comes with a set of built-in tools that allow it to interact with your local environment. These tools include:
+
+  - **File System Tools**: Read, write, and list files and directories.
+  - **Search Tools**: Search for text within files (`grep`) and find files by pattern (`glob`).
+  - **Web Tools**: Fetch content from URLs (`web-fetch`) and perform Google searches (`web-search`).
+  - **Shell**: Execute shell commands using the `!` prefix.
+
+After running `gemini`, you can enter prompts like:
+```bash
+> !ls -l
+```
+
+### GEMINI.md: Your Project's Brain
+
+You can create a `GEMINI.md` file in the root of your project to provide persistent instructions and context to Gemini CLI. This is a great way to define coding standards, project architecture, and other important details.
+
+```markdown
+# GEMINI.md
+-   This is a React project using Next.js.
+-   Use functional components and hooks.
+-   Follow the Airbnb style guide.
+-   Run tests with `npm test`.
+```
+
+### Multi-Directory Workspaces
+
+You can give Gemini CLI access to multiple directories at once, which is useful for working on complex projects with multiple repositories.
+
+After running `gemini`, you can enter prompts like:
+```bash
+gemini include-directories ../project-a ../project-b
+```
+
+### Custom Commands
+
+Create custom slash commands in your `GEMINI.md` file to define reusable prompts and workflows.
+
+### Checkpointing
+
+Gemini CLI can save a snapshot of your project before making file modifications, allowing you to easily revert changes if something goes wrong.
+
+ou can enable checkpointing when launching the Gemini CLI by using the --checkpointing or -c flag:
+
+```bash
+gemini --checkpointing
+```
+or
+```bash
+gemini -c
+```
+Once enabled, the Gemini CLI will automatically create checkpoints, allowing you to use the /restore command to revert to previous states of your project if needed.
+
+## More Use Cases
+
+Like we mentioned before, Gemini CLI is particularly powerful for certain scenarios. Here are some example prompts to illustrate its capabilities:
+
+### 1. Automating Complex Workflows
+
+This prompt instructs Gemini to act like an agent to perform a complete end-to-end task: creating a new feature, writing a test for it, and then preparing the git commit.
+
+```bash
+gemini -p "Create a new React component file 'src/Button.js' with a simple button that accepts 'label' and 'onClick' props. Then, create a corresponding test file 'src/Button.test.js' using Jest and React Testing Library to verify it renders and handles clicks. Finally, stage all changes with git and write a conventional commit message for this new feature."
+```
+
+### 2. DevOps and System Administration
+
+This example generates a shell script for a common DevOps task: checking server disk space and performing cleanup if a certain threshold is met.
+
+```bash
+gemini -p "Write a bash script named 'cleanup.sh' that checks the disk usage of the '/' partition. If usage is above 85%, it should find and delete all files ending in '.log' in the '/var/log' directory that are older than 14 days. Make the script executable after creating it."
+```
+
+### 3. Large-Scale Refactoring
+
+This prompt leverages Gemini's ability to understand the entire codebase (`@.`) to perform a widespread code modification, updating from an older, deprecated function to a new one.
+
+```bash
+gemini -p "In the entire codebase (@.), refactor all instances of the deprecated function 'getUserProfile()' to use the new asynchronous function 'fetchUserProfileAsync()'. Make sure to handle the promise correctly by adding the 'await' keyword and ensuring the containing function is marked as 'async'."
+```
+
+### 4. Research Without Leaving the Terminal
+
+This example uses the built-in `web-search` tool to troubleshoot a common coding problem and provide a solution directly in the terminal, saving you from switching contexts.
+
+```bash
+gemini -p "I'm getting a 'CORS policy' error in my Express.js application when the frontend tries to connect. Using web-search, find the common causes and provide the necessary middleware code snippet to install and configure the 'cors' npm package to fix it."
+```
+
+## Conclusion
+
+You've now learned the fundamentals of Gemini CLI. The best way to master it is to start using it in your daily workflow. Experiment with different prompts, explore the advanced features, and see how Gemini CLI can help you become a more efficient and effective developer. 
+Happy coding!
