@@ -1,0 +1,134 @@
+# Bright Data MCP: Build an Web Scraping AI Agent with Interactive UI
+
+## Introduction
+
+While there are many excellent Python-based AI agent frameworks that can already talk to Model Context Protocol (MCP) servers (e.g. LangChain, LlamaIndex, CrewAI, etc.), they typically require you to build or wire up your own front‑end each time you want to rapidly iterate. 
+
+For quick experimentation with MCP tools—especially when you want to inspect intermediate messages, test prompts, or share a demo—the lack of a rich, ready UI can slow you down. Mastra ships with an integrated Playground that gives you an instant conversational interface, agent selection, and tool invocation visibility out of the box. In this tutorial we pick Mastra + Bright Data MCP so you can focus on the agent logic and scraping workflow instead of scaffolding UI components.
+
+By the end of this tutorial, you will have a working AI agent that can take a URL, scrape its content, and answer questions about it.
+
+## Prerequisites
+
+Before you begin, make sure you have the following:
+
+* **Node.js** (v18 or higher)
+* A **Bright Data** account and API token
+* An **OpenAI** API key
+
+## Setting up the Project
+
+First, let's create a new Mastra project. Open your terminal and run the following command:
+
+```bash
+npx create-mastra@latest
+```
+
+Follow the prompts to set up your project. For this tutorial, we will use the following options:
+
+  * What do you want to name your project: `mastra-brightdata-agent`
+  * Where should we create the Mastra files: `src/`
+  * Select default provider:: `OpenAI`
+  * Enter your openai API key: `Skip for now`
+  * Make your AI IDE into a Mastra expert: `Skip for now`
+
+Once the project is created, navigate to the project directory:
+
+```bash
+cd mastra-brightdata-agent
+```
+
+The scaffold lets you skip entering the key during init. Before running the agent add your OpenAI API key to a `.env` file in the project root: 
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+```
+
+After saving the file, you’re ready to proceed.
+
+## Configuring Bright Data MCP
+
+Next, we need to set up the BrightData MCP server. This server will act as a bridge between our Mastra agent and the web.
+
+1.  **Get your BrightData API token:** Log in to your BrightData account and navigate to the API tokens section to get your token.
+
+2.  **Run the MCP server:** In a new terminal window, run the following command, replacing `<YOUR_BRIGHTDATA_API_TOKEN>` with your actual token:
+
+    ```bash
+    API_TOKEN=<YOUR_BRIGHTDATA_API_TOKEN> npx @brightdata/mcp
+    ```
+
+    The MCP server will start on `http://localhost:22999`. Keep this terminal window open.
+
+## Building the Agent
+
+Now, let's create our AI agent.
+
+1.  **Create a new agent file:** Inside the `src/mastra/agents` directory, create a new file named `web-scraper.ts`.
+
+2.  **Define the agent:** Add the following code to `src/mastra/agents/web-scraper.ts`:
+
+```typescript
+import { Agent } from '@mastra/core';
+import { openai } from '@ai-sdk/openai';
+
+export const webScraperAgent = new Agent({
+    name: 'Web Scraper Agent',
+    instructions: `
+    You are an AI agent that can scrape web pages.
+    When you receive a URL, use the scrape_as_markdown tool to get the content of the page.
+    Then, answer any questions the user has about the page content.
+    `,
+    model: openai('gpt-4o'),
+});
+```
+
+3.  **Add the MCP tool:** To allow our agent to use the Bright Data MCP server, we need to add it to the `Mastra` instance. Open the `src/mastra/index.ts` file and modify it as follows:
+
+```typescript
+import { Mastra } from '@mastra/core';
+import { webScraperAgent } from './agents/web-scraper';
+
+export const m = new Mastra({
+    agents: {
+    webScraperAgent,
+    },
+    mcp: {
+    servers: ['http://localhost:22999'],
+    },
+});
+```
+
+## Running the Agent
+
+Now, it's time to test our agent.
+
+1.  **Start the Mastra development server:** In your project's root directory, run the following command:
+
+```bash
+npm run dev
+```
+
+2.  **Open the Mastra playground:** Open your browser and navigate to `http://localhost:4111`. You should see the Mastra playground.
+
+3.  **Interact with the agent:** Select the `webScraperAgent` from the list of agents. In the chat window, enter a prompt that includes a URL, for example:
+
+```
+Please scrape the content of https://brightdata.com and tell me about their products.
+```
+
+The agent will use the Bright Data MCP server to scrape the website and provide you with a summary of the products.
+
+## Conclusion
+
+Congratulations! You have successfully built an AI agent that can scrape web data using Mastra and Bright Data MCP.
+
+This is just the beginning. You can extend this agent to perform more complex tasks, such as:
+
+  * Scraping multiple pages and comparing their content.
+  * Extracting specific data points from a page.
+  * Automating data entry tasks.
+
+We hope this tutorial has been helpful. 
+
+Happy building!

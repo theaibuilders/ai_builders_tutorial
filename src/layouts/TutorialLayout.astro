@@ -559,6 +559,14 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
             // Adjust main content margin for collapsed sidebar
             mainContent.style.marginLeft = '4rem'; // w-16 = 4rem
           }
+
+          // Persist new state (true means collapsed)
+          const newIsCollapsed = !isCollapsed;
+          try {
+            localStorage.setItem('sidebar-collapsed', String(newIsCollapsed));
+          } catch (e) {
+            // Fail silently if storage not available
+          }
         }
       }
       
@@ -629,6 +637,34 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
             closeMobileToc();
           }
         });
+
+        // Initialize persisted desktop sidebar state
+        try {
+          if (window.innerWidth >= 1024) { // only persist on desktop viewports
+            const stored = localStorage.getItem('sidebar-collapsed');
+            if (stored !== null) {
+              const shouldBeCollapsed = stored === 'true';
+              const fullSidebar = document.getElementById('left-sidebar');
+              const collapsedSidebar = document.getElementById('collapsed-sidebar');
+              const mainContent = document.querySelector('main');
+              if (fullSidebar && collapsedSidebar && mainContent) {
+                if (shouldBeCollapsed) {
+                  fullSidebar.style.display = 'none';
+                  fullSidebar.classList.add('hidden');
+                  collapsedSidebar.style.display = 'flex';
+                  mainContent.style.marginLeft = '4rem';
+                } else {
+                  fullSidebar.style.display = '';
+                  fullSidebar.classList.remove('hidden');
+                  collapsedSidebar.style.display = 'none';
+                  mainContent.style.marginLeft = '';
+                }
+              }
+            }
+          }
+        } catch (e) {
+          // Ignore storage errors
+        }
       });
     </script>
   </body>

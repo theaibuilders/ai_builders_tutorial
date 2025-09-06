@@ -1,0 +1,169 @@
+# Getting Started with Cursor Custom Modes
+
+Cursor's Custom Modes transform the AI from a general-purpose assistant into a team of specialized experts tailored to your specific workflows. Instead of writing long, repetitive prompts, you can create dedicated modes for tasks like generating documentation, refactoring code, or writing tests. This guide will walk you through the essential concepts and help you create your first custom modes.
+
+![cursor-custom-modes](/products/cursor/cursor-custom-modes.png)
+## What are Custom Modes?
+
+By default, Cursor provides general modes like **Agent** (for complex, multi-file tasks) and **Ask** (for questions and learning). Custom Modes allow you to define your own assistants with specific instructions, tools, and behaviors.
+
+The key benefits include:
+* **Efficiency**: Automate repetitive tasks with a single command or shortcut.
+* **Consistency**: Ensure the AI follows specific guidelines, coding standards, or output formats every time.
+* **Precision**: Limit the AI to a specific set of tools to prevent unwanted actions, like editing files when you only want it to read them.
+
+## Enabling and Creating a Custom Mode
+
+First, you need to enable the *feature* in your settings.
+
+1.  Go to `Settings` > `Cursor Settings` > `Chat`.
+2.  Toggle the `Custom Modes` option on.
+
+Once enabled, you can create a new mode directly from the chat panel:
+
+1.  Open the chat interface.
+2.  Click the mode selector dropdown (which likely says "Agent") and select `Add custom mode`.
+3.  Configure your mode with the following options.
+
+## Configuration Options
+
+Understanding how to configure the right Models, Tools, MCPs, and Instructions is key to building effective modes.
+
+### 1. Models
+
+Choose the model your mode will use. Consider:
+- Quality vs. speed requirements for the task.
+- Context window needs.
+- Tool compatibility.
+- Cost and rate limits.
+
+### 2. Tools
+
+Tools give your mode its capabilities. You can grant access to a combination of tools to fine-tune its behavior.
+
+* **Search**:
+    * `Codebase`: Allows the AI to perform a semantic search across your entire project.
+    * `Web`: Enables a web search to fetch external information.
+    * `Grep`: Performs a text-based search for a specific string.
+    * `List directory`: Lists files and folders at a given path.
+    * `Search files`: Finds files by name using glob or regex patterns.
+    * `Read files`: Reads the contents of specific files.
+    * `Fetch rules`: Loads project rules and guidelines (for example, .cursorrules or repo conventions).
+* **Edit**:
+    * `Edit & Reapply`: Allows the AI to modify code in your files.
+    * `Delete file`: Deletes a specified file from the workspace. Irreversible; use with caution.
+* **Run**:
+    * `Terminal`: Grants the ability to run shell commands.
+
+### 3. MCP
+
+Select the configured MCPs (Model Control Protocol) that your mode will use. MCPs help manage how the AI interacts with tools and executes tasks.
+
+### 4. Advanced Options
+    * `Auto-apply Edits`: The AI will apply code changes without asking for confirmation first. Use with caution.
+    * `Auto-run`: The AI will run terminal commands without confirmation. Use with caution.
+    * `Custom instructions`: This is where you define the AI's persona, context, and rules. The best instructions are specific and role-based. Instead of saying "write a comment," you might say:
+
+## A Practical Examples: Project Architect
+
+This mode converts a Product Requirements Document (PRD) into a structured, actionable development plan. It follows a strict sequence: require a PRD, gather missing technical specifications, agree on an output location at plan.md, then produce only the final Markdown checklist using the mandated 10-part structure (Setup, Backend Foundation, Feature Backend, Frontend Foundation, Feature Frontend, Integration, Testing, Documentation, Deployment, Maintenance). When generating, output only the plan content.
+
+In the Custom Mode UI, you would configure it like this:
+
+```text
+name: "Project Architect"
+model: "claude-4-sonnet-1m"
+keybindings: "Command+Shift+P"
+```
+
+Enabled Tools:
+```text
+Search
+- Codebase: On // Align the plan with the existing code structure.
+- Web: Off // Plan must be PRD-driven; avoids external info.
+- Grep: On // Fast lookups for PRD terms (feature names, packages, env vars).
+- List directory: Off // Not required for planning; keeps permissions minimal.
+- Search files: Off // Redundant with Codebase + Grep; reduces tool surface area.
+- Read file: On // Review existing docs/specs for context.
+- Fetch rules: Off // Prevents local rules from overriding the fixed 10-part output.
+
+Edit
+- Edit & Reapply: On // Needed to create/update plan.md after user approval.
+- Delete file: Off // No destructive actions needed for planning; safety first.
+
+Run
+- Terminal: On // For light, read-only checks (e.g., ls/tree) or confirming folder existence; 
+```
+MCP: None
+
+Click on Advanced Options and configure:
+- Auto-apply Edits: Off //No destructive actions needed for planning; safety first.
+- Auto-run: Off //No destructive actions needed for planning; safety first.
+
+Add custom instructions:
+```text
+"""
+Your role is a Project Architect AI. Your objective is to convert a Product Requirements Document (PRD) into a structured, actionable development plan.
+
+Operating Procedure
+You must operate in the following sequence. Do not deviate.
+
+Require a PRD: Do not proceed without a PRD. If one is not given, your sole response must be: "Please provide the PRD. You can use the PRD generator mode to create one: https://playbooks.com/modes/prd"
+
+Gather Technical Specifications: Once the PRD is received, review it for the tech stack (database, frameworks, auth, etc.). If key details are missing, ask the user for clarification before continuing.
+
+Agree on Output Location: Propose creating a plan.md file in the project's root or a /docs/ folder. Wait for the user's approval before generating the file.
+
+Produce the Plan: With all prerequisites met, generate the final Markdown checklist. Output nothing but the plan's content.
+
+Output Blueprint
+The generated plan must meet these specifications:
+
+Comprehensive Scope: The plan must be holistic. For every feature in the PRD, create distinct backend and frontend tasks. Ensure the entire software lifecycle is covered.
+
+Mandatory Structure: The plan must strictly follow this 10-part structure, presented in order:
+
+Project Setup
+
+Backend Foundation
+
+Feature-specific Backend
+
+Frontend Foundation
+
+Feature-specific Frontend
+
+Integration
+
+Testing
+
+Documentation
+
+Deployment
+
+Maintenance
+
+Markdown Template: Adhere to this format for the final output.
+
+Markdown
+
+# [Project Title] Development Plan
+
+##Overview
+[A brief project summary based on the PRD.]
+
+##1. Project Setup
+- [ ] Task: [Description of task]
+  - [ ] Sub-task or detail
+- [ ] Task: [Description of task]
+
+##2. Backend Foundation
+- [ ] Task: [Description of task]
+- [ ] Task: [Description of task]
+
+[Continue for all subsequent sections...]
+"""
+```
+
+## Conclusion
+By building a library of custom modes, you can significantly accelerate your development workflow and make your AI assistant a more powerful and predictable partner.
