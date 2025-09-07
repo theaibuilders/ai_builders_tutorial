@@ -13,9 +13,7 @@ Each tutorial is designed to be practical and immediately applicable:
 • **Best Practices**: Learn industry-standard approaches and common pitfalls to avoid
 • **Progressive Complexity**: Start with basics and advance to sophisticated implementations
 
-Tutorials are written in Python or TypeScript with concise explanations and runnable code / notebooks. Many include copy‑friendly prompts and refactor patterns so you can adapt them directly into real projects.
-
-
+Tutorials are written with concise explanations and runnable code / notebooks. Many include copy‑friendly prompts and refactor patterns so you can adapt them directly into real projects.
 
 ## Tutorial Categories
 
