@@ -1,6 +1,6 @@
 # AI Builders Tutorial Platform
 
-Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for viber coding as well as building AI applications using modern tools 🚀
+Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for viber coding as well as building AI applications using modern tools.
 
 ![AI Builders Tutorial Banner](public/github_banner.png)
 
