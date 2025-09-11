@@ -268,34 +268,71 @@ export function renderMarkdown(content: string): string {
  */
 export function extractMarkdownHeadings(content: string): Array<{id: string, text: string, level: number}> {
   const headings: Array<{id: string, text: string, level: number}> = [];
-  const lines = content.split('\n');
-  
+  const lines = content.split(/\r?\n/);
+
+  // Track fenced code blocks (``` or ~~~) to avoid capturing headings inside them
+  let inFence = false;
+  let fenceChar: '`' | '~' | '' = '';
+  let fenceSize = 0;
+
   for (const line of lines) {
-    const match = line.match(/^(#{1,6})\s+(.+)$/);
-    if (match) {
-      const level = match[1].length;
-      const rawText = match[2].trim();
-      
-      // Clean up markdown formatting for display text
-      const cleanText = rawText
-        .replace(/\*\*(.*?)\*\*/g, '$1')  // Remove bold formatting **text**
-        .replace(/\*(.*?)\*/g, '$1')      // Remove italic formatting *text*
-        .replace(/`([^`]+)`/g, '$1')      // Remove inline code formatting `code`
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Remove link formatting [text](url)
-        .trim();
-      
-      // Generate ID from cleaned text
-      const id = cleanText.toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-      
-      if (level >= 2 && level <= 3) { // Only h2 and h3 for TOC
-        headings.push({ id, text: cleanText, level });
+    // Detect start/end of fenced code blocks
+    const fenceMatch = line.match(/^([`~]{3,})(.*)$/);
+    if (fenceMatch) {
+      const seq = fenceMatch[1];
+      const char = seq[0] as '`' | '~';
+      if (!inFence) {
+        inFence = true;
+        fenceChar = char;
+        fenceSize = seq.length;
+      } else if (char === fenceChar && seq.length >= fenceSize) {
+        // Closing fence must be same char and at least the same length
+        inFence = false;
+        fenceChar = '';
+        fenceSize = 0;
       }
+      // Skip fence delimiter lines entirely
+      continue;
+    }
+
+    if (inFence) {
+      // Skip any content inside fenced code blocks
+      continue;
+    }
+
+    // Skip headings that are part of indented code blocks (basic heuristic)
+    if (/^(\t|\s{4,})#/.test(line)) {
+      continue;
+    }
+
+    const match = line.match(/^(#{1,6})\s+(.+?)\s*$/);
+    if (!match) continue;
+
+    const level = match[1].length;
+    const rawText = match[2].trim();
+
+    // Clean up markdown formatting for display text
+    const cleanText = rawText
+      .replace(/\*\*(.*?)\*\*/g, '$1') // bold
+      .replace(/\*(.*?)\*/g, '$1') // italic
+      .replace(/`([^`]+)`/g, '$1') // inline code
+      .replace(/!\[([^\]]+)\]\([^)]+\)/g, '$1') // images
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+      .trim();
+
+    // Generate ID from cleaned text
+    const id = cleanText
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+
+    if (level >= 2 && level <= 3) {
+      // Only h2 and h3 for TOC
+      headings.push({ id, text: cleanText, level });
     }
   }
-  
+
   return headings;
 }

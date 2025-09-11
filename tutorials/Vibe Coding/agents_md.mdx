@@ -1,0 +1,82 @@
+# Agents.md: A Standard for AI Coding Agent Instructions
+
+## What is Agents.md?
+
+[Agents.md](https://agents.md/) is an open, Markdown-based specification for creating a dedicated instruction file for AI coding agents. Think of it as a **"README for machines."** While a `README.md` file is for human developers, providing a project overview and setup instructions, `AGENTS.md` is specifically for AI agents, giving them the context and instructions they need to work effectively on your codebase.
+
+![agents-md](/products/agentsmd.jpg)
+## Why Use Agents.md?
+
+Using a dedicated instruction file for AI agents offers several benefits:
+
+  * **Consistency**: Ensures that all AI agents, regardless of the platform (GitHub Copilot, OpenAI Codex, etc.), follow the same set of rules and conventions for your project.
+  * **Clarity**: By separating machine-readable instructions from human-readable documentation, your `README.md` remains clean and focused, while agents get the precise information they need.
+  * **Efficiency**: Agents can work more autonomously and effectively with clear instructions, reducing the need for manual intervention and correction.
+  * **Standardization**: As a community-driven standard, `AGENTS.md` is supported by a growing number of AI tools and platforms, making it a future-proof way to manage AI agent instructions.
+
+## Key Concepts
+
+`AGENTS.md` is just a Markdown file, so you don't need to learn a new syntax. You can use standard Markdown headings, lists, and code blocks to structure your instructions. Here are some of the key sections you might include in your `AGENTS.md` file:
+
+  * **Project Overview**: A brief description of the project to give the agent context.
+  * **Development Environment Setup**: Commands for setting up the development environment, installing dependencies, and running the project.
+  * **Testing Instructions**: How to run tests and what to look for to ensure code quality.
+  * **Coding Conventions**: Guidelines on code style, naming conventions, and best practices.
+  * **Pull Request Guidelines**: Instructions on how to format pull requests, what to include in the description, and any other PR-related rules.
+  * **Security Considerations**: Any security-related information or practices the agent should be aware of.
+
+## Getting Started
+
+To get started with Agents.md, you simply need to create a file named `AGENTS.md` in the root of your project repository.
+
+### Example `AGENTS.md`
+
+Here's an example of a simple `AGENTS.md` file for a Node.js project:
+
+```markdown
+# Instructions for AI Agents
+
+## Project Overview
+
+This is a simple web server built with Express.js. The main application logic is in `src/index.js`, and tests are in the `src/` directory.
+
+## Development Environment Setup
+
+To set up the development environment, run the following commands:
+npm install
+
+To start the development server, use:
+npm run dev
+
+## Testing
+
+Run the tests using the following command:
+npm test
+Please ensure all tests pass before submitting a pull request.
+
+## Coding Conventions
+
+  * Use Prettier for code formatting. Run `npm run format` to format your code.
+  * Follow the Airbnb JavaScript style guide.
+  * Use camelCase for variable and function names.
+
+## Pull Request Guidelines
+
+  * All pull requests should be made to the `develop` branch.
+  * Include a clear and concise title and description for your pull request.
+  * Reference the issue number in the pull request description (e.g., "Closes \#123").
+```
+
+## Running the Agent
+
+Once you have an `AGENTS.md` file in your repository, AI coding agents that support this standard will automatically detect and use it. For example, when you use a tool like GitHub Copilot to work on your code, it will read the `AGENTS.md` file to understand your project's conventions and requirements, leading to more accurate and context-aware code suggestions.
+
+## Advanced Concepts
+
+### Monorepos
+
+For large projects with multiple packages (monorepos), you can have a root-level `AGENTS.md` file with global instructions, and also place `AGENTS.md` files in subdirectories for more specific instructions for each package. The agent will use the `AGENTS.md` file that is closest to the code it is working on.
+
+## Conclusion
+
+Agents.md is a simple yet powerful tool for improving collaboration with AI coding agents. By providing clear and consistent instructions, you can help agents work more effectively on your projects, leading to higher-quality code and increased productivity. As the use of AI in software development continues to grow, standards like Agents.md will become increasingly important for streamlining human-AI collaboration.

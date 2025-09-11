@@ -1,40 +1,86 @@
-# Ruler Configuration File
-# See https://ai.intellectronica.net/ruler for documentation.
+# Default agents to run when --agents is not specified
+# Uses case-insensitive substring matching
+default_agents = ["copilot", "claude", "aider"]
 
-# To specify which agents are active by default when --agents is not used,
-# uncomment and populate the following line. If omitted, all agents are active.
-# default_agents = ["copilot", "claude"]
+# --- Global MCP Server Configuration ---
+[mcp]
+# Enable/disable MCP propagation globally (default: true)
+enabled = false
+# Global merge strategy: 'merge' or 'overwrite' (default: 'merge')
+merge_strategy = "merge"
 
-# Enable nested rule loading from nested .ruler directories
-# When enabled, ruler will search for and process .ruler directories throughout the project hierarchy
-# nested = false
+# --- MCP Server Definitions ---
+[mcp_servers.filesystem]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/project"]
 
-# --- Agent Specific Configurations ---
-# You can enable/disable agents and override their default output paths here.
-# Use lowercase agent identifiers: amp, copilot, claude, codex, cursor, windsurf, cline, aider, kilocode
+[mcp_servers.git]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-git", "--repository", "."]
 
+[mcp_servers.remote_api]
+url = "https://api.example.com"
+
+[mcp_servers.remote_api.headers]
+Authorization = "Bearer your-token"
+
+# --- Global .gitignore Configuration ---
+[gitignore]
+# Enable/disable automatic .gitignore updates (default: true)
+enabled = true
+
+# --- Agent-Specific Configurations ---
 [agents.copilot]
 enabled = true
 output_path = ".github/copilot-instructions.md"
 
-# [agents.aider]
-# enabled = true
-# output_path_instructions = "AGENTS.md"
-# output_path_config = ".aider.conf.yml"
+[agents.claude]
+enabled = false
+output_path = "CLAUDE.md"
+
+[agents.aider]
+enabled = false
+output_path_instructions = "AGENTS.md"
+output_path_config = ".aider.conf.yml"
+
+# OpenAI Codex CLI agent and MCP config
+[agents.codex]
+enabled = false
+output_path = "AGENTS.md"
+output_path_config = ".codex/config.toml"
+
+# Agent-specific MCP configuration for Codex CLI
+[agents.codex.mcp]
+enabled = false
+merge_strategy = "merge"
+
+[agents.firebase]
+enabled = false
+output_path = ".idx/airules.md"
 
 [agents.gemini-cli]
 enabled = true
 
-# --- MCP Servers ---
-# Define Model Context Protocol servers here. Two examples:
-# 1. A stdio server (local executable)
-# 2. A remote server (HTTP-based)
+[agents.jules]
+enabled = false
 
-# [mcp_servers.example_stdio]
-# command = "node"
-# args = ["scripts/your-mcp-server.js"]
-# env = { API_KEY = "replace_me" }
+[agents.junie]
+enabled = false
+output_path = ".junie/guidelines.md"
 
-# [mcp_servers.example_remote]
-# url = "https://api.example.com/mcp"
-# headers = { Authorization = "Bearer REPLACE_ME" }
+# Agent-specific MCP configuration
+[agents.cursor.mcp]
+enabled = false
+merge_strategy = "merge"
+
+# Disable specific agents
+[agents.windsurf]
+enabled = false
+
+[agents.kilocode]
+enabled = false
+output_path = ".kilocode/rules/ruler_kilocode_instructions.md"
+
+[agents.warp]
+enabled = false
+output_path = "WARP.md"

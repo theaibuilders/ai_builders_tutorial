@@ -1,3 +1,31 @@
 {
-  "contextFileName": "AGENTS.md"
+  "contextFileName": "AGENTS.md",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/path/to/project"
+      ],
+      "type": "stdio"
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "--repository",
+        "."
+      ],
+      "type": "stdio"
+    },
+    "remote_api": {
+      "url": "https://api.example.com",
+      "headers": {
+        "Authorization": "Bearer your-token"
+      },
+      "type": "remote"
+    }
+  }
 }
