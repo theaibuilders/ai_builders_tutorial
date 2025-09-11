@@ -4,6 +4,7 @@ node_modules
 .astro
 dist
 .vercel
+.ruler
 tutorials_draft
 
 # Large model files

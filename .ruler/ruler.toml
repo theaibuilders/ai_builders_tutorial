@@ -32,7 +32,7 @@ enabled = true
 # --- Agent-Specific Configurations ---
 [agents.copilot]
 enabled = true
-output_path = ".github/copilot-instructions.md"
+output_path = ".ruler/.github/copilot-instructions.md"
 
 [agents.claude]
 enabled = false
@@ -56,7 +56,7 @@ merge_strategy = "merge"
 
 [agents.firebase]
 enabled = false
-output_path = ".idx/airules.md"
+output_path = ".ruler/.idx/airules.md"
 
 [agents.gemini-cli]
 enabled = true
@@ -66,7 +66,7 @@ enabled = false
 
 [agents.junie]
 enabled = false
-output_path = ".junie/guidelines.md"
+output_path = ".ruler/.junie/guidelines.md"
 
 # Agent-specific MCP configuration
 [agents.cursor.mcp]
@@ -79,8 +79,26 @@ enabled = false
 
 [agents.kilocode]
 enabled = false
-output_path = ".kilocode/rules/ruler_kilocode_instructions.md"
+output_path = ".ruler/.kilocode/rules/ruler_kilocode_instructions.md"
 
 [agents.warp]
 enabled = false
 output_path = "WARP.md"
+
+# --- Rules Configuration ---
+# List of rule files to load for Ruler
+[rules]
+files = [
+  ".amazonq/rules/ruler_q_rules.md",
+  ".augment/rules/ruler_augment_instructions.md",
+  ".cursor/rules/ruler_cursor_instructions.mdc",
+  ".kilocode/rules/ruler_kilocode_instructions.md",
+  ".kiro/steering/ruler_kiro_instructions.md",
+  ".trae/rules/project_rules.md",
+  ".windsurf/rules/ruler_windsurf_instructions.md",
+  "AGENTS.md",
+  "CLAUDE.md",
+  ".idx/airules.md",
+  ".junie/guidelines.md",
+  "WARP.md"
+]
