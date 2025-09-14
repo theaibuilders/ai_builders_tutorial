@@ -28,11 +28,10 @@ const searchableData = sections.flatMap(section =>
   }))
 );
 
-// Serialize safely for embedding inside a <script> tag. Avoid '</script>' early termination.
-function serializeForScript(data) {
+function serializeForScript(data: unknown) {
   return JSON.stringify(data).replace(/<\/script>/gi, '<\\/script>');
 }
-const searchableDataJson = serializeForScript(searchableData);
+const searchableDataJson: string = serializeForScript(searchableData);
 ---
 
 <div class="relative" id={`search-container-${id}`}>
@@ -80,16 +79,26 @@ const searchableDataJson = serializeForScript(searchableData);
     // Real tutorial data from server (shared across all instances)
     const searchDataElement = document.getElementById('search-data');
     
-    let tutorialData = [];
+  let tutorialData: TutorialItem[] = [];
     try {
       tutorialData = JSON.parse(searchDataElement?.textContent || '[]');
     } catch (error) {
       console.error('Error parsing search data:', error);
     }
 
-    function searchTutorials(query) {
+    interface TutorialItem {
+      title: string;
+      path: string;
+      type: string;
+      description: string;
+      section: string;
+      content: string;
+      notebookText: string;
+    }
+
+    function searchTutorials(query: string): TutorialItem[] {
       const lowercaseQuery = query.toLowerCase();
-      const results = tutorialData.filter((tutorial) => {
+      const results = tutorialData.filter((tutorial: TutorialItem) => {
         const matches = tutorial.title.toLowerCase().includes(lowercaseQuery) ||
           tutorial.description.toLowerCase().includes(lowercaseQuery) ||
           tutorial.section.toLowerCase().includes(lowercaseQuery) ||
@@ -101,7 +110,7 @@ const searchableDataJson = serializeForScript(searchableData);
       return results;
     }
 
-    function renderResults(results, searchResultsElement, searchInputElement) {
+    function renderResults(results: TutorialItem[], searchResultsElement: HTMLElement, searchInputElement: HTMLInputElement) {
       if (results.length === 0) {
         searchResultsElement.innerHTML = `
           <div class="p-4 text-center text-dark-secondary">
@@ -114,7 +123,7 @@ const searchableDataJson = serializeForScript(searchableData);
         return;
       }
       
-      searchResultsElement.innerHTML = results.map(result => {
+      searchResultsElement.innerHTML = results.map((result: TutorialItem) => {
         const safePath = (result.path || '').replace(/\.(md|mdx|ipynb)$/i, '');
         return `
         <button
@@ -150,21 +159,22 @@ const searchableDataJson = serializeForScript(searchableData);
     }
 
     // Initialize all search instances on the page
-    function initializeSearchInstance(instanceId) {
-      const searchInput = document.getElementById(`search-input-${instanceId}`);
-      const searchResults = document.getElementById(`search-results-${instanceId}`);
-      const searchLoading = document.getElementById(`search-loading-${instanceId}`);
+    function initializeSearchInstance(instanceId: string) {
+      const searchInput = document.getElementById(`search-input-${instanceId}`) as HTMLInputElement | null;
+      const searchResults = document.getElementById(`search-results-${instanceId}`) as HTMLElement | null;
+      const searchLoading = document.getElementById(`search-loading-${instanceId}`) as HTMLElement | null;
       
       if (!searchInput || !searchResults || !searchLoading) {
         return; // Skip if elements don't exist
       }
 
-  let searchTimeout;
+  let searchTimeout: number | undefined;
       
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim();
+      searchInput.addEventListener('input', (e: Event) => {
+        const target = e.target as HTMLInputElement | null;
+        const query = (target?.value || '').trim();
         
-        clearTimeout(searchTimeout);
+  if (searchTimeout) clearTimeout(searchTimeout);
         
         if (!query) {
           searchResults.classList.add('hidden');
@@ -174,7 +184,7 @@ const searchableDataJson = serializeForScript(searchableData);
         
         searchLoading.classList.remove('hidden');
         
-        searchTimeout = setTimeout(() => {
+        searchTimeout = window.setTimeout(() => {
           const results = searchTutorials(query);
           renderResults(results, searchResults, searchInput);
           searchResults.classList.remove('hidden');
@@ -190,8 +200,9 @@ const searchableDataJson = serializeForScript(searchableData);
       });
       
       // Close search results when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      document.addEventListener('click', (e: MouseEvent) => {
+        const target = e.target as Node | null;
+        if (target && !searchInput.contains(target) && !searchResults.contains(target)) {
           searchResults.classList.add('hidden');
         }
       });

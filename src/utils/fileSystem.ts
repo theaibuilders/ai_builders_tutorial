@@ -64,13 +64,35 @@ export function readMarkdownFile(filePath: string): string {
 export function readNotebookFile(filePath: string): any {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
-    
+
+    // Skip obviously truncated / empty files
+    if (!content || content.trim().length === 0) {
+      console.warn(`Notebook file empty or missing content: ${filePath} - skipping.`);
+      return null;
+    }
+
     // Check if it's VS Code XML format
     if (content.includes('<VSCode.Cell')) {
-      return convertVSCodeNotebookToJupyter(content);
-    } else {
-      // Try to parse as standard Jupyter JSON
+      try {
+        return convertVSCodeNotebookToJupyter(content);
+      } catch (convErr) {
+        console.error(`Conversion failed for VSCode notebook ${filePath}:`, convErr);
+        return null;
+      }
+    }
+
+    // Guard against clearly truncated JSON (very naive heuristic)
+    const trimmed = content.trim();
+    if (!(trimmed.startsWith('{') && (trimmed.endsWith('}') || trimmed.endsWith('}\n')))) {
+      console.warn(`Notebook JSON appears truncated or malformed (braces mismatch) in ${filePath} - skipping.`);
+      return null;
+    }
+
+    try {
       return JSON.parse(content);
+    } catch (parseErr) {
+      console.error(`JSON parse failed for notebook ${filePath}:`, parseErr);
+      return null;
     }
   } catch (error) {
     console.error(`Error reading notebook file ${filePath}:`, error);
