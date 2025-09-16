@@ -1,0 +1,86 @@
+
+# Zeabur: Image Editing with Seedream 4 through LobeChat
+
+This tutorial will guide you through deploying LobeChat on [Zeabur](https://zeabur.com/referral?referralCode=aibuilders), a seamless process that takes just a few minutes. We'll then configure LobeChat to use the powerful Seedream 4 model for advanced AI image generation and editing, walking through a real-world example of placing a logo onto a billboard.
+
+![zeabur-seedream4-with-zeabur](/products/zeabur/seedream-4-with-zeabur.png)
+## Why This Approach?
+
+Before jumping in, here's why we combine a one‑click Zeabur deployment of LobeChat with direct use of the Fal AI API (Seedream 4):
+
+1. **Lower Technical Barrier**: Calling the Fal API directly can feel too technical for some users (headers, auth, payload formats). A self-hosted LobeChat UI abstracts that complexity while still giving you control.
+2. **Avoid Extra Subscriptions**: Third‑party hosted “Seedream UI” style websites often bundle a monthly fee or credit markup. Running LobeChat yourself + using Fal usage-based billing helps you pay only for actual model calls.
+3. **Persistent Creative Workflow**: The Fal playground lets you experiment quickly, but it does not maintain a rich, queryable chat + image generation history. LobeChat preserves conversations, prompts, reference image context, and outputs so you can iterate intentionally.
+
+Taken together, this hybrid path gives you the best of both worlds: **minimal setup friction (one‑click deploy) plus cost efficiency (direct Fal API usage) and durable creative history (LobeChat's stored chats and images)**. Now let’s set it up and walk through a real example.
+
+## Introduction to the Tools
+
+* **LobeChat**: An open-source, modern AI chat framework. It's designed for high performance and allows for private deployment. LobeChat supports a wide range of AI models and plugins, making it a versatile tool for various AI-powered tasks.
+* **Zeabur**: A deployment platform that simplifies the process of hosting applications. With Zeabur, you can deploy services with a single click, and it offers a generous free tier, making it an excellent choice for personal projects and experimentation.
+* **Seedream 4**: A powerful image generation model developed by ByteDance. It excels at creating high-quality, coherent images from text prompts and offers advanced image editing capabilities like in-painting and object placement.
+* **Fal AI**: A platform that provides API access to a variety of serverless, on-demand AI models, including Seedream 4.
+
+## Prerequisites
+
+Before we begin, ensure you have the following:
+
+* A [**Zeabur account**](https://zeabur.com/referral?referralCode=aibuilders). You can sign up for free.
+* An **API key from Fal AI**. You can register and get your key from the [Fal AI website](https://fal.ai/).
+
+## Step 1: Deploying LobeChat on Zeabur
+
+Deploying LobeChat on Zeabur is incredibly straightforward, thanks to Zeabur's one-click deployment template.
+
+1. **Navigate to the LobeChat Template** (Use the LobeChat Database Version): Open your web browser and go to the [LobeChat deployment page on Zeabur](https://zeabur.com/templates/RRSPSD).
+2. **Click "Deploy"**: Click the "Deploy" button to start the process.
+![zeabur-lobechatdatabase](/products/zeabur/lobechatdatabase.png)
+
+3. **Access Your LobeChat Instance**: Once the deployment is complete, Zeabur provides a URL for your LobeChat instance. 
+4. **Post-deployment Config**: Follow the guide on [LobeChat deployment page on Zeabur](https://zeabur.com/templates/RRSPSD) to finalize any necessary configurations.
+5. **Configure an logto account**: When you first visit, you may be prompted to sign in or create an account for your private instance.
+![zeabur-lobetalk-signin-logto](/products/zeabur/lobetalk-signin-logto.png)
+
+## Step 2: Configuring Seedream 4 in LobeChat
+
+To enable Seedream 4, you need to connect LobeChat to the Fal AI service provider using your API key.
+
+1. **Go to AI Painting Page**: In your LobeChat application, click on the paintbrush icon in the left-hand sidebar to navigate to the **AI Painting** page. 
+2. **Enter Your Fal API Key**: In the model selection dropdown, select the gear icon next to fal. Paste your key into the input field. LobeChat will securely encrypt and store your key. After entering the key, enable the Fal provider using the toggle switch. You will now have access to all models provided by Fal, including Seedream 4.0.
+![zeabur-lobetalk-falapi](/products/zeabur/lobetalk-falapi.png)
+
+## Step 3: Advanced Image Editing with Seedream 4
+
+Now that LobeChat is configured, let's walk through a practical example of image editing: placing a custom logo onto a billboard in a photo.
+
+1.  **Navigate to AI Painting**: In the left-hand sidebar of LobeChat, click on the paintbrush icon to open the **AI Painting** page.
+
+2.  **Select Seedream 4.0**: On the Painting page, ensure **Seedream 4.0** is selected in the model dropdown menu.
+
+3.  **Upload Reference Images**: This is the key to advanced editing.
+    * In the **Reference Images** box, drag and drop your main background image (e.g., the photo of the city billboard).
+    * Drag and drop a second image that you want to add or integrate (e.g., the logo file). You can upload multiple images to guide the AI.
+
+4.  **Set Your Parameters**: Adjust the settings to match your desired output.
+    * **Aspect Ratio**: Choose an aspect ratio that matches your main reference image.
+    * **Width & Height**: Set the specific dimensions for your final image.
+    * **Number of Images**: Select how many variations you want to generate.
+
+5.  **Write a Precise Prompt**: In the text box, give the AI clear, direct instructions on how to combine the images.
+
+**Example from the Screenshot:**
+
+To place the "Builders" logo onto the billboard, the following prompt was used:
+
+```text
+put the logo on the billboard, make sure to include the whole logo include the icon and text
+```
+
+The AI will process the reference images and the text prompt to generate a new image where the logo is seamlessly integrated into the billboard.
+![zeabur-lobetalkaibuilders](/products/zeabur/lobetalkaibuilders.png)
+
+## Conclusion
+
+You have successfully deployed LobeChat on Zeabur and configured it to use the cutting-edge Seedream 4 model. By following the image editing example, you've seen how to go beyond simple text-to-image generation and perform powerful, context-aware edits. Experiment with your own images and prompts to unlock the full creative potential of AI-powered image manipulation.
+
+**Next step:** Spin up your own instance and start creating with Seedream 4 now on [Zeabur](https://zeabur.com/referral?referralCode=aibuilders)—deploy, plug in your Fal API key, and generate your first edited image in minutes. 🚀
