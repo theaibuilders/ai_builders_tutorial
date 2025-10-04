@@ -1,0 +1,401 @@
+creator_id,platform,name,channel_id,country,language,category,subscribers,avg_views,engagement_rate,recent_video_ids,last_30d_uploads
+creator_0,youtube,Creator 0,UC000000350,SG,en,AI,340243,30270,0.11381706996637658,"['vid_0_0', 'vid_0_1', 'vid_0_2', 'vid_0_3', 'vid_0_4', 'vid_0_5']",2
+creator_1,youtube,Creator 1,UC000001827,GB,zh,Tech,380749,104754,0.14937437678051507,"['vid_1_0', 'vid_1_1', 'vid_1_2', 'vid_1_3']",10
+creator_2,youtube,Creator 2,UC000002667,DE,zh,Education,477131,24605,0.07833356300070413,"['vid_2_0', 'vid_2_1', 'vid_2_2', 'vid_2_3', 'vid_2_4', 'vid_2_5', 'vid_2_6']",15
+creator_3,youtube,Creator 3,UC000003558,GB,ms,Tech,25308,8746,0.03993961867972144,"['vid_3_0', 'vid_3_1', 'vid_3_2', 'vid_3_3', 'vid_3_4', 'vid_3_5']",11
+creator_4,youtube,Creator 4,UC000004594,GB,en,Tech,71799,6493,0.045944605530098936,"['vid_4_0', 'vid_4_1', 'vid_4_2', 'vid_4_3', 'vid_4_4', 'vid_4_5']",10
+creator_5,youtube,Creator 5,UC000005606,GB,en,Tech,135838,21263,0.10126775921192929,"['vid_5_0', 'vid_5_1', 'vid_5_2', 'vid_5_3', 'vid_5_4', 'vid_5_5', 'vid_5_6']",1
+creator_6,youtube,Creator 6,UC000006547,US,ms,Tech,203627,22293,0.01136998443541024,"['vid_6_0', 'vid_6_1', 'vid_6_2', 'vid_6_3', 'vid_6_4', 'vid_6_5', 'vid_6_6']",13
+creator_7,youtube,Creator 7,UC000007202,US,zh,Gaming,207403,43601,0.036247927795503024,"['vid_7_0', 'vid_7_1', 'vid_7_2']",11
+creator_8,youtube,Creator 8,UC000008859,GB,zh,Education,453053,48626,0.13860886933511865,"['vid_8_0', 'vid_8_1', 'vid_8_2', 'vid_8_3', 'vid_8_4', 'vid_8_5']",6
+creator_9,youtube,Creator 9,UC000009702,DE,zh,AI,442105,167972,0.03470496725055059,"['vid_9_0', 'vid_9_1', 'vid_9_2', 'vid_9_3', 'vid_9_4']",0
+creator_10,youtube,Creator 10,UC000010401,GB,en,Education,123272,41174,0.13667173238820998,"['vid_10_0', 'vid_10_1', 'vid_10_2']",1
+creator_11,youtube,Creator 11,UC000011408,IN,en,Design,126572,11655,0.11026906590022101,"['vid_11_0', 'vid_11_1', 'vid_11_2', 'vid_11_3', 'vid_11_4', 'vid_11_5', 'vid_11_6']",10
+creator_12,youtube,Creator 12,UC000012240,US,ms,AI,174265,43993,0.09442078303190836,"['vid_12_0', 'vid_12_1', 'vid_12_2', 'vid_12_3', 'vid_12_4']",7
+creator_13,youtube,Creator 13,UC000013720,DE,id,Design,46485,4761,0.03935898031804419,"['vid_13_0', 'vid_13_1']",13
+creator_14,youtube,Creator 14,UC000014482,ID,en,Design,238970,59085,0.10663573308944252,"['vid_14_0', 'vid_14_1', 'vid_14_2', 'vid_14_3', 'vid_14_4', 'vid_14_5']",3
+creator_15,youtube,Creator 15,UC000015438,ID,en,Tech,23999,1381,0.03501862373081974,"['vid_15_0', 'vid_15_1', 'vid_15_2', 'vid_15_3', 'vid_15_4', 'vid_15_5', 'vid_15_6']",3
+creator_16,youtube,Creator 16,UC000016279,DE,ms,AI,125695,9983,0.10868224543956799,"['vid_16_0', 'vid_16_1', 'vid_16_2', 'vid_16_3', 'vid_16_4']",4
+creator_17,youtube,Creator 17,UC000017670,DE,en,Gaming,340977,28663,0.022783541160956395,"['vid_17_0', 'vid_17_1', 'vid_17_2', 'vid_17_3', 'vid_17_4', 'vid_17_5']",2
+creator_18,youtube,Creator 18,UC000018563,IN,en,Design,356546,39324,0.08040108378124354,"['vid_18_0', 'vid_18_1']",3
+creator_19,youtube,Creator 19,UC000019950,ID,en,Gaming,106779,23932,0.13477090582148357,"['vid_19_0', 'vid_19_1', 'vid_19_2', 'vid_19_3', 'vid_19_4']",13
+creator_20,youtube,Creator 20,UC000020384,DE,zh,Education,288258,101126,0.10942340620825244,"['vid_20_0', 'vid_20_1', 'vid_20_2']",3
+creator_21,youtube,Creator 21,UC000021300,IN,ms,Education,140776,47855,0.10166571336123134,"['vid_21_0', 'vid_21_1', 'vid_21_2', 'vid_21_3', 'vid_21_4', 'vid_21_5', 'vid_21_6']",11
+creator_22,youtube,Creator 22,UC000022711,ID,ms,AI,91037,23847,0.015694823916408966,"['vid_22_0', 'vid_22_1', 'vid_22_2']",10
+creator_23,youtube,Creator 23,UC000023835,US,en,Education,40989,12217,0.03139168877722959,"['vid_23_0', 'vid_23_1', 'vid_23_2', 'vid_23_3']",2
+creator_24,youtube,Creator 24,UC000024996,GB,id,Gaming,169275,25913,0.07692093811895849,"['vid_24_0', 'vid_24_1', 'vid_24_2', 'vid_24_3', 'vid_24_4']",4
+creator_25,youtube,Creator 25,UC000025207,IN,en,Design,377863,38282,0.03342519804527512,"['vid_25_0', 'vid_25_1', 'vid_25_2', 'vid_25_3', 'vid_25_4', 'vid_25_5']",4
+creator_26,youtube,Creator 26,UC000026940,MY,id,Tech,304954,100695,0.1402761164149471,"['vid_26_0', 'vid_26_1']",6
+creator_27,youtube,Creator 27,UC000027707,MY,id,Tech,6551,708,0.06569088885034345,"['vid_27_0', 'vid_27_1', 'vid_27_2']",2
+creator_28,youtube,Creator 28,UC000028846,DE,en,Tech,168486,24264,0.1199306408494502,"['vid_28_0', 'vid_28_1']",12
+creator_29,youtube,Creator 29,UC000029904,SG,ms,Tech,117825,41042,0.015440105247853372,"['vid_29_0', 'vid_29_1', 'vid_29_2', 'vid_29_3', 'vid_29_4', 'vid_29_5']",7
+creator_30,youtube,Creator 30,UC000030770,GB,ms,Gaming,145321,52969,0.13595429546969004,"['vid_30_0', 'vid_30_1', 'vid_30_2', 'vid_30_3', 'vid_30_4', 'vid_30_5', 'vid_30_6']",7
+creator_31,youtube,Creator 31,UC000031410,SG,en,AI,492311,54313,0.07810884774745251,"['vid_31_0', 'vid_31_1', 'vid_31_2']",6
+creator_32,youtube,Creator 32,UC000032166,US,ms,Education,105469,38709,0.09483047952067854,"['vid_32_0', 'vid_32_1', 'vid_32_2', 'vid_32_3']",15
+creator_33,youtube,Creator 33,UC000033920,US,id,Tech,435890,139322,0.0372001055398023,"['vid_33_0', 'vid_33_1']",15
+creator_34,youtube,Creator 34,UC000034337,SG,id,Design,50294,12983,0.09747123333863027,"['vid_34_0', 'vid_34_1']",14
+creator_35,youtube,Creator 35,UC000035445,MY,en,Education,147864,27334,0.09574476220146341,"['vid_35_0', 'vid_35_1', 'vid_35_2', 'vid_35_3', 'vid_35_4', 'vid_35_5']",0
+creator_36,youtube,Creator 36,UC000036978,SG,en,AI,228033,21072,0.05283808859476546,"['vid_36_0', 'vid_36_1', 'vid_36_2', 'vid_36_3', 'vid_36_4', 'vid_36_5']",8
+creator_37,youtube,Creator 37,UC000037582,MY,en,Gaming,106073,35051,0.13604842109603857,"['vid_37_0', 'vid_37_1', 'vid_37_2', 'vid_37_3']",0
+creator_38,youtube,Creator 38,UC000038410,ID,en,Tech,351265,47984,0.12401438411298381,"['vid_38_0', 'vid_38_1', 'vid_38_2', 'vid_38_3']",15
+creator_39,youtube,Creator 39,UC000039313,SG,en,Gaming,47493,15598,0.04061767510005077,"['vid_39_0', 'vid_39_1', 'vid_39_2']",9
+creator_40,youtube,Creator 40,UC000040777,MY,zh,Gaming,207747,55635,0.05927540461558973,"['vid_40_0', 'vid_40_1', 'vid_40_2', 'vid_40_3', 'vid_40_4', 'vid_40_5']",4
+creator_41,youtube,Creator 41,UC000041617,US,zh,Education,272864,48793,0.14138917557450598,"['vid_41_0', 'vid_41_1', 'vid_41_2', 'vid_41_3', 'vid_41_4']",4
+creator_42,youtube,Creator 42,UC000042656,US,en,Gaming,396130,124084,0.0795242551134763,"['vid_42_0', 'vid_42_1', 'vid_42_2']",10
+creator_43,youtube,Creator 43,UC000043335,IN,zh,AI,486224,157388,0.11612540897038674,"['vid_43_0', 'vid_43_1', 'vid_43_2', 'vid_43_3', 'vid_43_4', 'vid_43_5']",12
+creator_44,youtube,Creator 44,UC000044327,IN,en,Tech,260037,32751,0.08660368442038256,"['vid_44_0', 'vid_44_1', 'vid_44_2', 'vid_44_3', 'vid_44_4', 'vid_44_5']",4
+creator_45,youtube,Creator 45,UC000045615,GB,id,Education,329978,17598,0.05051517991780762,"['vid_45_0', 'vid_45_1', 'vid_45_2', 'vid_45_3', 'vid_45_4', 'vid_45_5']",7
+creator_46,youtube,Creator 46,UC000046372,ID,ms,Tech,440408,35672,0.12582193385514842,"['vid_46_0', 'vid_46_1', 'vid_46_2']",11
+creator_47,youtube,Creator 47,UC000047289,DE,ms,Design,235930,33753,0.04454964815675507,"['vid_47_0', 'vid_47_1', 'vid_47_2', 'vid_47_3']",6
+creator_48,youtube,Creator 48,UC000048369,ID,en,AI,319615,47032,0.1325400549949495,"['vid_48_0', 'vid_48_1', 'vid_48_2']",9
+creator_49,youtube,Creator 49,UC000049570,US,id,AI,51021,10295,0.056201599168579475,"['vid_49_0', 'vid_49_1', 'vid_49_2', 'vid_49_3', 'vid_49_4', 'vid_49_5']",15
+creator_50,youtube,Creator 50,UC000050219,US,zh,Gaming,466227,186074,0.14607094378462102,"['vid_50_0', 'vid_50_1', 'vid_50_2', 'vid_50_3']",1
+creator_51,youtube,Creator 51,UC000051846,US,id,Gaming,26796,10027,0.09193560541661185,"['vid_51_0', 'vid_51_1', 'vid_51_2', 'vid_51_3', 'vid_51_4', 'vid_51_5']",5
+creator_52,youtube,Creator 52,UC000052606,SG,ms,Education,116290,15148,0.055486004290403526,"['vid_52_0', 'vid_52_1', 'vid_52_2']",7
+creator_53,youtube,Creator 53,UC000053295,US,en,AI,406421,115136,0.04323560939616957,"['vid_53_0', 'vid_53_1', 'vid_53_2', 'vid_53_3', 'vid_53_4', 'vid_53_5']",10
+creator_54,youtube,Creator 54,UC000054732,GB,en,Tech,234123,85330,0.07170985217253938,"['vid_54_0', 'vid_54_1', 'vid_54_2', 'vid_54_3', 'vid_54_4', 'vid_54_5', 'vid_54_6']",15
+creator_55,youtube,Creator 55,UC000055979,DE,ms,Education,119330,10830,0.025298151180643026,"['vid_55_0', 'vid_55_1', 'vid_55_2', 'vid_55_3', 'vid_55_4', 'vid_55_5', 'vid_55_6']",15
+creator_56,youtube,Creator 56,UC000056426,US,zh,Tech,323515,80799,0.13685709037953314,"['vid_56_0', 'vid_56_1']",8
+creator_57,youtube,Creator 57,UC000057328,ID,en,Gaming,232461,57982,0.1271822385572204,"['vid_57_0', 'vid_57_1', 'vid_57_2', 'vid_57_3', 'vid_57_4']",2
+creator_58,youtube,Creator 58,UC000058556,IN,en,Education,71942,19552,0.14816498133152095,"['vid_58_0', 'vid_58_1', 'vid_58_2', 'vid_58_3', 'vid_58_4', 'vid_58_5']",14
+creator_59,youtube,Creator 59,UC000059569,US,en,Tech,43680,15224,0.131354574835438,"['vid_59_0', 'vid_59_1', 'vid_59_2', 'vid_59_3', 'vid_59_4', 'vid_59_5', 'vid_59_6']",2
+creator_60,youtube,Creator 60,UC000060652,MY,en,Gaming,83612,14653,0.02185130399752558,"['vid_60_0', 'vid_60_1']",8
+creator_61,youtube,Creator 61,UC000061338,ID,ms,Education,431200,111814,0.03631426839754017,"['vid_61_0', 'vid_61_1', 'vid_61_2', 'vid_61_3']",4
+creator_62,youtube,Creator 62,UC000062496,DE,en,Design,34795,6026,0.11789854215573127,"['vid_62_0', 'vid_62_1']",13
+creator_63,youtube,Creator 63,UC000063984,GB,en,Tech,229894,68519,0.11805480237608222,"['vid_63_0', 'vid_63_1', 'vid_63_2', 'vid_63_3', 'vid_63_4']",7
+creator_64,youtube,Creator 64,UC000064304,US,zh,AI,486715,41789,0.028812567206834325,"['vid_64_0', 'vid_64_1', 'vid_64_2', 'vid_64_3', 'vid_64_4', 'vid_64_5']",1
+creator_65,youtube,Creator 65,UC000065664,GB,ms,AI,111165,5655,0.1293224710320596,"['vid_65_0', 'vid_65_1', 'vid_65_2', 'vid_65_3', 'vid_65_4', 'vid_65_5']",10
+creator_66,youtube,Creator 66,UC000066892,US,en,Tech,496087,64976,0.07768358627405844,"['vid_66_0', 'vid_66_1']",7
+creator_67,youtube,Creator 67,UC000067673,MY,id,AI,264844,40486,0.1442269130137814,"['vid_67_0', 'vid_67_1', 'vid_67_2', 'vid_67_3', 'vid_67_4']",9
+creator_68,youtube,Creator 68,UC000068528,US,en,Gaming,79987,25970,0.06933981603976577,"['vid_68_0', 'vid_68_1']",1
+creator_69,youtube,Creator 69,UC000069946,GB,en,Tech,272070,71425,0.1054382589493991,"['vid_69_0', 'vid_69_1', 'vid_69_2', 'vid_69_3', 'vid_69_4']",2
+creator_70,youtube,Creator 70,UC000070403,DE,zh,Gaming,209019,28432,0.10550927250391194,"['vid_70_0', 'vid_70_1', 'vid_70_2', 'vid_70_3', 'vid_70_4']",0
+creator_71,youtube,Creator 71,UC000071538,MY,id,Design,240723,89938,0.12225205845307789,"['vid_71_0', 'vid_71_1']",9
+creator_72,youtube,Creator 72,UC000072217,GB,id,Design,289736,115812,0.08528753930644294,"['vid_72_0', 'vid_72_1', 'vid_72_2', 'vid_72_3', 'vid_72_4', 'vid_72_5']",10
+creator_73,youtube,Creator 73,UC000073856,IN,zh,Design,101921,22200,0.13854670547057157,"['vid_73_0', 'vid_73_1', 'vid_73_2', 'vid_73_3']",4
+creator_74,youtube,Creator 74,UC000074586,ID,en,Tech,357287,23732,0.13104051644346193,"['vid_74_0', 'vid_74_1']",3
+creator_75,youtube,Creator 75,UC000075280,US,zh,Design,52885,11887,0.08810090912794016,"['vid_75_0', 'vid_75_1', 'vid_75_2', 'vid_75_3', 'vid_75_4', 'vid_75_5']",2
+creator_76,youtube,Creator 76,UC000076133,SG,zh,AI,463879,174819,0.03259588221602532,"['vid_76_0', 'vid_76_1']",5
+creator_77,youtube,Creator 77,UC000077165,IN,en,AI,360058,41594,0.12598597356073105,"['vid_77_0', 'vid_77_1', 'vid_77_2', 'vid_77_3']",13
+creator_78,youtube,Creator 78,UC000078799,SG,id,Tech,109246,36554,0.08650746513282488,"['vid_78_0', 'vid_78_1', 'vid_78_2', 'vid_78_3', 'vid_78_4']",6
+creator_79,youtube,Creator 79,UC000079202,ID,id,AI,167346,32256,0.038210725531803345,"['vid_79_0', 'vid_79_1']",3
+creator_80,youtube,Creator 80,UC000080544,DE,id,Education,69048,10540,0.12060792293444961,"['vid_80_0', 'vid_80_1', 'vid_80_2', 'vid_80_3', 'vid_80_4', 'vid_80_5', 'vid_80_6']",10
+creator_81,youtube,Creator 81,UC000081408,SG,en,Tech,478342,26950,0.05314156165980859,"['vid_81_0', 'vid_81_1', 'vid_81_2', 'vid_81_3', 'vid_81_4', 'vid_81_5']",15
+creator_82,youtube,Creator 82,UC000082442,SG,zh,Gaming,322119,52367,0.010942228260939572,"['vid_82_0', 'vid_82_1', 'vid_82_2', 'vid_82_3']",15
+creator_83,youtube,Creator 83,UC000083603,MY,en,Design,268701,90334,0.13156000302153764,"['vid_83_0', 'vid_83_1', 'vid_83_2', 'vid_83_3']",13
+creator_84,youtube,Creator 84,UC000084427,GB,zh,Design,161233,49038,0.09839951020748201,"['vid_84_0', 'vid_84_1', 'vid_84_2']",14
+creator_85,youtube,Creator 85,UC000085983,DE,en,Design,77909,17946,0.07537994058277751,"['vid_85_0', 'vid_85_1', 'vid_85_2', 'vid_85_3']",10
+creator_86,youtube,Creator 86,UC000086851,US,en,Design,270580,65221,0.11550243704951284,"['vid_86_0', 'vid_86_1', 'vid_86_2', 'vid_86_3', 'vid_86_4', 'vid_86_5']",10
+creator_87,youtube,Creator 87,UC000087391,MY,id,Tech,206630,72151,0.10564287342295878,"['vid_87_0', 'vid_87_1', 'vid_87_2']",7
+creator_88,youtube,Creator 88,UC000088116,US,id,Tech,205261,70635,0.11796201031497028,"['vid_88_0', 'vid_88_1', 'vid_88_2', 'vid_88_3', 'vid_88_4']",6
+creator_89,youtube,Creator 89,UC000089940,DE,en,Tech,342700,65324,0.10936399841470938,"['vid_89_0', 'vid_89_1', 'vid_89_2', 'vid_89_3', 'vid_89_4', 'vid_89_5']",1
+creator_90,youtube,Creator 90,UC000090859,IN,en,Gaming,325841,78935,0.010103840065602368,"['vid_90_0', 'vid_90_1', 'vid_90_2', 'vid_90_3', 'vid_90_4', 'vid_90_5', 'vid_90_6']",12
+creator_91,youtube,Creator 91,UC000091342,DE,en,Design,306516,43832,0.0548976017055798,"['vid_91_0', 'vid_91_1', 'vid_91_2', 'vid_91_3']",15
+creator_92,youtube,Creator 92,UC000092533,US,en,AI,266392,37000,0.030098105534587923,"['vid_92_0', 'vid_92_1', 'vid_92_2', 'vid_92_3', 'vid_92_4', 'vid_92_5']",11
+creator_93,youtube,Creator 93,UC000093100,SG,en,Gaming,11008,4377,0.12254652181750045,"['vid_93_0', 'vid_93_1', 'vid_93_2']",5
+creator_94,youtube,Creator 94,UC000094506,MY,id,AI,162546,37359,0.02847039968604477,"['vid_94_0', 'vid_94_1']",13
+creator_95,youtube,Creator 95,UC000095514,DE,zh,AI,388627,113513,0.0448583280686793,"['vid_95_0', 'vid_95_1', 'vid_95_2', 'vid_95_3', 'vid_95_4', 'vid_95_5']",14
+creator_96,youtube,Creator 96,UC000096989,SG,id,Tech,68487,9834,0.03652484735592118,"['vid_96_0', 'vid_96_1', 'vid_96_2', 'vid_96_3', 'vid_96_4']",14
+creator_97,youtube,Creator 97,UC000097955,MY,en,Gaming,159626,25126,0.06795087749047894,"['vid_97_0', 'vid_97_1', 'vid_97_2', 'vid_97_3', 'vid_97_4', 'vid_97_5', 'vid_97_6']",0
+creator_98,youtube,Creator 98,UC000098278,IN,zh,Design,455804,138384,0.020398365305355888,"['vid_98_0', 'vid_98_1', 'vid_98_2']",5
+creator_99,youtube,Creator 99,UC000099265,GB,en,AI,432726,124924,0.0627853949060485,"['vid_99_0', 'vid_99_1', 'vid_99_2', 'vid_99_3', 'vid_99_4']",1
+creator_100,youtube,Creator 100,UC000100876,SG,en,Tech,296485,57862,0.09651751849202482,"['vid_100_0', 'vid_100_1']",10
+creator_101,youtube,Creator 101,UC000101150,US,en,Gaming,266897,55825,0.022612684091948436,"['vid_101_0', 'vid_101_1', 'vid_101_2', 'vid_101_3', 'vid_101_4', 'vid_101_5']",11
+creator_102,youtube,Creator 102,UC000102202,ID,en,Tech,281122,106986,0.14322010267895427,"['vid_102_0', 'vid_102_1']",12
+creator_103,youtube,Creator 103,UC000103687,US,id,Design,37312,14125,0.037514707742244024,"['vid_103_0', 'vid_103_1']",11
+creator_104,youtube,Creator 104,UC000104582,IN,id,Gaming,384156,96640,0.13069090993457327,"['vid_104_0', 'vid_104_1', 'vid_104_2', 'vid_104_3', 'vid_104_4', 'vid_104_5']",9
+creator_105,youtube,Creator 105,UC000105927,SG,en,Education,341097,45012,0.14501120150347258,"['vid_105_0', 'vid_105_1', 'vid_105_2', 'vid_105_3', 'vid_105_4']",7
+creator_106,youtube,Creator 106,UC000106877,US,ms,Tech,128015,41286,0.08062898376282064,"['vid_106_0', 'vid_106_1', 'vid_106_2', 'vid_106_3', 'vid_106_4', 'vid_106_5', 'vid_106_6']",0
+creator_107,youtube,Creator 107,UC000107619,MY,en,Tech,109777,39316,0.0513242799536067,"['vid_107_0', 'vid_107_1', 'vid_107_2', 'vid_107_3']",12
+creator_108,youtube,Creator 108,UC000108434,ID,en,Tech,483248,164372,0.1431155806001349,"['vid_108_0', 'vid_108_1', 'vid_108_2']",4
+creator_109,youtube,Creator 109,UC000109923,ID,en,Gaming,80668,23891,0.08844518307099744,"['vid_109_0', 'vid_109_1', 'vid_109_2']",14
+creator_110,youtube,Creator 110,UC000110756,IN,id,Design,416474,152653,0.04563022793076491,"['vid_110_0', 'vid_110_1', 'vid_110_2']",13
+creator_111,youtube,Creator 111,UC000111431,DE,en,Education,167609,52422,0.12365205575087578,"['vid_111_0', 'vid_111_1', 'vid_111_2']",11
+creator_112,youtube,Creator 112,UC000112975,GB,id,Gaming,472719,125940,0.07931958061121645,"['vid_112_0', 'vid_112_1', 'vid_112_2', 'vid_112_3', 'vid_112_4']",13
+creator_113,youtube,Creator 113,UC000113835,IN,id,AI,216302,84929,0.058295730225524596,"['vid_113_0', 'vid_113_1', 'vid_113_2', 'vid_113_3', 'vid_113_4', 'vid_113_5']",13
+creator_114,youtube,Creator 114,UC000114530,DE,id,Gaming,281595,31278,0.09876854551134172,"['vid_114_0', 'vid_114_1', 'vid_114_2', 'vid_114_3', 'vid_114_4']",14
+creator_115,youtube,Creator 115,UC000115760,GB,en,Gaming,397763,85487,0.10012706561897762,"['vid_115_0', 'vid_115_1', 'vid_115_2', 'vid_115_3']",1
+creator_116,youtube,Creator 116,UC000116787,SG,en,Education,365920,23344,0.07335104299758592,"['vid_116_0', 'vid_116_1', 'vid_116_2', 'vid_116_3']",3
+creator_117,youtube,Creator 117,UC000117916,MY,en,Gaming,94877,6197,0.12742029459609158,"['vid_117_0', 'vid_117_1', 'vid_117_2', 'vid_117_3', 'vid_117_4']",5
+creator_118,youtube,Creator 118,UC000118534,ID,id,Tech,287269,84302,0.027072151293091685,"['vid_118_0', 'vid_118_1', 'vid_118_2', 'vid_118_3', 'vid_118_4']",11
+creator_119,youtube,Creator 119,UC000119326,SG,en,Tech,208971,82964,0.12156083728156988,"['vid_119_0', 'vid_119_1', 'vid_119_2', 'vid_119_3', 'vid_119_4', 'vid_119_5']",1
+creator_120,youtube,Creator 120,UC000120862,IN,zh,Design,425720,136190,0.03703204739393022,"['vid_120_0', 'vid_120_1', 'vid_120_2', 'vid_120_3']",15
+creator_121,youtube,Creator 121,UC000121245,SG,en,Education,97089,12789,0.10762097805929516,"['vid_121_0', 'vid_121_1', 'vid_121_2', 'vid_121_3', 'vid_121_4', 'vid_121_5']",9
+creator_122,youtube,Creator 122,UC000122850,ID,zh,Gaming,260163,44821,0.07990429645673915,"['vid_122_0', 'vid_122_1']",9
+creator_123,youtube,Creator 123,UC000123256,GB,id,Gaming,146021,27235,0.0877925830481494,"['vid_123_0', 'vid_123_1', 'vid_123_2', 'vid_123_3']",8
+creator_124,youtube,Creator 124,UC000124879,ID,id,Gaming,201794,37958,0.056260274916343896,"['vid_124_0', 'vid_124_1', 'vid_124_2', 'vid_124_3', 'vid_124_4', 'vid_124_5']",3
+creator_125,youtube,Creator 125,UC000125100,IN,id,Design,19007,6935,0.01612771252241738,"['vid_125_0', 'vid_125_1', 'vid_125_2', 'vid_125_3', 'vid_125_4', 'vid_125_5', 'vid_125_6']",15
+creator_126,youtube,Creator 126,UC000126250,GB,en,Gaming,416995,35888,0.12905979743972237,"['vid_126_0', 'vid_126_1', 'vid_126_2', 'vid_126_3', 'vid_126_4', 'vid_126_5']",9
+creator_127,youtube,Creator 127,UC000127980,IN,zh,Tech,225809,47948,0.14669324375922815,"['vid_127_0', 'vid_127_1', 'vid_127_2', 'vid_127_3', 'vid_127_4']",10
+creator_128,youtube,Creator 128,UC000128397,ID,en,Tech,112775,40546,0.07591703788847595,"['vid_128_0', 'vid_128_1', 'vid_128_2', 'vid_128_3', 'vid_128_4', 'vid_128_5']",11
+creator_129,youtube,Creator 129,UC000129143,US,en,AI,401606,148393,0.1267354822324259,"['vid_129_0', 'vid_129_1', 'vid_129_2']",7
+creator_130,youtube,Creator 130,UC000130213,ID,zh,Tech,108887,16753,0.1356053229229695,"['vid_130_0', 'vid_130_1', 'vid_130_2', 'vid_130_3']",6
+creator_131,youtube,Creator 131,UC000131234,DE,en,Gaming,272134,14762,0.0733851426930243,"['vid_131_0', 'vid_131_1', 'vid_131_2', 'vid_131_3', 'vid_131_4']",14
+creator_132,youtube,Creator 132,UC000132502,SG,en,Gaming,427175,137204,0.11419895912232195,"['vid_132_0', 'vid_132_1', 'vid_132_2']",7
+creator_133,youtube,Creator 133,UC000133611,SG,zh,Tech,20796,3634,0.08185425040493652,"['vid_133_0', 'vid_133_1', 'vid_133_2']",4
+creator_134,youtube,Creator 134,UC000134721,GB,en,Design,440193,111497,0.027133683839154092,"['vid_134_0', 'vid_134_1', 'vid_134_2', 'vid_134_3', 'vid_134_4']",4
+creator_135,youtube,Creator 135,UC000135626,DE,en,Design,455329,146181,0.12996239038990373,"['vid_135_0', 'vid_135_1', 'vid_135_2', 'vid_135_3', 'vid_135_4', 'vid_135_5', 'vid_135_6']",2
+creator_136,youtube,Creator 136,UC000136846,SG,en,Gaming,178492,18082,0.10420730595545216,"['vid_136_0', 'vid_136_1', 'vid_136_2', 'vid_136_3', 'vid_136_4']",13
+creator_137,youtube,Creator 137,UC000137206,SG,zh,Gaming,219477,83364,0.09586565249254596,"['vid_137_0', 'vid_137_1']",4
+creator_138,youtube,Creator 138,UC000138561,GB,ms,Design,227458,14781,0.11696333716440316,"['vid_138_0', 'vid_138_1']",7
+creator_139,youtube,Creator 139,UC000139505,DE,en,Tech,490307,58242,0.11621839321555336,"['vid_139_0', 'vid_139_1', 'vid_139_2', 'vid_139_3', 'vid_139_4', 'vid_139_5', 'vid_139_6']",3
+creator_140,youtube,Creator 140,UC000140325,MY,ms,Education,63120,16717,0.09774688478477156,"['vid_140_0', 'vid_140_1', 'vid_140_2', 'vid_140_3', 'vid_140_4', 'vid_140_5', 'vid_140_6']",8
+creator_141,youtube,Creator 141,UC000141280,GB,ms,Education,231164,23092,0.03518090342484284,"['vid_141_0', 'vid_141_1', 'vid_141_2', 'vid_141_3', 'vid_141_4', 'vid_141_5', 'vid_141_6']",5
+creator_142,youtube,Creator 142,UC000142852,US,en,Education,403849,160195,0.098785102410038,"['vid_142_0', 'vid_142_1', 'vid_142_2', 'vid_142_3']",11
+creator_143,youtube,Creator 143,UC000143305,GB,ms,Gaming,168924,46073,0.07017911202896358,"['vid_143_0', 'vid_143_1', 'vid_143_2', 'vid_143_3', 'vid_143_4', 'vid_143_5', 'vid_143_6']",2
+creator_144,youtube,Creator 144,UC000144992,MY,en,AI,306720,99222,0.027306600501230606,"['vid_144_0', 'vid_144_1']",5
+creator_145,youtube,Creator 145,UC000145230,GB,en,Gaming,300657,93905,0.0223274436325845,"['vid_145_0', 'vid_145_1', 'vid_145_2', 'vid_145_3']",0
+creator_146,youtube,Creator 146,UC000146259,DE,zh,Education,101945,34633,0.09049408675304864,"['vid_146_0', 'vid_146_1', 'vid_146_2', 'vid_146_3', 'vid_146_4']",12
+creator_147,youtube,Creator 147,UC000147420,US,zh,Tech,36591,12542,0.13184184407543084,"['vid_147_0', 'vid_147_1']",9
+creator_148,youtube,Creator 148,UC000148243,US,zh,Gaming,70383,25136,0.09749514460632526,"['vid_148_0', 'vid_148_1', 'vid_148_2', 'vid_148_3', 'vid_148_4', 'vid_148_5', 'vid_148_6']",8
+creator_149,youtube,Creator 149,UC000149593,DE,en,Gaming,380886,39124,0.14265907656021012,"['vid_149_0', 'vid_149_1']",13
+creator_150,youtube,Creator 150,UC000150990,DE,zh,Tech,270688,62772,0.054561505790074724,"['vid_150_0', 'vid_150_1', 'vid_150_2', 'vid_150_3', 'vid_150_4', 'vid_150_5']",14
+creator_151,youtube,Creator 151,UC000151352,IN,en,Tech,186012,9491,0.021335699467558627,"['vid_151_0', 'vid_151_1', 'vid_151_2', 'vid_151_3']",15
+creator_152,youtube,Creator 152,UC000152309,DE,id,Gaming,470570,62553,0.13392832907689872,"['vid_152_0', 'vid_152_1', 'vid_152_2', 'vid_152_3']",7
+creator_153,youtube,Creator 153,UC000153430,MY,en,Education,234368,35473,0.12439802724931229,"['vid_153_0', 'vid_153_1', 'vid_153_2']",11
+creator_154,youtube,Creator 154,UC000154559,IN,id,Education,254616,55162,0.10234715381468913,"['vid_154_0', 'vid_154_1', 'vid_154_2', 'vid_154_3', 'vid_154_4', 'vid_154_5', 'vid_154_6']",9
+creator_155,youtube,Creator 155,UC000155639,US,ms,Gaming,248032,61515,0.11601811565809203,"['vid_155_0', 'vid_155_1']",8
+creator_156,youtube,Creator 156,UC000156793,DE,en,Education,44066,7765,0.08569663510458989,"['vid_156_0', 'vid_156_1', 'vid_156_2', 'vid_156_3', 'vid_156_4', 'vid_156_5', 'vid_156_6']",10
+creator_157,youtube,Creator 157,UC000157681,MY,en,AI,184021,42139,0.06467395445985195,"['vid_157_0', 'vid_157_1', 'vid_157_2', 'vid_157_3', 'vid_157_4']",6
+creator_158,youtube,Creator 158,UC000158209,IN,ms,Tech,105184,12065,0.09191366405202399,"['vid_158_0', 'vid_158_1', 'vid_158_2', 'vid_158_3', 'vid_158_4', 'vid_158_5', 'vid_158_6']",0
+creator_159,youtube,Creator 159,UC000159869,DE,zh,Design,62104,16448,0.05687314384727703,"['vid_159_0', 'vid_159_1', 'vid_159_2', 'vid_159_3', 'vid_159_4', 'vid_159_5', 'vid_159_6']",12
+creator_160,youtube,Creator 160,UC000160206,GB,en,Design,20937,6147,0.010358855175894788,"['vid_160_0', 'vid_160_1', 'vid_160_2', 'vid_160_3']",0
+creator_161,youtube,Creator 161,UC000161939,ID,en,Tech,20015,5176,0.02046644965286007,"['vid_161_0', 'vid_161_1', 'vid_161_2', 'vid_161_3']",1
+creator_162,youtube,Creator 162,UC000162458,DE,ms,Education,310290,94492,0.1193295125871898,"['vid_162_0', 'vid_162_1', 'vid_162_2', 'vid_162_3', 'vid_162_4', 'vid_162_5', 'vid_162_6']",2
+creator_163,youtube,Creator 163,UC000163452,DE,en,Design,406435,155786,0.07206362512631755,"['vid_163_0', 'vid_163_1', 'vid_163_2', 'vid_163_3', 'vid_163_4', 'vid_163_5', 'vid_163_6']",11
+creator_164,youtube,Creator 164,UC000164837,MY,zh,Gaming,281001,110737,0.015105318713012593,"['vid_164_0', 'vid_164_1', 'vid_164_2', 'vid_164_3', 'vid_164_4']",13
+creator_165,youtube,Creator 165,UC000165823,IN,en,Tech,157225,14788,0.0694870268750069,"['vid_165_0', 'vid_165_1', 'vid_165_2', 'vid_165_3', 'vid_165_4']",3
+creator_166,youtube,Creator 166,UC000166402,SG,ms,AI,348542,100933,0.10501521422268706,"['vid_166_0', 'vid_166_1', 'vid_166_2', 'vid_166_3', 'vid_166_4']",0
+creator_167,youtube,Creator 167,UC000167469,SG,zh,Education,211994,14960,0.14224908417730425,"['vid_167_0', 'vid_167_1', 'vid_167_2', 'vid_167_3', 'vid_167_4']",5
+creator_168,youtube,Creator 168,UC000168391,IN,en,Education,448546,136502,0.048615202077271887,"['vid_168_0', 'vid_168_1']",3
+creator_169,youtube,Creator 169,UC000169111,MY,en,Tech,214864,68894,0.14315232663932811,"['vid_169_0', 'vid_169_1', 'vid_169_2', 'vid_169_3', 'vid_169_4']",15
+creator_170,youtube,Creator 170,UC000170791,MY,ms,Gaming,478790,82600,0.0636921795847845,"['vid_170_0', 'vid_170_1', 'vid_170_2']",1
+creator_171,youtube,Creator 171,UC000171975,MY,en,AI,225843,80472,0.1383649153985091,"['vid_171_0', 'vid_171_1']",8
+creator_172,youtube,Creator 172,UC000172341,IN,ms,Design,126796,40835,0.028374060884790525,"['vid_172_0', 'vid_172_1', 'vid_172_2', 'vid_172_3', 'vid_172_4']",15
+creator_173,youtube,Creator 173,UC000173632,MY,en,AI,417634,139751,0.1132449395157025,"['vid_173_0', 'vid_173_1', 'vid_173_2', 'vid_173_3']",5
+creator_174,youtube,Creator 174,UC000174834,SG,id,Design,395276,74555,0.01626207941558784,"['vid_174_0', 'vid_174_1', 'vid_174_2', 'vid_174_3', 'vid_174_4', 'vid_174_5', 'vid_174_6']",4
+creator_175,youtube,Creator 175,UC000175731,IN,zh,Education,401269,159744,0.09074281115134905,"['vid_175_0', 'vid_175_1', 'vid_175_2', 'vid_175_3', 'vid_175_4', 'vid_175_5']",15
+creator_176,youtube,Creator 176,UC000176550,SG,en,Design,19709,3259,0.11891404414515445,"['vid_176_0', 'vid_176_1', 'vid_176_2', 'vid_176_3', 'vid_176_4', 'vid_176_5', 'vid_176_6']",11
+creator_177,youtube,Creator 177,UC000177369,MY,en,Education,93449,9213,0.05181650952222442,"['vid_177_0', 'vid_177_1']",1
+creator_178,youtube,Creator 178,UC000178489,IN,en,Education,484049,65725,0.09328292629325824,"['vid_178_0', 'vid_178_1', 'vid_178_2', 'vid_178_3', 'vid_178_4', 'vid_178_5', 'vid_178_6']",1
+creator_179,youtube,Creator 179,UC000179740,DE,en,Tech,165775,59771,0.14583813326330894,"['vid_179_0', 'vid_179_1', 'vid_179_2', 'vid_179_3', 'vid_179_4', 'vid_179_5', 'vid_179_6']",12
+creator_180,youtube,Creator 180,UC000180784,SG,id,AI,296889,88413,0.09617365450732443,"['vid_180_0', 'vid_180_1', 'vid_180_2', 'vid_180_3', 'vid_180_4']",13
+creator_181,youtube,Creator 181,UC000181440,US,zh,Design,12786,718,0.010911818952299781,"['vid_181_0', 'vid_181_1', 'vid_181_2']",11
+creator_182,youtube,Creator 182,UC000182272,MY,id,Design,148608,16861,0.04931303185133003,"['vid_182_0', 'vid_182_1', 'vid_182_2']",15
+creator_183,youtube,Creator 183,UC000183474,MY,zh,Tech,144473,41820,0.1048454438980714,"['vid_183_0', 'vid_183_1', 'vid_183_2', 'vid_183_3', 'vid_183_4', 'vid_183_5']",2
+creator_184,youtube,Creator 184,UC000184242,MY,ms,AI,37434,11525,0.08647845905010208,"['vid_184_0', 'vid_184_1']",8
+creator_185,youtube,Creator 185,UC000185357,ID,ms,Education,252590,55437,0.138304362776113,"['vid_185_0', 'vid_185_1', 'vid_185_2', 'vid_185_3', 'vid_185_4']",13
+creator_186,youtube,Creator 186,UC000186250,IN,ms,Tech,228165,30229,0.13187832945159475,"['vid_186_0', 'vid_186_1', 'vid_186_2', 'vid_186_3', 'vid_186_4']",6
+creator_187,youtube,Creator 187,UC000187283,DE,en,Tech,12164,1208,0.03305126796457611,"['vid_187_0', 'vid_187_1']",11
+creator_188,youtube,Creator 188,UC000188341,MY,id,Tech,276271,37964,0.02539557482974392,"['vid_188_0', 'vid_188_1', 'vid_188_2', 'vid_188_3', 'vid_188_4']",1
+creator_189,youtube,Creator 189,UC000189175,DE,id,Design,314777,92837,0.08744561841333207,"['vid_189_0', 'vid_189_1', 'vid_189_2', 'vid_189_3']",13
+creator_190,youtube,Creator 190,UC000190973,DE,ms,Tech,152912,34638,0.1358041413315413,"['vid_190_0', 'vid_190_1', 'vid_190_2', 'vid_190_3', 'vid_190_4', 'vid_190_5', 'vid_190_6']",1
+creator_191,youtube,Creator 191,UC000191992,DE,en,Tech,491262,94072,0.01804576685956088,"['vid_191_0', 'vid_191_1']",0
+creator_192,youtube,Creator 192,UC000192130,US,en,Education,170442,43568,0.04702873719895356,"['vid_192_0', 'vid_192_1', 'vid_192_2', 'vid_192_3', 'vid_192_4', 'vid_192_5']",10
+creator_193,youtube,Creator 193,UC000193595,GB,en,Design,391912,101622,0.10634984640025978,"['vid_193_0', 'vid_193_1', 'vid_193_2', 'vid_193_3', 'vid_193_4', 'vid_193_5']",13
+creator_194,youtube,Creator 194,UC000194563,MY,ms,Education,155610,59204,0.10595505972352683,"['vid_194_0', 'vid_194_1', 'vid_194_2', 'vid_194_3', 'vid_194_4', 'vid_194_5']",6
+creator_195,youtube,Creator 195,UC000195376,IN,zh,Design,131781,38021,0.014784029195458914,"['vid_195_0', 'vid_195_1']",6
+creator_196,youtube,Creator 196,UC000196244,SG,ms,Design,289180,15448,0.024467592854950503,"['vid_196_0', 'vid_196_1']",11
+creator_197,youtube,Creator 197,UC000197398,US,zh,Gaming,89902,35173,0.05273953972129805,"['vid_197_0', 'vid_197_1']",14
+creator_198,youtube,Creator 198,UC000198286,GB,en,AI,27383,2544,0.11428936597455323,"['vid_198_0', 'vid_198_1', 'vid_198_2']",14
+creator_199,youtube,Creator 199,UC000199315,ID,en,AI,447452,64856,0.10648300897021822,"['vid_199_0', 'vid_199_1', 'vid_199_2', 'vid_199_3', 'vid_199_4']",8
+creator_200,youtube,Creator 200,UC000200829,DE,id,Tech,233816,47418,0.10331129657197187,"['vid_200_0', 'vid_200_1', 'vid_200_2', 'vid_200_3', 'vid_200_4']",8
+creator_201,youtube,Creator 201,UC000201230,US,en,Design,91863,21804,0.05809915994926036,"['vid_201_0', 'vid_201_1', 'vid_201_2', 'vid_201_3', 'vid_201_4', 'vid_201_5']",7
+creator_202,youtube,Creator 202,UC000202757,US,zh,Education,376817,123485,0.09286067706648417,"['vid_202_0', 'vid_202_1', 'vid_202_2']",12
+creator_203,youtube,Creator 203,UC000203632,ID,en,Education,406197,103565,0.038413988512735094,"['vid_203_0', 'vid_203_1', 'vid_203_2', 'vid_203_3', 'vid_203_4', 'vid_203_5']",0
+creator_204,youtube,Creator 204,UC000204401,SG,en,Tech,347300,83717,0.12829834059930484,"['vid_204_0', 'vid_204_1', 'vid_204_2', 'vid_204_3', 'vid_204_4', 'vid_204_5', 'vid_204_6']",0
+creator_205,youtube,Creator 205,UC000205435,GB,en,Tech,419275,77895,0.0844507722657756,"['vid_205_0', 'vid_205_1', 'vid_205_2', 'vid_205_3', 'vid_205_4']",0
+creator_206,youtube,Creator 206,UC000206232,ID,en,Design,473684,75888,0.10308606000128195,"['vid_206_0', 'vid_206_1', 'vid_206_2']",15
+creator_207,youtube,Creator 207,UC000207981,US,id,AI,73970,5572,0.12964051259667772,"['vid_207_0', 'vid_207_1', 'vid_207_2', 'vid_207_3']",15
+creator_208,youtube,Creator 208,UC000208273,DE,en,Tech,469908,61540,0.11139080566205033,"['vid_208_0', 'vid_208_1', 'vid_208_2', 'vid_208_3', 'vid_208_4']",8
+creator_209,youtube,Creator 209,UC000209808,ID,zh,Gaming,243265,72471,0.05620529876565368,"['vid_209_0', 'vid_209_1']",3
+creator_210,youtube,Creator 210,UC000210682,US,id,Education,462815,26499,0.09690233614742935,"['vid_210_0', 'vid_210_1', 'vid_210_2', 'vid_210_3']",6
+creator_211,youtube,Creator 211,UC000211306,SG,zh,Gaming,112008,21228,0.07997173784652313,"['vid_211_0', 'vid_211_1']",15
+creator_212,youtube,Creator 212,UC000212201,DE,zh,Tech,327434,111286,0.0755133020888686,"['vid_212_0', 'vid_212_1', 'vid_212_2', 'vid_212_3', 'vid_212_4', 'vid_212_5']",14
+creator_213,youtube,Creator 213,UC000213619,DE,en,Design,268260,66539,0.12545465644859266,"['vid_213_0', 'vid_213_1', 'vid_213_2', 'vid_213_3', 'vid_213_4', 'vid_213_5']",11
+creator_214,youtube,Creator 214,UC000214569,SG,id,AI,431007,70825,0.01435420089447564,"['vid_214_0', 'vid_214_1', 'vid_214_2', 'vid_214_3']",8
+creator_215,youtube,Creator 215,UC000215715,SG,ms,Education,455842,48115,0.11413392323477699,"['vid_215_0', 'vid_215_1']",12
+creator_216,youtube,Creator 216,UC000216880,US,en,Gaming,282917,30782,0.013823330168605137,"['vid_216_0', 'vid_216_1', 'vid_216_2']",1
+creator_217,youtube,Creator 217,UC000217487,MY,zh,Education,88756,18077,0.12599979409768988,"['vid_217_0', 'vid_217_1', 'vid_217_2', 'vid_217_3', 'vid_217_4', 'vid_217_5']",7
+creator_218,youtube,Creator 218,UC000218859,IN,en,Education,201561,20851,0.1367841053092943,"['vid_218_0', 'vid_218_1', 'vid_218_2', 'vid_218_3', 'vid_218_4', 'vid_218_5', 'vid_218_6']",4
+creator_219,youtube,Creator 219,UC000219658,US,en,Gaming,86482,4839,0.11173214004585537,"['vid_219_0', 'vid_219_1', 'vid_219_2', 'vid_219_3']",0
+creator_220,youtube,Creator 220,UC000220664,SG,en,Tech,271834,18457,0.10204705536701673,"['vid_220_0', 'vid_220_1']",15
+creator_221,youtube,Creator 221,UC000221152,MY,id,Education,42008,4767,0.10216432497688102,"['vid_221_0', 'vid_221_1', 'vid_221_2', 'vid_221_3', 'vid_221_4', 'vid_221_5']",2
+creator_222,youtube,Creator 222,UC000222188,US,en,Design,424157,160977,0.05843350186153437,"['vid_222_0', 'vid_222_1', 'vid_222_2', 'vid_222_3', 'vid_222_4', 'vid_222_5', 'vid_222_6']",1
+creator_223,youtube,Creator 223,UC000223820,US,en,Education,26469,5524,0.010758476058892779,"['vid_223_0', 'vid_223_1', 'vid_223_2']",8
+creator_224,youtube,Creator 224,UC000224188,IN,en,AI,242442,15258,0.030699332454799222,"['vid_224_0', 'vid_224_1', 'vid_224_2', 'vid_224_3', 'vid_224_4', 'vid_224_5', 'vid_224_6']",11
+creator_225,youtube,Creator 225,UC000225765,DE,en,Design,189004,47651,0.14442933377585732,"['vid_225_0', 'vid_225_1', 'vid_225_2', 'vid_225_3']",11
+creator_226,youtube,Creator 226,UC000226607,US,ms,AI,303479,60956,0.07595741046091327,"['vid_226_0', 'vid_226_1', 'vid_226_2']",7
+creator_227,youtube,Creator 227,UC000227904,DE,en,Tech,338883,107818,0.04674549030383332,"['vid_227_0', 'vid_227_1', 'vid_227_2']",3
+creator_228,youtube,Creator 228,UC000228947,IN,id,Education,333533,23470,0.0896011606275992,"['vid_228_0', 'vid_228_1', 'vid_228_2', 'vid_228_3', 'vid_228_4', 'vid_228_5', 'vid_228_6']",0
+creator_229,youtube,Creator 229,UC000229279,GB,en,Tech,111130,33598,0.019125318877718067,"['vid_229_0', 'vid_229_1', 'vid_229_2']",6
+creator_230,youtube,Creator 230,UC000230281,US,ms,Tech,203171,45464,0.10252789853778693,"['vid_230_0', 'vid_230_1', 'vid_230_2', 'vid_230_3', 'vid_230_4']",2
+creator_231,youtube,Creator 231,UC000231142,IN,ms,AI,220535,11288,0.08989235908621533,"['vid_231_0', 'vid_231_1']",14
+creator_232,youtube,Creator 232,UC000232805,GB,ms,AI,18838,2273,0.06767679532383818,"['vid_232_0', 'vid_232_1', 'vid_232_2', 'vid_232_3', 'vid_232_4', 'vid_232_5', 'vid_232_6']",14
+creator_233,youtube,Creator 233,UC000233614,MY,id,AI,358672,65472,0.04142764734939222,"['vid_233_0', 'vid_233_1']",13
+creator_234,youtube,Creator 234,UC000234270,IN,en,Tech,179506,55121,0.04001952565049952,"['vid_234_0', 'vid_234_1', 'vid_234_2']",2
+creator_235,youtube,Creator 235,UC000235909,MY,en,Gaming,19242,5457,0.018437608430456855,"['vid_235_0', 'vid_235_1', 'vid_235_2', 'vid_235_3', 'vid_235_4']",8
+creator_236,youtube,Creator 236,UC000236984,US,en,AI,138412,19217,0.147885247285972,"['vid_236_0', 'vid_236_1']",3
+creator_237,youtube,Creator 237,UC000237404,ID,id,Education,390114,79766,0.11679175208893788,"['vid_237_0', 'vid_237_1', 'vid_237_2', 'vid_237_3']",2
+creator_238,youtube,Creator 238,UC000238477,GB,ms,Tech,322593,127460,0.1185610786386541,"['vid_238_0', 'vid_238_1']",0
+creator_239,youtube,Creator 239,UC000239899,ID,en,AI,408184,42212,0.013649503739542553,"['vid_239_0', 'vid_239_1', 'vid_239_2', 'vid_239_3', 'vid_239_4']",5
+creator_240,youtube,Creator 240,UC000240290,SG,zh,AI,271067,47577,0.05024655716806511,"['vid_240_0', 'vid_240_1']",15
+creator_241,youtube,Creator 241,UC000241269,MY,en,Tech,219284,27385,0.027935477111050093,"['vid_241_0', 'vid_241_1', 'vid_241_2', 'vid_241_3', 'vid_241_4', 'vid_241_5', 'vid_241_6']",11
+creator_242,youtube,Creator 242,UC000242497,ID,ms,Education,246011,41599,0.10350819885282654,"['vid_242_0', 'vid_242_1', 'vid_242_2', 'vid_242_3', 'vid_242_4', 'vid_242_5', 'vid_242_6']",14
+creator_243,youtube,Creator 243,UC000243569,SG,en,AI,410559,22993,0.12223609439329626,"['vid_243_0', 'vid_243_1', 'vid_243_2', 'vid_243_3', 'vid_243_4', 'vid_243_5']",5
+creator_244,youtube,Creator 244,UC000244874,MY,en,AI,56764,21784,0.024357306062316585,"['vid_244_0', 'vid_244_1', 'vid_244_2', 'vid_244_3', 'vid_244_4']",6
+creator_245,youtube,Creator 245,UC000245582,SG,en,Design,422030,126288,0.14152252719977837,"['vid_245_0', 'vid_245_1', 'vid_245_2', 'vid_245_3', 'vid_245_4', 'vid_245_5', 'vid_245_6']",3
+creator_246,youtube,Creator 246,UC000246578,MY,en,Tech,444018,37161,0.12051828008095536,"['vid_246_0', 'vid_246_1']",5
+creator_247,youtube,Creator 247,UC000247722,MY,id,Design,25831,2543,0.08611921639080365,"['vid_247_0', 'vid_247_1']",0
+creator_248,youtube,Creator 248,UC000248176,SG,en,Tech,90624,17854,0.10987527265789349,"['vid_248_0', 'vid_248_1']",2
+creator_249,youtube,Creator 249,UC000249357,DE,en,AI,36467,5173,0.08337719231603312,"['vid_249_0', 'vid_249_1']",15
+creator_250,youtube,Creator 250,UC000250502,MY,en,AI,122808,6810,0.0759018525265792,"['vid_250_0', 'vid_250_1', 'vid_250_2', 'vid_250_3', 'vid_250_4', 'vid_250_5', 'vid_250_6']",9
+creator_251,youtube,Creator 251,UC000251328,MY,en,Tech,445239,81651,0.13867202003653395,"['vid_251_0', 'vid_251_1', 'vid_251_2', 'vid_251_3', 'vid_251_4', 'vid_251_5']",12
+creator_252,youtube,Creator 252,UC000252433,DE,zh,Tech,163120,56653,0.05426674641022894,"['vid_252_0', 'vid_252_1']",2
+creator_253,youtube,Creator 253,UC000253177,MY,zh,Design,22257,4637,0.08964198616295421,"['vid_253_0', 'vid_253_1', 'vid_253_2']",7
+creator_254,youtube,Creator 254,UC000254496,DE,ms,Education,129192,48693,0.14289467551946303,"['vid_254_0', 'vid_254_1', 'vid_254_2', 'vid_254_3', 'vid_254_4', 'vid_254_5', 'vid_254_6']",6
+creator_255,youtube,Creator 255,UC000255445,GB,en,Education,44392,6958,0.142966274227886,"['vid_255_0', 'vid_255_1']",15
+creator_256,youtube,Creator 256,UC000256255,MY,en,Gaming,187013,49629,0.14993482712358214,"['vid_256_0', 'vid_256_1', 'vid_256_2', 'vid_256_3', 'vid_256_4', 'vid_256_5']",11
+creator_257,youtube,Creator 257,UC000257561,DE,zh,Design,241177,86150,0.06246535027054468,"['vid_257_0', 'vid_257_1', 'vid_257_2', 'vid_257_3']",4
+creator_258,youtube,Creator 258,UC000258322,ID,en,Education,122622,13279,0.015127304645007649,"['vid_258_0', 'vid_258_1', 'vid_258_2']",2
+creator_259,youtube,Creator 259,UC000259888,IN,en,Gaming,437064,97723,0.11970610496465045,"['vid_259_0', 'vid_259_1', 'vid_259_2']",15
+creator_260,youtube,Creator 260,UC000260591,ID,en,Tech,347203,19776,0.09567568631883662,"['vid_260_0', 'vid_260_1', 'vid_260_2']",2
+creator_261,youtube,Creator 261,UC000261873,ID,zh,Education,357319,48480,0.03938689509312456,"['vid_261_0', 'vid_261_1', 'vid_261_2']",3
+creator_262,youtube,Creator 262,UC000262125,SG,id,Design,42332,4300,0.01915490188206232,"['vid_262_0', 'vid_262_1', 'vid_262_2', 'vid_262_3']",12
+creator_263,youtube,Creator 263,UC000263552,MY,zh,AI,236788,57579,0.12644421155691557,"['vid_263_0', 'vid_263_1', 'vid_263_2']",4
+creator_264,youtube,Creator 264,UC000264147,SG,id,AI,21984,7474,0.06121910114089161,"['vid_264_0', 'vid_264_1', 'vid_264_2', 'vid_264_3', 'vid_264_4', 'vid_264_5', 'vid_264_6']",9
+creator_265,youtube,Creator 265,UC000265764,MY,en,AI,21328,4952,0.0907502342844763,"['vid_265_0', 'vid_265_1', 'vid_265_2', 'vid_265_3', 'vid_265_4', 'vid_265_5', 'vid_265_6']",3
+creator_266,youtube,Creator 266,UC000266219,DE,en,Education,497514,75968,0.028696527769251058,"['vid_266_0', 'vid_266_1', 'vid_266_2']",9
+creator_267,youtube,Creator 267,UC000267213,GB,ms,AI,199294,47399,0.12233507219623661,"['vid_267_0', 'vid_267_1', 'vid_267_2', 'vid_267_3', 'vid_267_4', 'vid_267_5']",9
+creator_268,youtube,Creator 268,UC000268487,MY,zh,Tech,13775,3590,0.042731483856057684,"['vid_268_0', 'vid_268_1', 'vid_268_2', 'vid_268_3', 'vid_268_4']",6
+creator_269,youtube,Creator 269,UC000269850,US,zh,Design,226208,23869,0.1121509891392103,"['vid_269_0', 'vid_269_1']",1
+creator_270,youtube,Creator 270,UC000270364,IN,en,Design,191806,60385,0.07879628388145037,"['vid_270_0', 'vid_270_1', 'vid_270_2', 'vid_270_3', 'vid_270_4']",8
+creator_271,youtube,Creator 271,UC000271117,ID,ms,Gaming,101794,23666,0.10755831739575937,"['vid_271_0', 'vid_271_1', 'vid_271_2', 'vid_271_3']",6
+creator_272,youtube,Creator 272,UC000272103,GB,id,Education,459479,148518,0.050649884662802784,"['vid_272_0', 'vid_272_1', 'vid_272_2']",5
+creator_273,youtube,Creator 273,UC000273312,DE,en,Education,193706,40730,0.08520044221183086,"['vid_273_0', 'vid_273_1', 'vid_273_2']",7
+creator_274,youtube,Creator 274,UC000274730,DE,zh,Gaming,275687,16125,0.07046099665065746,"['vid_274_0', 'vid_274_1', 'vid_274_2', 'vid_274_3']",3
+creator_275,youtube,Creator 275,UC000275659,SG,en,Design,237786,51622,0.020252945243170895,"['vid_275_0', 'vid_275_1', 'vid_275_2', 'vid_275_3', 'vid_275_4', 'vid_275_5', 'vid_275_6']",10
+creator_276,youtube,Creator 276,UC000276819,MY,en,Design,463529,51265,0.027349303667997045,"['vid_276_0', 'vid_276_1']",14
+creator_277,youtube,Creator 277,UC000277389,US,ms,Education,137424,33039,0.05126661861558281,"['vid_277_0', 'vid_277_1', 'vid_277_2']",14
+creator_278,youtube,Creator 278,UC000278151,DE,id,Education,287301,79659,0.1289230912631799,"['vid_278_0', 'vid_278_1', 'vid_278_2', 'vid_278_3', 'vid_278_4', 'vid_278_5']",6
+creator_279,youtube,Creator 279,UC000279614,DE,en,Design,129173,14635,0.1279071596507997,"['vid_279_0', 'vid_279_1', 'vid_279_2', 'vid_279_3', 'vid_279_4']",6
+creator_280,youtube,Creator 280,UC000280360,ID,id,AI,313314,34107,0.09256415403717755,"['vid_280_0', 'vid_280_1', 'vid_280_2']",8
+creator_281,youtube,Creator 281,UC000281570,IN,id,Design,394631,86065,0.11632725521503032,"['vid_281_0', 'vid_281_1', 'vid_281_2', 'vid_281_3', 'vid_281_4']",12
+creator_282,youtube,Creator 282,UC000282852,US,zh,Education,306795,55045,0.05023334755365783,"['vid_282_0', 'vid_282_1', 'vid_282_2', 'vid_282_3']",9
+creator_283,youtube,Creator 283,UC000283714,MY,zh,Education,361715,64240,0.09916609877419645,"['vid_283_0', 'vid_283_1', 'vid_283_2', 'vid_283_3', 'vid_283_4', 'vid_283_5', 'vid_283_6']",9
+creator_284,youtube,Creator 284,UC000284663,GB,id,Tech,240148,71543,0.07721785786335388,"['vid_284_0', 'vid_284_1']",8
+creator_285,youtube,Creator 285,UC000285518,ID,en,Education,221830,46804,0.066403242067744,"['vid_285_0', 'vid_285_1']",15
+creator_286,youtube,Creator 286,UC000286184,MY,zh,AI,289754,60374,0.11543967223887788,"['vid_286_0', 'vid_286_1', 'vid_286_2', 'vid_286_3']",6
+creator_287,youtube,Creator 287,UC000287629,MY,en,Gaming,323664,77176,0.08133491386575624,"['vid_287_0', 'vid_287_1', 'vid_287_2', 'vid_287_3', 'vid_287_4', 'vid_287_5', 'vid_287_6']",6
+creator_288,youtube,Creator 288,UC000288220,US,en,Design,130707,11916,0.017729427560409333,"['vid_288_0', 'vid_288_1', 'vid_288_2', 'vid_288_3', 'vid_288_4', 'vid_288_5']",14
+creator_289,youtube,Creator 289,UC000289332,GB,zh,Gaming,245517,63603,0.05857005997428997,"['vid_289_0', 'vid_289_1', 'vid_289_2', 'vid_289_3', 'vid_289_4']",0
+creator_290,youtube,Creator 290,UC000290737,US,zh,AI,420676,72460,0.03792266646391205,"['vid_290_0', 'vid_290_1', 'vid_290_2']",4
+creator_291,youtube,Creator 291,UC000291768,ID,en,Tech,123794,37508,0.11210372784892517,"['vid_291_0', 'vid_291_1', 'vid_291_2', 'vid_291_3', 'vid_291_4', 'vid_291_5', 'vid_291_6']",1
+creator_292,youtube,Creator 292,UC000292564,US,en,Education,489599,88998,0.12290773341024842,"['vid_292_0', 'vid_292_1', 'vid_292_2', 'vid_292_3']",10
+creator_293,youtube,Creator 293,UC000293584,SG,en,AI,357719,140028,0.01686767188770726,"['vid_293_0', 'vid_293_1', 'vid_293_2', 'vid_293_3', 'vid_293_4', 'vid_293_5']",12
+creator_294,youtube,Creator 294,UC000294231,DE,en,Tech,470338,130752,0.03739175639773815,"['vid_294_0', 'vid_294_1', 'vid_294_2', 'vid_294_3', 'vid_294_4']",13
+creator_295,youtube,Creator 295,UC000295717,SG,en,AI,71528,24408,0.07744702971337337,"['vid_295_0', 'vid_295_1', 'vid_295_2', 'vid_295_3', 'vid_295_4']",2
+creator_296,youtube,Creator 296,UC000296589,SG,zh,Tech,380972,113521,0.04947805123011191,"['vid_296_0', 'vid_296_1', 'vid_296_2', 'vid_296_3', 'vid_296_4']",11
+creator_297,youtube,Creator 297,UC000297657,IN,id,Design,41531,13167,0.09031434041978935,"['vid_297_0', 'vid_297_1', 'vid_297_2']",4
+creator_298,youtube,Creator 298,UC000298890,SG,en,AI,294855,25389,0.029378801257797918,"['vid_298_0', 'vid_298_1', 'vid_298_2', 'vid_298_3', 'vid_298_4', 'vid_298_5', 'vid_298_6']",1
+creator_299,youtube,Creator 299,UC000299151,DE,en,Design,470154,138996,0.12587933704489174,"['vid_299_0', 'vid_299_1', 'vid_299_2', 'vid_299_3', 'vid_299_4']",12
+creator_300,youtube,Creator 300,UC000300886,US,en,AI,409090,132540,0.012937107207010712,"['vid_300_0', 'vid_300_1']",7
+creator_301,youtube,Creator 301,UC000301273,GB,zh,AI,53982,3114,0.14228633751395336,"['vid_301_0', 'vid_301_1', 'vid_301_2', 'vid_301_3', 'vid_301_4', 'vid_301_5']",0
+creator_302,youtube,Creator 302,UC000302536,ID,id,Tech,374360,65594,0.0805467741470986,"['vid_302_0', 'vid_302_1', 'vid_302_2', 'vid_302_3', 'vid_302_4', 'vid_302_5']",15
+creator_303,youtube,Creator 303,UC000303720,IN,zh,AI,129804,18206,0.07025402875607281,"['vid_303_0', 'vid_303_1', 'vid_303_2', 'vid_303_3', 'vid_303_4']",15
+creator_304,youtube,Creator 304,UC000304926,IN,zh,Tech,390280,91012,0.12550611611244944,"['vid_304_0', 'vid_304_1', 'vid_304_2', 'vid_304_3', 'vid_304_4']",6
+creator_305,youtube,Creator 305,UC000305605,IN,en,Design,310156,75215,0.09711626147303795,"['vid_305_0', 'vid_305_1', 'vid_305_2']",0
+creator_306,youtube,Creator 306,UC000306654,SG,id,Design,442470,148270,0.06280898257337168,"['vid_306_0', 'vid_306_1', 'vid_306_2', 'vid_306_3']",1
+creator_307,youtube,Creator 307,UC000307587,IN,zh,AI,225303,49931,0.10741398906636523,"['vid_307_0', 'vid_307_1', 'vid_307_2', 'vid_307_3', 'vid_307_4', 'vid_307_5', 'vid_307_6']",0
+creator_308,youtube,Creator 308,UC000308124,MY,en,Gaming,51479,18480,0.1476195116966861,"['vid_308_0', 'vid_308_1', 'vid_308_2', 'vid_308_3']",10
+creator_309,youtube,Creator 309,UC000309991,US,en,Tech,417750,59018,0.02674074940130041,"['vid_309_0', 'vid_309_1']",0
+creator_310,youtube,Creator 310,UC000310398,IN,en,Tech,114389,15838,0.10334710974593321,"['vid_310_0', 'vid_310_1', 'vid_310_2']",3
+creator_311,youtube,Creator 311,UC000311874,IN,en,Tech,34455,4050,0.09652828454203609,"['vid_311_0', 'vid_311_1', 'vid_311_2', 'vid_311_3', 'vid_311_4']",15
+creator_312,youtube,Creator 312,UC000312566,US,en,Education,77779,18381,0.12069500516481135,"['vid_312_0', 'vid_312_1', 'vid_312_2']",0
+creator_313,youtube,Creator 313,UC000313917,IN,en,Design,48090,16040,0.053798847571183715,"['vid_313_0', 'vid_313_1', 'vid_313_2']",1
+creator_314,youtube,Creator 314,UC000314688,GB,en,Tech,164764,55663,0.035923817489521455,"['vid_314_0', 'vid_314_1', 'vid_314_2', 'vid_314_3', 'vid_314_4', 'vid_314_5', 'vid_314_6']",11
+creator_315,youtube,Creator 315,UC000315270,ID,en,Gaming,383722,84483,0.09067166133682614,"['vid_315_0', 'vid_315_1', 'vid_315_2', 'vid_315_3']",9
+creator_316,youtube,Creator 316,UC000316311,GB,id,Tech,436841,140231,0.03464187567083807,"['vid_316_0', 'vid_316_1', 'vid_316_2', 'vid_316_3', 'vid_316_4', 'vid_316_5', 'vid_316_6']",14
+creator_317,youtube,Creator 317,UC000317511,US,zh,Education,357239,95971,0.09887743315635736,"['vid_317_0', 'vid_317_1']",15
+creator_318,youtube,Creator 318,UC000318989,IN,ms,Design,320762,85525,0.03367056768636967,"['vid_318_0', 'vid_318_1', 'vid_318_2', 'vid_318_3', 'vid_318_4', 'vid_318_5', 'vid_318_6']",7
+creator_319,youtube,Creator 319,UC000319332,US,en,Tech,162858,12745,0.101816922865324,"['vid_319_0', 'vid_319_1', 'vid_319_2', 'vid_319_3']",14
+creator_320,youtube,Creator 320,UC000320867,US,en,Gaming,395101,50376,0.040468616854284704,"['vid_320_0', 'vid_320_1']",4
+creator_321,youtube,Creator 321,UC000321858,SG,id,Gaming,238307,23976,0.12182162855771116,"['vid_321_0', 'vid_321_1', 'vid_321_2', 'vid_321_3', 'vid_321_4', 'vid_321_5', 'vid_321_6']",6
+creator_322,youtube,Creator 322,UC000322216,US,ms,Education,211371,27265,0.1268113263719798,"['vid_322_0', 'vid_322_1', 'vid_322_2']",5
+creator_323,youtube,Creator 323,UC000323218,DE,id,Design,48696,5583,0.02759980762316469,"['vid_323_0', 'vid_323_1', 'vid_323_2', 'vid_323_3', 'vid_323_4']",14
+creator_324,youtube,Creator 324,UC000324797,IN,ms,Tech,7898,1291,0.11487650671959244,"['vid_324_0', 'vid_324_1', 'vid_324_2', 'vid_324_3', 'vid_324_4', 'vid_324_5']",12
+creator_325,youtube,Creator 325,UC000325734,SG,zh,Tech,215880,18143,0.04615256824882742,"['vid_325_0', 'vid_325_1', 'vid_325_2', 'vid_325_3']",2
+creator_326,youtube,Creator 326,UC000326681,GB,en,Education,466851,154601,0.10546794015942484,"['vid_326_0', 'vid_326_1', 'vid_326_2']",5
+creator_327,youtube,Creator 327,UC000327597,MY,en,Gaming,487558,44847,0.03804162553498902,"['vid_327_0', 'vid_327_1']",13
+creator_328,youtube,Creator 328,UC000328983,US,en,Tech,202436,49534,0.058455715008576443,"['vid_328_0', 'vid_328_1', 'vid_328_2', 'vid_328_3', 'vid_328_4', 'vid_328_5']",3
+creator_329,youtube,Creator 329,UC000329585,MY,ms,Gaming,432649,134940,0.06302600819257809,"['vid_329_0', 'vid_329_1', 'vid_329_2', 'vid_329_3', 'vid_329_4']",14
+creator_330,youtube,Creator 330,UC000330152,SG,en,AI,275730,25651,0.09292341812307474,"['vid_330_0', 'vid_330_1', 'vid_330_2', 'vid_330_3', 'vid_330_4']",4
+creator_331,youtube,Creator 331,UC000331277,ID,en,Tech,125873,34692,0.07949947023062869,"['vid_331_0', 'vid_331_1', 'vid_331_2', 'vid_331_3', 'vid_331_4']",6
+creator_332,youtube,Creator 332,UC000332894,MY,en,AI,30388,3813,0.07133476252742196,"['vid_332_0', 'vid_332_1']",3
+creator_333,youtube,Creator 333,UC000333973,DE,en,Design,310261,39815,0.033068951842033595,"['vid_333_0', 'vid_333_1', 'vid_333_2', 'vid_333_3', 'vid_333_4', 'vid_333_5', 'vid_333_6']",12
+creator_334,youtube,Creator 334,UC000334180,GB,en,Gaming,17405,5546,0.1385740468536515,"['vid_334_0', 'vid_334_1', 'vid_334_2', 'vid_334_3']",3
+creator_335,youtube,Creator 335,UC000335527,ID,en,AI,496008,44094,0.010728294290924971,"['vid_335_0', 'vid_335_1', 'vid_335_2', 'vid_335_3']",9
+creator_336,youtube,Creator 336,UC000336622,MY,en,AI,43642,5938,0.02765643759630839,"['vid_336_0', 'vid_336_1', 'vid_336_2']",9
+creator_337,youtube,Creator 337,UC000337644,SG,ms,Tech,272582,65283,0.12419445553772186,"['vid_337_0', 'vid_337_1', 'vid_337_2', 'vid_337_3']",10
+creator_338,youtube,Creator 338,UC000338339,GB,en,Design,456496,126914,0.08809637796890969,"['vid_338_0', 'vid_338_1', 'vid_338_2', 'vid_338_3']",0
+creator_339,youtube,Creator 339,UC000339892,US,ms,Gaming,146095,45354,0.04880987462001685,"['vid_339_0', 'vid_339_1', 'vid_339_2', 'vid_339_3', 'vid_339_4', 'vid_339_5', 'vid_339_6']",2
+creator_340,youtube,Creator 340,UC000340331,IN,ms,AI,148897,28583,0.1074608895100684,"['vid_340_0', 'vid_340_1', 'vid_340_2', 'vid_340_3', 'vid_340_4']",14
+creator_341,youtube,Creator 341,UC000341827,US,zh,Design,328690,54318,0.03153665695098845,"['vid_341_0', 'vid_341_1', 'vid_341_2', 'vid_341_3', 'vid_341_4']",1
+creator_342,youtube,Creator 342,UC000342725,ID,en,AI,451581,142276,0.08877130505384696,"['vid_342_0', 'vid_342_1']",14
+creator_343,youtube,Creator 343,UC000343274,SG,ms,Education,121710,38934,0.09327113495596255,"['vid_343_0', 'vid_343_1', 'vid_343_2', 'vid_343_3', 'vid_343_4', 'vid_343_5']",11
+creator_344,youtube,Creator 344,UC000344286,MY,en,Education,274907,106392,0.08665409821639676,"['vid_344_0', 'vid_344_1', 'vid_344_2']",11
+creator_345,youtube,Creator 345,UC000345396,ID,id,Design,369441,84003,0.017399295304906,"['vid_345_0', 'vid_345_1']",11
+creator_346,youtube,Creator 346,UC000346377,ID,en,Gaming,201632,20853,0.05084512223681161,"['vid_346_0', 'vid_346_1', 'vid_346_2', 'vid_346_3', 'vid_346_4']",15
+creator_347,youtube,Creator 347,UC000347183,SG,en,Education,29496,7681,0.06927069361985384,"['vid_347_0', 'vid_347_1', 'vid_347_2', 'vid_347_3', 'vid_347_4', 'vid_347_5']",0
+creator_348,youtube,Creator 348,UC000348258,SG,zh,AI,415791,140783,0.041695278638440865,"['vid_348_0', 'vid_348_1', 'vid_348_2']",12
+creator_349,youtube,Creator 349,UC000349344,IN,zh,Education,57915,18806,0.056617975443260665,"['vid_349_0', 'vid_349_1', 'vid_349_2', 'vid_349_3']",2
+creator_350,youtube,Creator 350,UC000350446,MY,id,Tech,344825,118083,0.12429254575306292,"['vid_350_0', 'vid_350_1', 'vid_350_2']",15
+creator_351,youtube,Creator 351,UC000351390,GB,en,AI,201401,77240,0.014537149462729902,"['vid_351_0', 'vid_351_1']",13
+creator_352,youtube,Creator 352,UC000352123,GB,en,Education,382911,50307,0.14891248302381344,"['vid_352_0', 'vid_352_1', 'vid_352_2', 'vid_352_3', 'vid_352_4']",1
+creator_353,youtube,Creator 353,UC000353266,ID,id,Gaming,234047,68438,0.04296651516530514,"['vid_353_0', 'vid_353_1', 'vid_353_2', 'vid_353_3', 'vid_353_4']",13
+creator_354,youtube,Creator 354,UC000354823,ID,en,Design,481996,136747,0.04349762265444206,"['vid_354_0', 'vid_354_1', 'vid_354_2']",1
+creator_355,youtube,Creator 355,UC000355194,US,en,Gaming,64993,25487,0.10802036866397347,"['vid_355_0', 'vid_355_1', 'vid_355_2', 'vid_355_3']",7
+creator_356,youtube,Creator 356,UC000356994,MY,id,Education,187055,10794,0.07073834482089426,"['vid_356_0', 'vid_356_1']",6
+creator_357,youtube,Creator 357,UC000357517,DE,en,Education,447975,46426,0.06279552909596096,"['vid_357_0', 'vid_357_1', 'vid_357_2', 'vid_357_3']",6
+creator_358,youtube,Creator 358,UC000358643,GB,id,Tech,210352,15840,0.11396362149854207,"['vid_358_0', 'vid_358_1', 'vid_358_2', 'vid_358_3', 'vid_358_4']",13
+creator_359,youtube,Creator 359,UC000359383,ID,zh,Gaming,64916,24845,0.11905863421300956,"['vid_359_0', 'vid_359_1', 'vid_359_2', 'vid_359_3', 'vid_359_4', 'vid_359_5', 'vid_359_6']",9
+creator_360,youtube,Creator 360,UC000360861,SG,zh,Education,429587,120390,0.13322019195581777,"['vid_360_0', 'vid_360_1', 'vid_360_2']",4
+creator_361,youtube,Creator 361,UC000361245,DE,id,Design,427514,51028,0.10942862200241094,"['vid_361_0', 'vid_361_1', 'vid_361_2', 'vid_361_3']",4
+creator_362,youtube,Creator 362,UC000362535,GB,en,Education,17972,1706,0.131343137482017,"['vid_362_0', 'vid_362_1', 'vid_362_2', 'vid_362_3', 'vid_362_4', 'vid_362_5']",10
+creator_363,youtube,Creator 363,UC000363458,IN,en,Education,301177,88217,0.06758671016070512,"['vid_363_0', 'vid_363_1']",6
+creator_364,youtube,Creator 364,UC000364122,SG,zh,AI,10478,1333,0.05879437891357277,"['vid_364_0', 'vid_364_1', 'vid_364_2', 'vid_364_3']",0
+creator_365,youtube,Creator 365,UC000365783,ID,en,Design,24052,3027,0.11970667614007262,"['vid_365_0', 'vid_365_1', 'vid_365_2']",15
+creator_366,youtube,Creator 366,UC000366153,ID,en,Tech,348602,71272,0.1396179355939884,"['vid_366_0', 'vid_366_1', 'vid_366_2']",8
+creator_367,youtube,Creator 367,UC000367432,IN,ms,Tech,188996,30506,0.10098533935438397,"['vid_367_0', 'vid_367_1', 'vid_367_2', 'vid_367_3', 'vid_367_4', 'vid_367_5']",9
+creator_368,youtube,Creator 368,UC000368105,GB,en,Tech,75396,28536,0.14292192094595174,"['vid_368_0', 'vid_368_1', 'vid_368_2', 'vid_368_3']",6
+creator_369,youtube,Creator 369,UC000369691,US,en,Gaming,126277,37265,0.07108139882285691,"['vid_369_0', 'vid_369_1', 'vid_369_2', 'vid_369_3', 'vid_369_4', 'vid_369_5', 'vid_369_6']",11
+creator_370,youtube,Creator 370,UC000370961,US,ms,Tech,446616,144814,0.12458915029297711,"['vid_370_0', 'vid_370_1']",2
+creator_371,youtube,Creator 371,UC000371217,MY,ms,Tech,454623,177863,0.10405110581597835,"['vid_371_0', 'vid_371_1', 'vid_371_2', 'vid_371_3', 'vid_371_4']",12
+creator_372,youtube,Creator 372,UC000372432,DE,en,Design,257223,51028,0.016403692253590035,"['vid_372_0', 'vid_372_1', 'vid_372_2']",3
+creator_373,youtube,Creator 373,UC000373913,IN,en,Design,381273,123856,0.03270818263071542,"['vid_373_0', 'vid_373_1', 'vid_373_2', 'vid_373_3', 'vid_373_4', 'vid_373_5', 'vid_373_6']",2
+creator_374,youtube,Creator 374,UC000374467,GB,id,Education,499526,162314,0.14195176086253602,"['vid_374_0', 'vid_374_1', 'vid_374_2', 'vid_374_3']",1
+creator_375,youtube,Creator 375,UC000375399,ID,en,Tech,400436,23268,0.09396467444872615,"['vid_375_0', 'vid_375_1', 'vid_375_2', 'vid_375_3']",6
+creator_376,youtube,Creator 376,UC000376851,US,en,Design,159351,33519,0.07702804684595754,"['vid_376_0', 'vid_376_1', 'vid_376_2', 'vid_376_3', 'vid_376_4']",10
+creator_377,youtube,Creator 377,UC000377906,GB,en,Tech,292343,109873,0.050338116801696545,"['vid_377_0', 'vid_377_1', 'vid_377_2', 'vid_377_3']",14
+creator_378,youtube,Creator 378,UC000378999,GB,en,AI,410558,135521,0.08733709330130515,"['vid_378_0', 'vid_378_1', 'vid_378_2']",4
+creator_379,youtube,Creator 379,UC000379868,GB,en,AI,382745,30971,0.12464125076923192,"['vid_379_0', 'vid_379_1', 'vid_379_2', 'vid_379_3']",2
+creator_380,youtube,Creator 380,UC000380943,GB,en,Tech,52988,4302,0.058364009916006813,"['vid_380_0', 'vid_380_1', 'vid_380_2', 'vid_380_3', 'vid_380_4', 'vid_380_5', 'vid_380_6']",14
+creator_381,youtube,Creator 381,UC000381371,GB,en,Tech,108807,25766,0.12185386495299211,"['vid_381_0', 'vid_381_1', 'vid_381_2', 'vid_381_3']",13
+creator_382,youtube,Creator 382,UC000382782,IN,id,Tech,160485,30068,0.02807206551688047,"['vid_382_0', 'vid_382_1', 'vid_382_2']",7
+creator_383,youtube,Creator 383,UC000383856,DE,en,Gaming,363354,25610,0.017771486571332887,"['vid_383_0', 'vid_383_1', 'vid_383_2', 'vid_383_3', 'vid_383_4']",11
+creator_384,youtube,Creator 384,UC000384477,US,en,Gaming,87437,9159,0.08655078346162154,"['vid_384_0', 'vid_384_1', 'vid_384_2', 'vid_384_3']",12
+creator_385,youtube,Creator 385,UC000385559,SG,zh,AI,282324,29133,0.030038293434785632,"['vid_385_0', 'vid_385_1']",5
+creator_386,youtube,Creator 386,UC000386491,SG,id,Design,159504,38886,0.10715103933583701,"['vid_386_0', 'vid_386_1']",12
+creator_387,youtube,Creator 387,UC000387312,MY,zh,Design,154483,24755,0.1364042284278219,"['vid_387_0', 'vid_387_1', 'vid_387_2', 'vid_387_3', 'vid_387_4', 'vid_387_5', 'vid_387_6']",0
+creator_388,youtube,Creator 388,UC000388655,DE,en,AI,197394,43323,0.08079678070123104,"['vid_388_0', 'vid_388_1', 'vid_388_2', 'vid_388_3', 'vid_388_4', 'vid_388_5', 'vid_388_6']",3
+creator_389,youtube,Creator 389,UC000389814,IN,ms,Education,112674,35080,0.014907378704979986,"['vid_389_0', 'vid_389_1', 'vid_389_2', 'vid_389_3']",12
+creator_390,youtube,Creator 390,UC000390456,DE,id,Design,324370,20836,0.0433198382505534,"['vid_390_0', 'vid_390_1', 'vid_390_2']",1
+creator_391,youtube,Creator 391,UC000391520,ID,id,Education,486659,150406,0.03142717077534452,"['vid_391_0', 'vid_391_1']",14
+creator_392,youtube,Creator 392,UC000392526,ID,ms,Education,318029,70499,0.07146844018698133,"['vid_392_0', 'vid_392_1', 'vid_392_2']",12
+creator_393,youtube,Creator 393,UC000393849,SG,id,Tech,326105,99673,0.014349905446386667,"['vid_393_0', 'vid_393_1', 'vid_393_2']",15
+creator_394,youtube,Creator 394,UC000394225,US,zh,Education,117344,9427,0.06645516120988633,"['vid_394_0', 'vid_394_1', 'vid_394_2', 'vid_394_3', 'vid_394_4', 'vid_394_5']",4
+creator_395,youtube,Creator 395,UC000395136,SG,en,Design,34675,7018,0.13933577886361914,"['vid_395_0', 'vid_395_1', 'vid_395_2', 'vid_395_3', 'vid_395_4', 'vid_395_5', 'vid_395_6']",9
+creator_396,youtube,Creator 396,UC000396145,DE,en,Design,127637,31845,0.04691240283635998,"['vid_396_0', 'vid_396_1', 'vid_396_2', 'vid_396_3', 'vid_396_4', 'vid_396_5']",7
+creator_397,youtube,Creator 397,UC000397948,ID,en,AI,96518,36857,0.08712941767127903,"['vid_397_0', 'vid_397_1', 'vid_397_2', 'vid_397_3', 'vid_397_4', 'vid_397_5']",9
+creator_398,youtube,Creator 398,UC000398522,ID,zh,Tech,314396,32064,0.0778711718704787,"['vid_398_0', 'vid_398_1', 'vid_398_2', 'vid_398_3', 'vid_398_4']",13
+creator_399,youtube,Creator 399,UC000399822,IN,ms,AI,27924,10209,0.021929562990942418,"['vid_399_0', 'vid_399_1', 'vid_399_2', 'vid_399_3', 'vid_399_4', 'vid_399_5']",3
