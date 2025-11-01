@@ -1,0 +1,447 @@
+# Nosana x Mastra: Building and Deploying Decentralized AI Agents
+
+This tutorial guides you through building intelligent AI agents using the Mastra framework and deploying them on Nosana's decentralized GPU network.
+
+![nosana-mastra](/products/nosana/nosana_mastra.png)
+
+## Understanding the Core Technologies
+
+### What is Nosana?
+
+Nosana is a decentralized GPU marketplace built on Solana that connects GPU owners with AI developers. By leveraging underutilized consumer GPUs globally, Nosana provides cost-effective AI inference compute power at up to 85% lower costs compared to traditional cloud providers. The network processes AI workloads through Docker containers, offering dynamic pricing and seamless integration for production deployments.
+
+Key features include:
+- **Decentralized Infrastructure**: Built on Solana blockchain with peer-to-peer GPU sharing
+- **AI Inference Focus**: Optimized specifically for running trained AI models
+- **Docker-Ready**: Deploy containerized applications with any AI framework
+- **Performance Validation**: All GPUs undergo rigorous benchmarking before deployment
+
+### What is Mastra?
+
+Mastra is an open-source TypeScript framework designed for building production-ready AI agents and workflows. Created by the team behind Gatsby, Mastra provides a comprehensive toolkit with agents, workflows, memory systems, tool integration, and built-in observability. The framework supports the Model Context Protocol (MCP) for seamless tool integration and includes a local playground for testing.
+
+Core primitives:
+- **Agents**: Autonomous systems that use LLMs and tools to solve tasks
+- **Workflows**: State-machine based orchestration with suspend/resume capabilities
+- **Tools**: Type-safe functions that agents execute to interact with external systems
+- **Memory**: Persistent conversation history and semantic recall
+- **MCP Integration**: Universal plugin system for connecting to external services
+
+## Project Setup
+
+### Prerequisites
+
+Ensure you have the following installed:
+- Node.js 18+ and npm/pnpm
+- Docker and Docker Hub account
+- Git for version control
+- OpenAI API key or access to Ollama
+
+### Initialize Your Mastra Project
+
+Create a new Mastra project using the CLI:
+
+```bash
+npm create mastra@latest my-agent-project
+cd my-agent-project
+```
+
+During setup, configure the following:
+- Install both Agents and Workflows
+- Include example tools
+- Select your LLM provider (OpenAI or Ollama)
+- Add the weather example
+
+Configure your environment variables in `.env`:
+
+```bash
+# For OpenAI
+OPENAI_API_KEY=your-openai-api-key
+
+# For Nosana Ollama Endpoint (development)
+OLLAMA_API_URL=https://nosana-url-id.node.k8s.prd.nos.ci/api
+MODEL_NAME_AT_ENDPOINT=qwen3:8b
+```
+
+Start the development servers:
+
+```bash
+pnpm run dev:ui     # UI on port 3000
+pnpm run dev:agent  # Agent server on port 4111
+```
+
+## Building Your First Agent
+
+### Creating a Custom Agent
+
+Agents in Mastra are autonomous systems that combine LLMs with tools to accomplish tasks. Create a new agent file:
+
+```typescript
+// src/mastra/agents/assistant.ts
+import { Agent } from '@mastra/core/agent';
+import { openai } from '@ai-sdk/openai';
+
+export const assistantAgent = new Agent({
+  name: 'Personal Assistant',
+  instructions: `You are a helpful personal assistant that can:
+    - Answer questions about various topics
+    - Help with task management
+    - Provide recommendations
+    
+    Always be concise and accurate in your responses.
+    Use available tools when needed to accomplish tasks.`,
+  model: openai('gpt-4o-mini'),
+  tools: {},
+});
+```
+
+### Implementing Custom Tools
+
+Tools extend agent capabilities by connecting to external APIs and services. Create a tool for fetching data:
+
+```typescript
+// src/mastra/tools/index.ts
+import { createTool } from '@mastra/core';
+import { z } from 'zod';
+
+export const searchTool = createTool({
+  id: 'web-search',
+  description: 'Search the web for information on a given topic',
+  inputSchema: z.object({
+    query: z.string().describe('The search query'),
+  }),
+  outputSchema: z.object({
+    results: z.string().describe('Search results summary'),
+  }),
+  execute: async ({ context }) => {
+    const { query } = context;
+    const response = await fetch(
+      `https://api.example.com/search?q=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+    
+    return {
+      results: data.summary || 'No results found',
+    };
+  },
+});
+
+export const calculatorTool = createTool({
+  id: 'calculator',
+  description: 'Perform mathematical calculations',
+  inputSchema: z.object({
+    expression: z.string().describe('Mathematical expression to evaluate'),
+  }),
+  outputSchema: z.object({
+    result: z.number(),
+  }),
+  execute: async ({ context }) => {
+    const { expression } = context;
+    try {
+      const result = eval(expression);
+      return { result: parseFloat(result) };
+    } catch (error) {
+      throw new Error('Invalid mathematical expression');
+    }
+  },
+});
+```
+
+Add tools to your agent:
+
+```typescript
+import { assistantAgent } from './agents/assistant';
+import { searchTool, calculatorTool } from './tools';
+
+export const enhancedAgent = new Agent({
+  name: 'Enhanced Assistant',
+  instructions: assistantAgent.instructions,
+  model: openai('gpt-4o-mini'),
+  tools: { searchTool, calculatorTool },
+});
+```
+
+## Integrating Model Context Protocol (MCP)
+
+MCP enables agents to access hundreds of external services through standardized servers. This protocol acts as a universal plugin system for AI tools.
+
+### Setting Up MCP Clients
+
+Install the MCP package:
+
+```bash
+npm install @mastra/mcp@latest
+```
+
+Configure MCP servers:
+
+```typescript
+// src/mastra/mcp/index.ts
+import { MCPClient } from '@mastra/mcp';
+
+export const mcpClient = new MCPClient({
+  servers: {
+    filesystem: {
+      command: 'npx',
+      args: [
+        '-y',
+        '@modelcontextprotocol/server-filesystem',
+        '/path/to/documents',
+      ],
+    },
+    github: {
+      command: 'npx',
+      args: ['-y', '@modelcontextprotocol/server-github'],
+      env: {
+        GITHUB_PERSONAL_ACCESS_TOKEN: process.env.GITHUB_TOKEN,
+      },
+    },
+  },
+});
+```
+
+Connect MCP tools to your agent:
+
+```typescript
+import { Agent } from '@mastra/core/agent';
+import { mcpClient } from '../mcp';
+
+export const mcpAgent = new Agent({
+  name: 'MCP-Enabled Assistant',
+  instructions: `You have access to filesystem and GitHub operations.
+    Use these tools to help users manage files and repositories.`,
+  model: openai('gpt-4o-mini'),
+  tools: await mcpClient.getTools(),
+});
+```
+
+## Building Multi-Step Workflows
+
+Workflows orchestrate complex sequences of agent and tool executions with control flow logic.
+
+### Creating a Research Workflow
+
+```typescript
+// src/mastra/workflows/research.ts
+import { Step, Workflow, createWorkflow } from '@mastra/core/workflows';
+import { z } from 'zod';
+import { researchAgent } from '../agents/research';
+import { writerAgent } from '../agents/writer';
+
+const researchStep = new Step({
+  id: 'research',
+  execute: async ({ context }) => {
+    const { topic } = context.triggerData;
+    
+    const result = await researchAgent.generate(
+      `Research comprehensive information about: ${topic}`
+    );
+    
+    return { research: result.text };
+  },
+});
+
+const writeStep = new Step({
+  id: 'write',
+  execute: async ({ context }) => {
+    const research = context.getStepResult('research')?.research;
+    
+    const result = await writerAgent.generate(
+      `Write a detailed article using this research: ${research}`
+    );
+    
+    return { article: result.text };
+  },
+});
+
+export const researchWorkflow = createWorkflow({
+  name: 'research-and-write',
+  triggerSchema: z.object({
+    topic: z.string(),
+  }),
+})
+  .then(researchStep)
+  .then(writeStep)
+  .commit();
+```
+
+Execute workflows programmatically:
+
+```typescript
+const result = await researchWorkflow.execute({
+  triggerData: { topic: 'Quantum Computing' },
+});
+
+console.log(result.results.write.article);
+```
+
+## Adding Agent Memory
+
+Memory enables agents to maintain context across conversations and recall previous interactions.
+
+### Implementing Memory
+
+```typescript
+import { Agent } from '@mastra/core/agent';
+import { Memory } from '@mastra/memory';
+
+export const memoryAgent = new Agent({
+  name: 'Memory-Enabled Assistant',
+  instructions: 'You remember past conversations and provide personalized responses.',
+  model: openai('gpt-4o-mini'),
+  memory: new Memory(),
+  tools: {},
+});
+```
+
+Use memory in conversations:
+
+```typescript
+const response = await memoryAgent.generate(
+  'My name is Alex and I work in finance',
+  {
+    memory: {
+      thread: 'user-123',
+      resourceid: 'conversation',
+    },
+  }
+);
+
+const followUp = await memoryAgent.generate(
+  'What did I say my profession was?',
+  {
+    memory: {
+      thread: 'user-123',
+      resourceid: 'conversation',
+    },
+  }
+);
+```
+
+## Deploying to Nosana
+
+### Building Your Docker Container
+
+Create a Dockerfile for your complete application stack:
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000 4111
+
+CMD ["npm", "start"]
+```
+
+Build and test locally:
+
+```bash
+docker build -t yourusername/agent-challenge:latest .
+docker run -p 3000:3000 -p 4111:4111 yourusername/agent-challenge:latest
+```
+
+### Publishing to Docker Hub
+
+```bash
+docker login
+docker push yourusername/agent-challenge:latest
+```
+
+### Deploying on Nosana Network
+
+Create a job definition file:
+
+```json
+{
+  "version": "0.1",
+  "type": "container",
+  "image": "yourusername/agent-challenge:latest",
+  "network": "mainnet",
+  "resources": {
+    "gpu": true,
+    "memory": "8GB"
+  }
+}
+```
+
+Deploy using the Nosana Dashboard or CLI:
+
+```bash
+npm install -g @nosana/cli
+
+nosana job post \
+  --file ./nosana_job.json \
+  --market nvidia-3090 \
+  --timeout 30
+```
+
+Monitor your deployment through the Nosana Dashboard to track performance, costs, and logs.
+
+## Testing and Validation
+
+### Using the Mastra Playground
+
+The Mastra Playground provides interactive testing capabilities:
+
+1. Navigate to `http://localhost:4111`
+2. Test agents with different prompts
+3. Inspect tool calls and execution traces
+4. Debug agent decision-making processes
+5. Monitor workflow execution steps
+
+### Implementing Evals
+
+Evals help measure and track agent performance:
+
+```typescript
+import { createEval } from '@mastra/core';
+
+const accuracyEval = createEval({
+  name: 'response-accuracy',
+  evaluate: async ({ output, expected }) => {
+    const score = calculateSimilarity(output, expected);
+    return {
+      score,
+      passed: score > 0.8,
+      metadata: { output, expected },
+    };
+  },
+});
+```
+
+## Best Practices and Tips
+
+### Agent Design
+- Write clear, detailed system prompts that define roles and capabilities
+- Start with simple agents and gradually add complexity
+- Test tools in isolation before integrating them
+
+### Tool Implementation
+- Provide descriptive tool descriptions for better LLM understanding
+- Implement proper error handling in tool execute functions
+- Use Zod schemas for type-safe input/output validation
+
+### Performance Optimization
+- Use streaming responses for real-time user feedback
+- Implement caching for expensive operations
+- Limit maxSteps to prevent infinite loops
+
+### Deployment Strategy
+- Test Docker containers locally before pushing to Nosana
+- Monitor resource usage and optimize for cost efficiency
+- Implement proper logging and observability
+
+## Conclusion
+
+You have learned to build production-ready AI agents using Mastra and deploy them on Nosana's decentralized GPU network. This architecture combines powerful agent capabilities with cost-effective, scalable infrastructure for AI inference workloads.
+
+Key takeaways include understanding agent fundamentals, implementing custom tools, integrating MCP servers, building multi-step workflows, and deploying to decentralized compute infrastructure.
+
+Explore the Mastra documentation for advanced features like RAG pipelines, multi-agent systems, and custom integrations. Join the Nosana and Mastra communities to connect with other builders and access support resources.
