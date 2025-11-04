@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "node manage-metadata.js auto-update && astro dev",
-    "start": "node ./dist/server/entry.mjs",
+    "start": "node start.mjs",
     "build": "node manage-metadata.js auto-update && astro build",
     "preview": "astro preview",
     "astro": "astro",
