@@ -19,7 +19,7 @@ Tutorials are written with concise explanations and runnable code / notebooks. M
 
 Below is a quick mental map of the content areas. Open a category in the sidebar to explore individual tools, frameworks, and notebooks.
 
-### Vibe Coding
+### Vibe Coding course
 Leverage AI‑native editors (Cursor, Windsurf, etc.) plus one‑click deploy flows to supercharge iteration beyond simple “chat” usage—own your code, not just generated files.
 
 ### Automation
