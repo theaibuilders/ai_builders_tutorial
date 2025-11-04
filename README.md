@@ -4,7 +4,7 @@ Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial seri
 
 ![AI Builders Tutorial Banner](public/github_banner.png)
 
-## What You'll Learn
+## What You'll Learn from this side
 
 Each tutorial is designed to be practical and immediately applicable:
 
