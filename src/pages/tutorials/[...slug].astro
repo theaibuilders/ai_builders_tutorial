@@ -4,6 +4,9 @@ import { extractMarkdownHeadings } from '../../utils/notebook';
 import { scanTutorialsDirectory, findTutorialFile } from '../../utils/fileSystem';
 import type { TutorialFile, TutorialSection } from '../../types/tutorial';
 
+// Disable prerendering for this page to enable dynamic content updates
+export const prerender = false;
+
 export async function getStaticPaths() {
   try {
     // Scan the actual tutorials directory to generate paths

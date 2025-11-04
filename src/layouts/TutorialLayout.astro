@@ -691,7 +691,71 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         } catch (e) {
           // Ignore storage errors
         }
+
+        // Tutorial HMR: Listen for file changes and reload content automatically
+        if (import.meta.hot) {
+          import.meta.hot.on('tutorial-update', (data) => {
+            console.log('[Tutorial HMR] File changed:', data.file);
+
+            // Check if the changed file matches the current page
+            const currentPath = window.location.pathname;
+            const changedFile = data.file.replace(/^tutorials\//, '').replace(/\.(md|mdx|ipynb)$/, '');
+
+            if (currentPath.includes(changedFile)) {
+              console.log('[Tutorial HMR] Reloading current page content...');
+
+              // Show a subtle notification
+              const notification = document.createElement('div');
+              notification.textContent = '🔄 Content updated';
+              notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10b981;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                z-index: 9999;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                animation: slideIn 0.3s ease-out;
+              `;
+
+              document.body.appendChild(notification);
+
+              // Reload the page to get fresh content
+              setTimeout(() => {
+                window.location.reload();
+              }, 500);
+            }
+          });
+        }
       });
+    </script>
+
+    <!-- Tutorial HMR CSS Animation -->
+    <style>
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    </style>
+
+    <script is:inline>
+      // Alternative HMR listener for development
+      if (typeof window !== 'undefined' && import.meta.env.DEV) {
+        // Connect to Vite's WebSocket for custom events
+        if (import.meta.hot) {
+          console.log('[Tutorial HMR] Connected to dev server');
+        }
+      }
     </script>
   </body>
 </html>

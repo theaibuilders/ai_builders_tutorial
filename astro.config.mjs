@@ -1,8 +1,14 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import preact from '@astrojs/preact';
+import node from '@astrojs/node';
+import tutorialHmrPlugin from './vite-plugin-tutorial-hmr.js';
 
 export default defineConfig({
+  output: 'hybrid', // Enable hybrid rendering mode
+  adapter: node({
+    mode: 'standalone'
+  }),
   integrations: [
     tailwind(),
     preact({ compat: true })
@@ -22,6 +28,15 @@ export default defineConfig({
         'html',
         'xml'
       ]
+    }
+  },
+  // Watch external directories for changes
+  vite: {
+    plugins: [tutorialHmrPlugin()],
+    server: {
+      watch: {
+        ignored: ['!**/tutorials/**']
+      }
     }
   }
 });

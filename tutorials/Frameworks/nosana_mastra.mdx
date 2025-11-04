@@ -1,6 +1,6 @@
 # Nosana x Mastra: Building and Deploying Decentralized AI Agents
 
-This tutorial guides you through building intelligent AI agents using the Mastra framework and deploying them on Nosana's decentralized GPU network.
+This tutorial guides you through building intelligent AI agents using the Mastra framework, utilizing open source model from Nosana, and deploying them on Nosana's decentralized GPU network.
 
 ![nosana-mastra](/products/nosana/nosana_mastra.png)
 
@@ -8,7 +8,7 @@ This tutorial guides you through building intelligent AI agents using the Mastra
 
 ### What is Nosana?
 
-Nosana is a decentralized GPU marketplace built on Solana that connects GPU owners with AI developers. By leveraging underutilized consumer GPUs globally, Nosana provides cost-effective AI inference compute power at up to 85% lower costs compared to traditional cloud providers. The network processes AI workloads through Docker containers, offering dynamic pricing and seamless integration for production deployments.
+[Nosana](https://nosana.com/?utm_source=aibuilders) is a decentralized GPU marketplace built on Solana that connects GPU owners with AI developers. By leveraging underutilized consumer GPUs globally, Nosana provides cost-effective AI inference compute power at up to 85% lower costs compared to traditional cloud providers. The network processes AI workloads through Docker containers, offering dynamic pricing and seamless integration for production deployments.
 
 Key features include:
 - **Decentralized Infrastructure**: Built on Solana blockchain with peer-to-peer GPU sharing
@@ -35,7 +35,7 @@ Ensure you have the following installed:
 - Node.js 18+ and npm/pnpm
 - Docker and Docker Hub account
 - Git for version control
-- OpenAI API key or access to Ollama
+- Nosana account with pre-loaded credits
 
 ### Initialize Your Mastra Project
 
@@ -43,33 +43,103 @@ Create a new Mastra project using the CLI:
 
 ```bash
 npm create mastra@latest my-agent-project
+```
+
+During setup, you'll see the following prompts:
+
+```
+Where should we create the Mastra files? (default: src/)
+│  src/
+│
+◇  Select a default provider:
+│  OpenAI
+│
+◇  Enter your OpenAI API key?
+│  Skip for now
+│
+◇  Make your IDE into a Mastra expert? (Installs Mastra's MCP server)
+│  Skip for now
+```
+
+Open your project with your favorite IDE:
+
+```bash
 cd my-agent-project
 ```
+### Deploy GPT-OSS 20B Model on Nosana
 
-During setup, configure the following:
-- Install both Agents and Workflows
-- Include example tools
-- Select your LLM provider (OpenAI or Ollama)
-- Add the weather example
+Before configuring your agent, you need to deploy the GPT-OSS 20B model on Nosana's infrastructure:
 
-Configure your environment variables in `.env`:
+![nosana-template](/products/nosana/nosana-template.png)
+
+1. Navigate to the [Nosana Dashboard](https://nosana.com/dashboard?utm_source=aibuilders)
+2. Log in with your Nosana account
+3. Go to the **Inference** section
+4. Click **Deploy New Model**
+5. Select **GPT-OSS 20B** from the available model templates
+6. Choose your preferred GPU configuration (recommended: NVIDIA RTX 4090 or higher)
+7. Click **Deploy** and wait for the model to be provisioned (usually takes 2-5 minutes)
+8. Once deployed, copy the **API endpoint URL** - it will look like:
+   ```
+   https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci
+   ```
+
+### Configure Environment Variables
+
+Make a copy of `.env.example`, rename it to `.env`, and configure your environment variables with the Nosana endpoint:
 
 ```bash
-# For OpenAI
-OPENAI_API_KEY=your-openai-api-key
-
-# For Nosana Ollama Endpoint (development)
-OLLAMA_API_URL=https://nosana-url-id.node.k8s.prd.nos.ci/api
-MODEL_NAME_AT_ENDPOINT=qwen3:8b
+# For Nosana Ollama Endpoint with GPT-OSS 20B
+OLLAMA_API_URL=https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci/api
+MODEL_NAME_AT_ENDPOINT=gpt-oss:20b
 ```
 
-Start the development servers:
+Replace `https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci` with your actual Nosana API endpoint URL after you click `Open Service` (just copy paste the page link).
+
+<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 16px 0; border-radius: 4px;">
+  <strong>⚠️ Important:</strong> Remember to put an extra <code>/api</code> at the end of the Nosana URL, otherwise your model endpoint won't work correctly.
+</div>
+
+Since Mastra doesn't have Ollama as a default template, you can use the following prompt with an AI assistant to help configure your project to use the Ollama model:
+
+```
+I need to configure my Mastra project to use Ollama instead of OpenAI.
+Please help me:
+
+1. Update the agent configuration files to use Ollama with the following
+   settings:
+   - API URL: process.env.OLLAMA_API_URL
+   - Model: process.env.MODEL_NAME_AT_ENDPOINT
+2. Update any imports and model initialization to use the Ollama provider
+   from @ai-sdk/ollama
+3. Ensure all agents in the project are configured to use this Ollama setup
+```
+
+### Start Your Mastra Project
+
+After you've set up your project, simply run the following command to start everything:
 
 ```bash
-pnpm run dev:ui     # UI on port 3000
-pnpm run dev:agent  # Agent server on port 4111
+pnpm run dev
 ```
 
+You should see output like this:
+
+```
+...
+ mastra  0.17.7 ready in XXXX ms
+
+│ Playground: http://localhost:4111/
+│ API:        http://localhost:4111/api
+```
+
+Click the `Playground` link shown in your console output (http://localhost:4111/) , you should see `gtp-oss:20b` listed as the model for your default weather agent.
+![mastra_gpt_oss_20b](/products/nosana/mastra_gpt_oss_20b.png)
+
+If you ask the model as question like `what's the weather like in Singapore today?`, it should should you the tool response of the weather condition in Singapore today.
+![mastra_weather_test](/products/nosana/mastra_weather_test.png)
+
+UNTIL HERE
 ## Building Your First Agent
 
 ### Creating a Custom Agent
