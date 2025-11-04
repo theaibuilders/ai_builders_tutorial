@@ -29,6 +29,12 @@ RUN npm ci --production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/start.mjs ./start.mjs
 
+# Copy tutorials content and metadata files needed at runtime
+COPY --from=builder /app/tutorials ./tutorials
+COPY --from=builder /app/tutorial-metadata.json ./tutorial-metadata.json
+COPY --from=builder /app/author-metadata.json ./author-metadata.json
+COPY --from=builder /app/manage-metadata.js ./manage-metadata.js
+
 # Expose port (Zeabur will override this with PORT env var)
 EXPOSE 3000
 
