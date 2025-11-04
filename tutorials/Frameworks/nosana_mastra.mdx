@@ -139,7 +139,6 @@ Click the `Playground` link shown in your console output (http://localhost:4111/
 If you ask the model as question like `what's the weather like in Singapore today?`, it should should you the tool response of the weather condition in Singapore today.
 ![mastra_weather_test](/products/nosana/mastra_weather_test.png)
 
-UNTIL HERE
 ## Building Your First Agent
 
 ### Creating a Custom Agent
@@ -230,66 +229,8 @@ export const enhancedAgent = new Agent({
   tools: { searchTool, calculatorTool },
 });
 ```
-
-## Integrating Model Context Protocol (MCP)
-
-MCP enables agents to access hundreds of external services through standardized servers. This protocol acts as a universal plugin system for AI tools.
-
-### Setting Up MCP Clients
-
-Install the MCP package:
-
-```bash
-npm install @mastra/mcp@latest
-```
-
-Configure MCP servers:
-
-```typescript
-// src/mastra/mcp/index.ts
-import { MCPClient } from '@mastra/mcp';
-
-export const mcpClient = new MCPClient({
-  servers: {
-    filesystem: {
-      command: 'npx',
-      args: [
-        '-y',
-        '@modelcontextprotocol/server-filesystem',
-        '/path/to/documents',
-      ],
-    },
-    github: {
-      command: 'npx',
-      args: ['-y', '@modelcontextprotocol/server-github'],
-      env: {
-        GITHUB_PERSONAL_ACCESS_TOKEN: process.env.GITHUB_TOKEN,
-      },
-    },
-  },
-});
-```
-
-Connect MCP tools to your agent:
-
-```typescript
-import { Agent } from '@mastra/core/agent';
-import { mcpClient } from '../mcp';
-
-export const mcpAgent = new Agent({
-  name: 'MCP-Enabled Assistant',
-  instructions: `You have access to filesystem and GitHub operations.
-    Use these tools to help users manage files and repositories.`,
-  model: openai('gpt-4o-mini'),
-  tools: await mcpClient.getTools(),
-});
-```
-
-## Building Multi-Step Workflows
-
-Workflows orchestrate complex sequences of agent and tool executions with control flow logic.
-
 ### Creating a Research Workflow
+Workflows orchestrate complex sequences of agent and tool executions with control flow logic.
 
 ```typescript
 // src/mastra/workflows/research.ts
@@ -345,11 +286,9 @@ const result = await researchWorkflow.execute({
 console.log(result.results.write.article);
 ```
 
-## Adding Agent Memory
+### Adding Agent Memory
 
 Memory enables agents to maintain context across conversations and recall previous interactions.
-
-### Implementing Memory
 
 ```typescript
 import { Agent } from '@mastra/core/agent';
@@ -390,32 +329,93 @@ const followUp = await memoryAgent.generate(
 
 ## Deploying to Nosana
 
+### Creating a .dockerignore File
+
+Before building your Docker container, create a `.dockerignore` file in your project root to exclude unnecessary files from the Docker build context. This reduces build time and image size:
+
+```dockerignore
+node_modules
+npm-debug.log
+# .env - commented out so production env vars are included
+.env.development
+.env.local
+*.db
+*.db-*
+.git
+output.txt
+```
+
+**Important Note**: We're including the `.env` file in the Docker image for this tutorial. In production environments, you should pass environment variables at runtime using `docker run -e` or `--env-file` flags instead of including them in the image for security reasons.
+
 ### Building Your Docker Container
 
-Create a Dockerfile for your complete application stack:
+Create a Dockerfile in your project root for your complete application stack:
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
+# Copy source code and config files
 COPY . .
-RUN npm run build
 
+# Expose ports for API and Playground
 EXPOSE 3000 4111
 
-CMD ["npm", "start"]
+# Set environment variables
+ENV HOST=0.0.0.0
+ENV PORT=4111
+
+# Use dev mode to serve the playground (dev mode includes the playground interface)
+CMD ["sh", "-c", "HOST=0.0.0.0 npm run dev"]
 ```
+
+**Key Configuration Details**:
+- `HOST=0.0.0.0`: This is crucial! It makes the Mastra server bind to all network interfaces, allowing access from outside the Docker container. Without this, the server only binds to localhost and won't be accessible.
+- **Using `npm run dev` instead of `npm start`**: The `mastra start` command (production mode) only serves the API with a basic welcome page. The `mastra dev` command includes the full playground interface, which is what we want for development and testing.
+- We're using `npm` as the package manager (adjust if you're using `pnpm` or `yarn`).
+- No build step needed: Dev mode runs directly from source, making the Docker image faster to build.
 
 Build and test locally:
 
 ```bash
+# Build the Docker image
 docker build -t yourusername/agent-challenge:latest .
+
+# Run the container
 docker run -p 3000:3000 -p 4111:4111 yourusername/agent-challenge:latest
+
+# Or run in detached mode (background)
+docker run -d -p 3000:3000 -p 4111:4111 --name mastra-app yourusername/agent-challenge:latest
+
+# View logs
+docker logs mastra-app
+
+# Stop and remove the container
+docker stop mastra-app && docker rm mastra-app
 ```
+
+Once the container is running, you should see output like:
+```
+✓ Initial bundle complete
+◇ Starting Mastra dev server...
+mastra-cloud-ai-tracing-exporter disabled: MASTRA_CLOUD_ACCESS_TOKEN environment variable not set.
+
+ mastra  0.17.7 ready in 4117 ms
+
+│ Playground: http://0.0.0.0:4111/
+│ API:        http://0.0.0.0:4111/api
+
+◯ watching for file changes...
+```
+
+Now visit `http://localhost:4111` in your browser to access the Mastra Playground! You should see the "Mastra Studio" interface where you can test your agents and workflows.
 
 ### Publishing to Docker Hub
 
@@ -453,38 +453,6 @@ nosana job post \
 ```
 
 Monitor your deployment through the Nosana Dashboard to track performance, costs, and logs.
-
-## Testing and Validation
-
-### Using the Mastra Playground
-
-The Mastra Playground provides interactive testing capabilities:
-
-1. Navigate to `http://localhost:4111`
-2. Test agents with different prompts
-3. Inspect tool calls and execution traces
-4. Debug agent decision-making processes
-5. Monitor workflow execution steps
-
-### Implementing Evals
-
-Evals help measure and track agent performance:
-
-```typescript
-import { createEval } from '@mastra/core';
-
-const accuracyEval = createEval({
-  name: 'response-accuracy',
-  evaluate: async ({ output, expected }) => {
-    const score = calculateSimilarity(output, expected);
-    return {
-      score,
-      passed: score > 0.8,
-      metadata: { output, expected },
-    };
-  },
-});
-```
 
 ## Best Practices and Tips
 
