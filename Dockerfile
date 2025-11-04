@@ -1,8 +1,5 @@
 FROM node:22-alpine AS builder
 
-# Add build argument for cache busting
-ARG CACHEBUST=1
-
 WORKDIR /app
 
 # Copy package files
