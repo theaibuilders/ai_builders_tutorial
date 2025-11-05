@@ -1,6 +1,6 @@
-# Nosana x Mastra: Building and Deploying Decentralized AI Agents
+# Nosana x Mastra: Building Intelligent AI Agents Locally
 
-This tutorial guides you through building intelligent AI agents using the Mastra framework, utilizing open source model from Nosana, and deploying them on Nosana's decentralized GPU network.
+This tutorial guides you through building intelligent AI agents using the Mastra framework and utilizing open-source models from Nosana's decentralized GPU network.
 
 ![nosana-mastra](/products/nosana/nosana_mastra.png)
 
@@ -33,9 +33,8 @@ Core primitives:
 
 Ensure you have the following installed:
 - Node.js 18+ and npm/pnpm
-- Docker and Docker Hub account
 - Git for version control
-- Nosana account with pre-loaded credits
+- Nosana account with pre-loaded credits (to deploy and access the GPT-OSS model)
 
 ### Initialize Your Mastra Project
 
@@ -327,132 +326,37 @@ const followUp = await memoryAgent.generate(
 );
 ```
 
-## Deploying to Nosana
+## Testing and Validation
 
-### Creating a .dockerignore File
+### Using the Mastra Playground
 
-Before building your Docker container, create a `.dockerignore` file in your project root to exclude unnecessary files from the Docker build context. This reduces build time and image size:
+The Mastra Playground provides interactive testing capabilities:
 
-```dockerignore
-node_modules
-npm-debug.log
-# .env - commented out so production env vars are included
-.env.development
-.env.local
-*.db
-*.db-*
-.git
-output.txt
+1. Navigate to `http://localhost:4111`
+2. Test agents with different prompts
+3. Inspect tool calls and execution traces
+4. Debug agent decision-making processes
+5. Monitor workflow execution steps
+
+### Implementing Evals
+
+Evals help measure and track agent performance:
+
+```typescript
+import { createEval } from '@mastra/core';
+
+const accuracyEval = createEval({
+  name: 'response-accuracy',
+  evaluate: async ({ output, expected }) => {
+    const score = calculateSimilarity(output, expected);
+    return {
+      score,
+      passed: score > 0.8,
+      metadata: { output, expected },
+    };
+  },
+});
 ```
-
-**Important Note**: We're including the `.env` file in the Docker image for this tutorial. In production environments, you should pass environment variables at runtime using `docker run -e` or `--env-file` flags instead of including them in the image for security reasons.
-
-### Building Your Docker Container
-
-Create a Dockerfile in your project root for your complete application stack:
-
-```dockerfile
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code and config files
-COPY . .
-
-# Expose ports for API and Playground
-EXPOSE 3000 4111
-
-# Set environment variables
-ENV HOST=0.0.0.0
-ENV PORT=4111
-
-# Use dev mode to serve the playground (dev mode includes the playground interface)
-CMD ["sh", "-c", "HOST=0.0.0.0 npm run dev"]
-```
-
-**Key Configuration Details**:
-- `HOST=0.0.0.0`: This is crucial! It makes the Mastra server bind to all network interfaces, allowing access from outside the Docker container. Without this, the server only binds to localhost and won't be accessible.
-- **Using `npm run dev` instead of `npm start`**: The `mastra start` command (production mode) only serves the API with a basic welcome page. The `mastra dev` command includes the full playground interface, which is what we want for development and testing.
-- We're using `npm` as the package manager (adjust if you're using `pnpm` or `yarn`).
-- No build step needed: Dev mode runs directly from source, making the Docker image faster to build.
-
-Build and test locally:
-
-```bash
-# Build the Docker image
-docker build -t yourusername/agent-challenge:latest .
-
-# Run the container
-docker run -p 3000:3000 -p 4111:4111 yourusername/agent-challenge:latest
-
-# Or run in detached mode (background)
-docker run -d -p 3000:3000 -p 4111:4111 --name mastra-app yourusername/agent-challenge:latest
-
-# View logs
-docker logs mastra-app
-
-# Stop and remove the container
-docker stop mastra-app && docker rm mastra-app
-```
-
-Once the container is running, you should see output like:
-```
-✓ Initial bundle complete
-◇ Starting Mastra dev server...
-mastra-cloud-ai-tracing-exporter disabled: MASTRA_CLOUD_ACCESS_TOKEN environment variable not set.
-
- mastra  0.17.7 ready in 4117 ms
-
-│ Playground: http://0.0.0.0:4111/
-│ API:        http://0.0.0.0:4111/api
-
-◯ watching for file changes...
-```
-
-Now visit `http://localhost:4111` in your browser to access the Mastra Playground! You should see the "Mastra Studio" interface where you can test your agents and workflows.
-
-### Publishing to Docker Hub
-
-```bash
-docker login
-docker push yourusername/agent-challenge:latest
-```
-
-### Deploying on Nosana Network
-
-Create a job definition file:
-
-```json
-{
-  "version": "0.1",
-  "type": "container",
-  "image": "yourusername/agent-challenge:latest",
-  "network": "mainnet",
-  "resources": {
-    "gpu": true,
-    "memory": "8GB"
-  }
-}
-```
-
-Deploy using the Nosana Dashboard or CLI:
-
-```bash
-npm install -g @nosana/cli
-
-nosana job post \
-  --file ./nosana_job.json \
-  --market nvidia-3090 \
-  --timeout 30
-```
-
-Monitor your deployment through the Nosana Dashboard to track performance, costs, and logs.
 
 ## Best Practices and Tips
 
@@ -470,16 +374,25 @@ Monitor your deployment through the Nosana Dashboard to track performance, costs
 - Use streaming responses for real-time user feedback
 - Implement caching for expensive operations
 - Limit maxSteps to prevent infinite loops
-
-### Deployment Strategy
-- Test Docker containers locally before pushing to Nosana
-- Monitor resource usage and optimize for cost efficiency
+- Monitor resource usage and optimize for efficiency
 - Implement proper logging and observability
 
 ## Conclusion
 
-You have learned to build production-ready AI agents using Mastra and deploy them on Nosana's decentralized GPU network. This architecture combines powerful agent capabilities with cost-effective, scalable infrastructure for AI inference workloads.
+You have learned to build intelligent AI agents using the Mastra framework with open-source models from Nosana. This tutorial covered setting up your development environment, creating custom agents, implementing tools and workflows, adding memory capabilities, and testing everything locally using the Mastra Playground.
 
-Key takeaways include understanding agent fundamentals, implementing custom tools, integrating MCP servers, building multi-step workflows, and deploying to decentralized compute infrastructure.
+Key takeaways include:
+- Understanding Mastra's core primitives: agents, tools, workflows, and memory
+- Connecting to Nosana's open-source models via Ollama
+- Building custom agents with specific capabilities
+- Creating type-safe tools with Zod schemas
+- Implementing multi-step workflows
+- Testing and validating agents using the playground
 
-Explore the Mastra documentation for advanced features like RAG pipelines, multi-agent systems, and custom integrations. Join the Nosana and Mastra communities to connect with other builders and access support resources.
+## Next Steps
+
+To continue your journey with Mastra:
+- Explore the [Mastra documentation](https://mastra.ai/docs) for advanced features like RAG pipelines and multi-agent systems
+- Join the Mastra community to connect with other builders
+- Experiment with different Nosana models and configurations
+- Build more complex workflows and integrations
