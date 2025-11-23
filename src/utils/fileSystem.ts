@@ -4,6 +4,7 @@ import type { TutorialFile, TutorialSection, AuthorMetadata } from '../types/tut
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
 const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
+const DRAFTS_DIR = path.join(process.cwd(), 'tutorials_draft');
 const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
 const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
 
@@ -265,6 +266,80 @@ export function scanTutorialsDirectory(): TutorialSection[] {
     });
     return sections;
   }
+}
+
+export function scanDraftTutorialsDirectory(): TutorialSection[] {
+  const sections: TutorialSection[] = [];
+
+  try {
+    if (!fs.existsSync(DRAFTS_DIR)) {
+      return sections;
+    }
+
+    const sectionDirs = fs.readdirSync(DRAFTS_DIR).filter(item => {
+      const fullPath = path.join(DRAFTS_DIR, item);
+      return fs.statSync(fullPath).isDirectory();
+    });
+
+    for (const sectionDir of sectionDirs) {
+      const sectionPath = path.join(DRAFTS_DIR, sectionDir);
+      const files: TutorialFile[] = [];
+      const fileNames = fs.readdirSync(sectionPath).filter(file =>
+        file.endsWith('.md') || file.endsWith('.mdx') || file.endsWith('.ipynb')
+      );
+
+      for (const fileName of fileNames) {
+        const filePath = path.join(sectionPath, fileName);
+        const relativePath = `${sectionDir}/${fileName}`;
+
+        try {
+          if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
+            const content = readMarkdownFile(filePath);
+            if (content) {
+              const metadata = extractMarkdownMetadata(content, relativePath);
+              files.push({
+                path: relativePath,
+                name: fileName,
+                type: 'markdown',
+                content,
+                metadata
+              });
+            }
+          } else if (fileName.endsWith('.ipynb')) {
+            const notebook = readNotebookFile(filePath);
+            if (notebook) {
+              const metadata = extractNotebookMetadata(notebook, relativePath);
+              files.push({
+                path: relativePath,
+                name: fileName,
+                type: 'notebook',
+                notebook,
+                metadata
+              });
+            }
+          }
+        } catch (error) {
+          console.error(`Error processing draft file ${filePath}:`, error);
+        }
+      }
+
+      // Sort files alphabetically
+      files.sort((a, b) => a.name.localeCompare(b.name));
+
+      sections.push({
+        name: sectionDir.charAt(0).toUpperCase() + sectionDir.slice(1),
+        path: sectionDir,
+        files
+      });
+    }
+
+    // Sort sections alphabetically
+    sections.sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.error('Error scanning drafts directory:', error);
+  }
+
+  return sections;
 }
 
 export function findTutorialFile(sections: TutorialSection[], targetPath: string): TutorialFile | undefined {

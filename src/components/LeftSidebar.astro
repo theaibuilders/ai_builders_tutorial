@@ -1,6 +1,7 @@
 ---
 import SearchBar from '../components/SearchBar.astro';
 import type { TutorialFile, TutorialSection } from '../types/tutorial';
+import { scanDraftTutorialsDirectory } from '../utils/fileSystem';
 
 interface Props {
   sections: TutorialSection[];
@@ -8,6 +9,13 @@ interface Props {
 }
 
 const { sections, currentFile } = Astro.props;
+
+// Detect if we're in localhost environment
+const isLocalhost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+
+// Load draft tutorials if in localhost
+const draftSections = isLocalhost ? scanDraftTutorialsDirectory() : [];
+const hasDrafts = draftSections.length > 0;
 ---
 
 <div class="h-screen flex flex-col lg:pt-0">
@@ -65,6 +73,74 @@ const { sections, currentFile } = Astro.props;
   <!-- Navigation Content -->
   <div class="flex-1 overflow-y-auto min-h-0">
     <nav class="p-4 pb-20">
+      {/* Drafts Section - Only visible in localhost */}
+      {isLocalhost && hasDrafts && (
+        <div class="mb-6 border-b border-yellow-500/30 pb-6">
+          <button
+            class="flex items-center justify-between w-full text-left p-3 sm:p-2 rounded-lg bg-yellow-500/10 hover:bg-yellow-500/20 transition-colors group"
+            data-section="drafts"
+            onclick="toggleSection(this)"
+          >
+            <span class="font-semibold text-yellow-400 capitalize flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              Drafts
+            </span>
+            <svg
+              class="w-5 h-5 sm:w-4 sm:h-4 text-yellow-400 transform transition-transform group-data-[expanded]:rotate-90"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+
+          <div
+            class="ml-4 mt-2 space-y-1 section-content"
+            data-section-content="drafts"
+            style="display: none;"
+          >
+            {draftSections.map((section) => (
+              <div class="mb-4">
+                <div class="text-xs font-semibold text-yellow-400/70 uppercase tracking-wide mb-2">
+                  {section.name}
+                </div>
+                {section.files.map((file) => {
+                  const isActive = currentFile && currentFile.path === file.path;
+                  const cleanPath = file.path.replace(/\.(md|mdx|ipynb)$/, '');
+
+                  return (
+                    <a
+                      href={`/tutorials_draft/${cleanPath}`}
+                      class={`block p-3 sm:p-2 rounded-lg text-sm transition-colors ${
+                        isActive
+                          ? 'bg-yellow-500/10 text-yellow-400 border-l-2 border-yellow-400'
+                          : 'text-dark-secondary hover:bg-dark-hover hover:text-dark-text'
+                      }`}
+                      onclick="closeMobileNav()"
+                    >
+                      <div class="flex items-center">
+                        <span class="truncate">
+                          {file.metadata.title}
+                        </span>
+                      </div>
+
+                      {file.metadata.description && (
+                        <div class="mt-1 text-xs text-dark-secondary opacity-75 line-clamp-2">
+                          {file.metadata.description}
+                        </div>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {sections.map((section) => (
         <div class="mb-6">
           <!-- Section Header -->
