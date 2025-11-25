@@ -7,6 +7,12 @@ dist
 .ruler
 tutorials_draft
 
+# Cache directories
+.cache
+.temp
+.tmp
+**/.cache
+
 # Large model files
 tutorials/Fine Tuning/results/
 *.safetensors
