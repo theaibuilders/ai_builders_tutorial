@@ -1,0 +1,206 @@
+# Getting Started with Qoder: The Agentic Coding Platform
+
+Qoder is an AI-powered IDE that goes beyond code completion. It functions as an autonomous coding partner capable of understanding entire codebases, planning complex tasks, and executing multi-file changes independently.
+
+![Qoder](/public/products/qoder/qoder.png)
+
+## Installation
+
+Download from [qoder.com](https://qoder.com) for Windows, macOS, or Linux. Launch the IDE and authenticate using Google, GitHub, or email. Qoder supports importing settings from VS Code or Cursor during setup.
+
+## Core Interaction Modes
+
+Qoder offers three primary modes:
+
+**Ask Mode**: Query your codebase with natural language. Ideal for understanding unfamiliar code.
+
+**Agent Mode**: Interactive pair programming with real-time AI assistance for coding, debugging, and refactoring.
+
+**Quest Mode**: Autonomous execution of complex, long-running tasks through specification-driven workflows.
+
+## Code Completion with NES
+
+Next Edit Suggestion (NES) provides context-aware completions that predict subsequent edits across your codebase.
+
+Enable NES in **Settings > NES** (`Cmd+Shift+,` on macOS, `Ctrl+Shift+,` on Windows).
+
+```python
+# Type partial code; NES suggests context-aware completions
+def calculate_total_price
+
+# NES completes based on project context:
+def calculate_total_price(items: list[Item], discount: float = 0.0) -> float:
+    subtotal = sum(item.price * item.quantity for item in items)
+    return subtotal * (1 - discount)
+```
+
+| Action | macOS | Windows |
+|--------|-------|---------|
+| Trigger suggestion | `Option+P` | `Alt+P` |
+| Accept suggestion | `Tab` | `Tab` |
+| Reject suggestion | `Esc` | `Esc` |
+
+## Inline Chat
+
+Edit code directly through conversation without switching contexts.
+
+1. Select code or place cursor on a line
+2. Press `Cmd+I` (macOS) or `Ctrl+I` (Windows)
+3. Enter instruction and press `Cmd+Enter` to apply
+
+```javascript
+// Select this function, invoke inline chat: "Add error handling"
+function fetchUserData(userId) {
+    return fetch(`/api/users/${userId}`).then(r => r.json());
+}
+
+// Result after applying changes:
+async function fetchUserData(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch user data:', error);
+        throw error;
+    }
+}
+```
+
+## AI Chat Panel
+
+Open with `Cmd+L` (macOS) or `Ctrl+L` (Windows).
+
+**Ask Mode** handles questions about your codebase:
+```
+How does the authentication flow work?
+What modules depend on UserService?
+```
+
+**Agent Mode** executes autonomous actions:
+```
+Create unit tests for PaymentProcessor using pytest
+```
+
+The agent reads files, makes edits, runs commands, and reports results with diff views.
+
+## Quest Mode
+
+Quest Mode handles complex tasks through specification-driven development.
+
+### Workflow
+
+1. Click **New Task** and enter description
+2. Select **Spec First** for complex changes
+3. Choose **Local** or **Remote** execution
+4. Review the generated Spec, then click **Start Now**
+
+### Example Specification
+
+```markdown
+## Feature: User Notification System
+
+### Requirements
+- Email notifications for account events
+- In-app notification center with read/unread status
+
+### Constraints
+- Use existing EmailService
+- Implement rate limiting (10 emails/user/hour)
+
+### Acceptance Criteria
+- Unit tests for all notification types
+- Integration tests for full flow
+```
+
+The **Action Flow** displays execution progress. Add requirements mid-task; Qoder adjusts dynamically. The **Task Report** summarizes changes with diffs for review.
+
+## Repo Wiki
+
+Repo Wiki auto-generates structured documentation covering architecture, modules, and dependencies.
+
+```
+.qoder/repowiki/
+├── architecture.md
+├── modules/
+│   ├── auth.md
+│   └── payments.md
+└── dependencies.md
+```
+
+Wiki generation takes approximately 120 minutes for 4,000 files. Commit the `.qoder/repowiki/` directory to share with your team.
+
+## Memory and Rules
+
+Configure persistent rules in `.qoder/rules/`:
+
+```yaml
+rules:
+  - name: TypeScript conventions
+    description: Use strict TypeScript with explicit return types
+  - name: Commit messages
+    description: Follow conventional commits format
+```
+
+Add plain-English preferences in **Settings > Memory**:
+```
+Always use arrow functions for callbacks
+Include JSDoc comments for exported functions
+```
+
+## MCP Integration
+
+Model Context Protocol connects Qoder to external tools.
+
+Configure in **Settings > MCP**:
+
+```json
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "<TOKEN>" }
+    }
+  }
+}
+```
+
+Use in Agent Mode:
+```
+Search for open issues labeled "bug" and create a summary
+```
+
+## Keyboard Shortcuts
+
+| Action | macOS | Windows |
+|--------|-------|---------|
+| AI Chat | `Cmd+L` | `Ctrl+L` |
+| Inline Chat | `Cmd+I` | `Ctrl+I` |
+| Settings | `Cmd+Shift+,` | `Ctrl+Shift+,` |
+| Apply changes | `Cmd+Enter` | `Ctrl+Enter` |
+
+## Practical Workflows
+
+**New Projects**: Describe requirements in Quest Mode to generate project scaffolding.
+
+**Legacy Code**: Let Repo Wiki initialize, then query architecture and dependencies.
+
+**Refactoring**: Define scope and constraints in Quest specifications:
+```
+Refactor UserRepository to Repository pattern.
+Maintain backward compatibility.
+Verify with existing test suite.
+```
+
+## Pricing
+
+Currently in free public preview. Credit-based plans:
+- **Free**: 2-week Pro trial, unlimited completions
+- **Pro**: 2,000 monthly credits, Quest Mode, Repo Wiki
+
+## Best Practices
+
+Write detailed Quest specifications; clear requirements improve output quality. Build rule libraries for consistent AI-generated code. Use Ask mode to understand codebases before editing with Agent mode. Monitor credit usage via the status bar.
+
+Qoder represents a shift from AI-assisted to AI-delegated development, enabling focus on architecture while delegating implementation.
