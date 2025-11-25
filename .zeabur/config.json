@@ -1,7 +1,8 @@
 {
   "build": {
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "FORCE_REBUILD": "2025-11-25"
     }
   }
 }
