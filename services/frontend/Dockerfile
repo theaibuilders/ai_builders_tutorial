@@ -1,25 +1,10 @@
 FROM node:22-slim
-
-# Set working directory
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
+LABEL "language"="nodejs"
+LABEL "framework"="astro"
+WORKDIR /src
+COPY services/frontend/package*.json .
 RUN npm install
-
-# Copy application code
-COPY . .
-
-# Build the application
+COPY services/frontend .
 RUN npm run build
-
-# Expose port
-EXPOSE 4321
-
-# Set environment to production
-ENV NODE_ENV=production
-
-# Start the application
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4321"]
+EXPOSE 8080
+CMD ["npm", "start"]
