@@ -2,7 +2,60 @@
 
 Welcome to AI Builders Tutorial! This is a comprehensive, hands-on tutorial series for vibe coding as well as building AI applications using modern tools.
 
-![AI Builders Tutorial Banner](public/github_banner.png)
+![AI Builders Tutorial Banner](services/frontend/public/github_banner.png)
+
+## 📁 Project Structure
+
+```
+ai_builders_tutorial/
+├── services/              # Main application services
+│   ├── frontend/         # Astro + Preact web application
+│   └── backend/          # Python FastAPI REST API
+├── docs/                 # Comprehensive documentation
+├── start-auth-servers.sh # Quick start script
+└── README.md            # This file
+```
+
+### Services Directory
+
+All application code is organized under the `/services` directory:
+
+- **`services/frontend/`** - Full-stack web application with tutorials, UI components, and static assets
+- **`services/backend/`** - Authentication API with Circle integration and Google OAuth
+
+See [services/README.md](services/README.md) for detailed service documentation.
+
+## 🚀 Quick Start
+
+Get up and running in 3 commands:
+
+```bash
+# 1. Setup project (creates .env, installs dependencies)
+make setup
+
+# 2. Edit services/backend/.env with your Circle API credentials
+
+# 3. Start both services
+make dev
+```
+
+That's it! Visit:
+- **Frontend**: http://localhost:4321
+- **Backend API**: http://localhost:8000/docs
+- **Login**: http://localhost:4321/login
+
+### Available Make Commands
+
+```bash
+make help              # Show all available commands
+make dev               # Start both frontend and backend
+make dev-backend       # Start backend only
+make dev-frontend      # Start frontend only
+make install           # Install all dependencies
+make test-backend      # Run backend tests
+make clean             # Clean build artifacts
+make info              # Show project information
+```
 
 ## What You'll Learn from this side
 
@@ -26,7 +79,7 @@ Leverage AI‑native editors (Cursor, Windsurf, etc.) plus one‑click deploy fl
 Connect AI + workflow engines (n8n, Zapier‑style orchestration, background jobs) to trigger agents or model calls from events and pipelines.
 
 ### Model Providers
-Call, configure, and optimize a wide range of proprietary & open model APIs (latency, quality, fallbacks, cost shaping).
+Call, configure,  and optimize a wide range of proprietary & open model APIs (latency, quality, fallbacks, cost shaping).
 
 ### Gateways
 Unify multiple providers behind one interface with routing, retries, caching, usage tracking, and graceful degradation.
@@ -75,3 +128,77 @@ Connect with fellow AI builders from around the world! Join our vibrant communit
 - Network with AI enthusiasts and professionals globally
 
 Whether you're just starting out or you're an experienced developer, our community welcomes everyone who's passionate about building with AI. Come join us and be part of the future of AI development!
+
+## 🔐 Circle Authentication Feature
+
+This platform now includes a complete Circle Headless API authentication system for secure user authentication!
+
+### Features
+- ✅ Email/password login (verifies Circle community membership)
+- ✅ Google OAuth integration
+- ✅ JWT-based session management
+- ✅ Secure token handling
+- ✅ Protected routes and API endpoints
+
+### Quick Start
+
+#### 1. Setup Backend (Python FastAPI)
+```bash
+cd services/backend
+python3 -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your Circle API credentials
+```
+
+#### 2. Get Circle API Token
+1. Go to Circle admin → Settings → Developers → Tokens
+2. Create "Headless Auth" token
+3. Add to `services/backend/.env`
+
+#### 3. Start Servers
+```bash
+# Option 1: Use Makefile (recommended)
+make dev
+
+# Option 2: Use startup script
+./start-auth-servers.sh
+
+# Option 3: Manual start
+# Terminal 1 - Backend
+make dev-backend
+# OR: cd services/backend && python main.py
+
+# Terminal 2 - Frontend
+make dev-frontend
+# OR: cd services/frontend && npm run dev
+```
+
+#### 4. Test Authentication
+Visit: http://localhost:4321/login
+
+### Documentation
+- **Quick Reference**: [`docs/QUICK_REFERENCE.md`](docs/QUICK_REFERENCE.md) - Fast setup guide
+- **Full Setup Guide**: [`docs/CIRCLE_AUTH_SETUP.md`](docs/CIRCLE_AUTH_SETUP.md) - Complete documentation
+- **Implementation Details**: [`docs/IMPLEMENTATION_SUMMARY.md`](docs/IMPLEMENTATION_SUMMARY.md) - Technical overview
+- **Backend API**: [`services/backend/README.md`](services/backend/README.md) - API endpoints & usage
+
+### API Endpoints
+- `POST /auth/login` - Email/password authentication
+- `POST /auth/google` - Google OAuth login
+- `GET /auth/me` - Get current user
+- `POST /auth/refresh` - Refresh access token
+- `GET /health` - Health check
+
+### Testing
+```bash
+# Test backend setup
+cd services/backend
+python test_setup.py
+
+# Test API health
+curl http://localhost:8000/health
+```
+
+For detailed setup instructions, see [`docs/CIRCLE_AUTH_SETUP.md`](docs/CIRCLE_AUTH_SETUP.md).

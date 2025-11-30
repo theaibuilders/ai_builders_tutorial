@@ -2,6 +2,7 @@
 import type { TutorialFile } from '../types/tutorial';
 import nb from 'notebookjs';
 import { getHighlighter } from 'shiki';
+import MaskedContent from './MaskedContent.astro';
 
 // Format date as 'Month Day Year' (e.g., May 25 2025)
 function formatDateMDY(dateString) {
@@ -1394,9 +1395,12 @@ function getNbviewerUrl(filePath: string): string {
 
 <div class="h-screen overflow-y-auto">
   {currentFile ? (
-    <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
-      <!-- Tutorial Header -->
-      <header class="mb-6 lg:mb-8">
+    currentFile.metadata.masked ? (
+      <!-- Masked Content - Show login prompt with blurred content underneath -->
+      <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 relative">
+        <!-- Blurred Tutorial Content (underneath) -->
+        <div id="tutorial-content-preview" class="blur-content">
+          <header class="mb-6 lg:mb-8">
         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-dark-text mb-2">
           {currentFile.metadata.title}
         </h1>
@@ -1514,6 +1518,80 @@ function getNbviewerUrl(filePath: string): string {
           background-color: #252830 !important;
           background: #252830 !important;
         }
+        
+        /* Masked Content Blur and Overlay Styles */
+        .blur-content {
+          filter: blur(8px);
+          pointer-events: none;
+          user-select: none;
+          position: relative;
+          opacity: 0.3;
+        }
+        
+        .masked-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(229, 231, 235, 0.15);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 100;
+          padding: 2rem;
+        }
+        
+        .overlay-modal {
+          position: relative;
+          z-index: 101;
+          max-width: 500px;
+          width: 100%;
+        }
+        
+        /* Toast Notification */
+        .auth-toast {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+          color: #374151;
+          padding: 1rem 1.5rem;
+          border-radius: 0.5rem;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          z-index: 1000;
+          display: none;
+          align-items: center;
+          gap: 0.75rem;
+          border: 1px solid #d1d5db;
+        }
+        
+        .auth-toast.show {
+          display: flex;
+        }
+        
+        .auth-toast-icon {
+          color: #6b7280;
+          flex-shrink: 0;
+        }
+        
+        .auth-toast-message {
+          font-weight: 500;
+          font-size: 0.875rem;
+        }
+        
+        .auth-toast-message a {
+          color: #6b7280;
+          text-decoration: underline;
+          font-weight: 600;
+          transition: color 0.2s;
+        }
+        
+        .auth-toast-message a:hover {
+          color: #4b5563;
+        }
 
         /* ================= DataFrame / Wide Table Horizontal Scroll Fix ================= */
         /* Prevent overall page horizontal scroll while allowing per-output scroll */
@@ -1619,7 +1697,142 @@ function getNbviewerUrl(filePath: string): string {
       <div class="tutorial-content">
         <div set:html={renderedContent}></div>
       </div>
-    </div>
+        </div>
+        
+        <!-- Semi-transparent Overlay -->
+        <div id="masked-content-overlay" class="masked-overlay">
+          <div class="overlay-modal">
+            <MaskedContent tutorialTitle={currentFile.metadata.title} />
+          </div>
+        </div>
+      </div>
+    ) : (
+      <!-- Unmasked Content - Show normally -->
+      <div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="mb-6 lg:mb-8">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-dark-text mb-2">
+          {currentFile.metadata.title}
+        </h1>
+        
+        <!-- Metadata -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-6 text-sm text-dark-secondary">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+            {currentFile.metadata.author && (
+              <div class="flex items-center gap-2">
+                {currentFile.metadata.authorUrl ? (
+                  <a 
+                    href={currentFile.metadata.authorUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="flex items-center gap-2 text-dark-secondary hover:text-dark-text transition-colors cursor-pointer group"
+                    title={`Visit ${currentFile.metadata.author}'s profile`}
+                  >
+                    {currentFile.metadata.authorPicture && (
+                      <img 
+                        src={currentFile.metadata.authorPicture} 
+                        alt={`${currentFile.metadata.author} profile picture`}
+                        class="w-6 h-6 rounded-full object-cover border border-gray-600 group-hover:border-gray-400 transition-colors duration-200"
+                        onError="this.style.display='none'"
+                      />
+                    )}
+                    <span>{currentFile.metadata.author}</span>
+                  </a>
+                ) : (
+                  <div class="flex items-center gap-2">
+                    {currentFile.metadata.authorPicture && (
+                      <img 
+                        src={currentFile.metadata.authorPicture} 
+                        alt={`${currentFile.metadata.author} profile picture`}
+                        class="w-6 h-6 rounded-full object-cover border border-gray-600"
+                        onError="this.style.display='none'"
+                      />
+                    )}
+                    <span>{currentFile.metadata.author}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div class="flex items-center gap-2">
+              <span>Last updated: {formatDateMDY(currentFile.metadata.lastUpdated)}</span>
+            </div>
+          </div>
+          
+          <!-- View in Github Link -->
+          <div class="flex items-center gap-2 sm:gap-4">
+            <a 
+              href={getGithubUrl(currentFile.path)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-1 text-dark-secondary hover:text-dark-text transition-colors"
+            >
+              <svg class="w-4 h-4 text-gray-800 dark:text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span>View in Github</span>
+            </a>
+            
+            {/* Only show nbviewer link for notebook files */}
+            {currentFile.type === 'notebook' && (
+              <a 
+                href={getNbviewerUrl(currentFile.path)}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center gap-1 text-dark-secondary hover:text-dark-text transition-colors"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M7.5 2A1.5 1.5 0 0 0 6 3.5v17A1.5 1.5 0 0 0 7.5 22h9a1.5 1.5 0 0 0 1.5-1.5v-17A1.5 1.5 0 0 0 16.5 2h-9zM8 4h8v16H8V4zm1 2v2h2V6H9zm3 0v2h2V6h-2zm3 0v2h2V6h-2zM9 9v2h2V9H9zm3 0v2h2V9h-2zm3 0v2h2V9h-2zM9 12v2h2v-2H9zm3 0v2h2v-2h-2zm3 0v2h2v-2h-2zM9 15v2h2v-2H9zm3 0v2h2v-2h-2zm3 0v2h2v-2h-2z"/>
+                </svg>
+                <span>View in nbviewer</span>
+              </a>
+            )}
+          </div>
+        </div>
+      </header>
+      
+      <!-- Tutorial Content -->
+      <style>
+        /* Force MDX code blocks to use the correct background color */
+        .tutorial-content .code-block,
+        .tutorial-content .code-block *,
+        .tutorial-content pre,
+        .tutorial-content pre *,
+        .tutorial-content code {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+
+        /* Enable wrapping specifically for bash/shell code blocks */
+        .tutorial-content .code-block[data-lang="bash"] pre,
+        .tutorial-content .code-block[data-lang="bash"] code,
+        .tutorial-content .code-block[data-lang="shell"] pre,
+        .tutorial-content .code-block[data-lang="shell"] code,
+        .tutorial-content .code-block[data-lang="sh"] pre,
+        .tutorial-content .code-block[data-lang="sh"] code {
+          white-space: pre-wrap !important;
+          word-break: break-word !important;
+          overflow-x: hidden !important;
+        }
+        
+        /* Override any Shiki theme backgrounds */
+        .tutorial-content [style*="background"] {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+        
+        /* Force specific overrides for common Shiki classes */
+        .tutorial-content .shiki,
+        .tutorial-content .shiki *,
+        .tutorial-content [class*="shiki"] {
+          background-color: #252830 !important;
+          background: #252830 !important;
+        }
+      </style>
+      <div class="tutorial-content">
+        <div set:html={renderedContent}></div>
+      </div>
+      </div>
+    )
   ) : (
     <!-- No Tutorial Selected -->
     <div class="h-full flex items-center justify-center p-4">
@@ -1646,6 +1859,15 @@ function getNbviewerUrl(filePath: string): string {
       </div>
     </div>
   )}
+
+<!-- Toast Notification -->
+<div id="auth-toast" class="auth-toast">
+  <svg class="auth-toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </svg>
+  <span class="auth-toast-message">Please <a href="#" id="toast-signin-link">sign in</a> to view this content</span>
 </div>
 
 <!-- Copy Button Component -->
@@ -2165,5 +2387,51 @@ function getNbviewerUrl(filePath: string): string {
     setTimeout(() => {
       forceCodeCellBackgrounds();
     }, 2000);
+    
+    // Tutorial masking check - show/hide content based on authentication
+    function checkTutorialAccess() {
+      const blurContent = document.getElementById('tutorial-content-preview');
+      const overlay = document.getElementById('masked-content-overlay');
+      const toast = document.getElementById('auth-toast');
+      
+      if (!blurContent && !overlay) return; // Not a masked tutorial
+      
+      const token = localStorage.getItem('auth_token');
+      
+      if (token && blurContent && overlay) {
+        // User is authenticated - remove blur and hide overlay
+        blurContent.classList.remove('blur-content');
+        overlay.style.display = 'none';
+        // Hide toast if it's showing
+        if (toast) {
+          toast.classList.remove('show');
+        }
+      } else if (blurContent && overlay) {
+        // User is not authenticated - show blur and overlay
+        blurContent.classList.add('blur-content');
+        overlay.style.display = 'flex';
+        // Show toast notification (keep it visible)
+        if (toast) {
+          toast.classList.add('show');
+        }
+      }
+    }
+    
+    // Check on page load
+    checkTutorialAccess();
+    
+    // Add click handler for toast sign-in link
+    const toastSignInLink = document.getElementById('toast-signin-link');
+    if (toastSignInLink) {
+      toastSignInLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('openLoginModal'));
+      });
+    }
+    
+    // Re-check when authentication status changes
+    window.addEventListener('authStatusChanged', () => {
+      checkTutorialAccess();
+    });
   });
 </script>

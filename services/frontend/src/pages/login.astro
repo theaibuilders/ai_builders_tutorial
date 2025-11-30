@@ -1,0 +1,49 @@
+---
+import LoginForm from '../islands/LoginForm';
+
+const pageTitle = 'Login | AI Builders Tutorial';
+const description = 'Login to AI Builders community to access exclusive tutorials and resources.';
+const canonicalUrl = 'https://tutorial.theaibuilders.dev/login';
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>{pageTitle}</title>
+    <meta name="title" content={pageTitle} />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="https://tutorial.theaibuilders.dev/github_banner.png" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content="https://tutorial.theaibuilders.dev/github_banner.png" />
+
+    <!-- Google Sign-In -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body class="bg-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-white mb-2">AI Builders</h1>
+        <p class="text-gray-400">Access the community</p>
+      </div>
+      <LoginForm client:load />
+    </div>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+---
+interface Props {
+  tutorialTitle?: string;
+}
+
+const { tutorialTitle = "this tutorial" } = Astro.props;
+---
+
+<div class="masked-content-overlay">
+  <div class="masked-content-card">
+    <div class="masked-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    
+    <h2 class="masked-title">Authentication Required</h2>
+    
+    <p class="masked-description">
+      To access {tutorialTitle}, please sign in with your AI Builders account.
+    </p>
+    
+    <button 
+      id="masked-signin-button"
+      class="masked-signin-btn"
+      onclick="window.dispatchEvent(new CustomEvent('openLoginModal'))"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Sign In / Sign Up
+    </button>
+    
+    <p class="masked-community-note">
+      Not a member yet? 
+      <a href="https://community.theaibuilders.dev" target="_blank" rel="noopener noreferrer">
+        Join our community
+      </a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .masked-content-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem;
+  }
+  
+  .masked-content-card {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 1px solid #d1d5db;
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  .masked-icon {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+    opacity: 0.9;
+  }
+  
+  .masked-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 1rem;
+  }
+  
+  .masked-description {
+    font-size: 1.125rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  
+  .masked-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.875rem 2rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(107, 114, 128, 0.3);
+  }
+  
+  .masked-signin-btn:hover {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(107, 114, 128, 0.4);
+  }
+  
+  .masked-signin-btn:active {
+    transform: translateY(0);
+  }
+  
+  .masked-community-note {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .masked-community-note a {
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  
+  .masked-community-note a:hover {
+    color: #4b5563;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 640px) {
+    .masked-content-card {
+      padding: 2rem 1.5rem;
+    }
+    
+    .masked-title {
+      font-size: 1.5rem;
+    }
+    
+    .masked-description {
+      font-size: 1rem;
+    }
+  }
+</style>

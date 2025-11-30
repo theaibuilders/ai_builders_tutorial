@@ -7,6 +7,18 @@ dist
 .ruler
 tutorials_draft
 
+# Python backend
+services/backend/venv/
+services/backend/__pycache__/
+services/backend/.env
+services/backend/*.pyc
+
+# Frontend
+services/frontend/node_modules/
+services/frontend/.astro/
+services/frontend/dist/
+services/frontend/.env
+
 # Cache directories
 .cache
 .temp

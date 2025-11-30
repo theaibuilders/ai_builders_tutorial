@@ -55,6 +55,7 @@ export interface TutorialMetadata {
   lastUpdated: string;
   tags?: string[];
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  masked?: boolean;
 }
 
 export interface AuthorMetadata {

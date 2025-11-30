@@ -1,0 +1,132 @@
+{
+  "tutorials": {
+    "Overview/tutorial_overview.mdx": {
+      "masked": false
+    },
+    "Vibe Coding/agents_md.mdx": {
+      "masked": false
+    },
+    "Vibe Coding/cursor_custom_modes.mdx": {
+      "masked": true
+    },
+    "Vibe Coding/qoder-tutorial.mdx": {
+      "masked": false
+    },
+    "Vibe Coding/ruler_config.mdx": {
+      "masked": false
+    },
+    "Vibe Coding/zeabur_cursor.mdx": {
+      "masked": false
+    },
+    "Automation/zeabur_n8n.mdx": {
+      "masked": false
+    },
+    "Automation/flowithos.mdx": {
+      "masked": false
+    },
+    "Web Search/brightdata_tutorial.ipynb": {
+      "masked": false
+    },
+    "Web Search/brightdata_proxy.ipynb": {
+      "masked": false
+    },
+    "Image and Video/nosana_stable_diffusion_tutorial.ipynb": {
+      "masked": false
+    },
+    "Image and Video/zeabur_seedream4.mdx": {
+      "masked": false
+    },
+    "Data and Memory/qdrant_tutorial.ipynb": {
+      "masked": true
+    },
+    "Data and Memory/bright_data_dataset.ipynb": {
+      "masked": false
+    },
+    "Data and Memory/supabase_tutorial.mdx": {
+      "masked": true
+    },
+    "Model Providers/ai21_tutorial.ipynb": {
+      "masked": false
+    },
+    "Model Providers/cerebras_tutorial.ipynb": {
+      "masked": true
+    },
+    "Model Providers/nosana_gpt_oss_tutorial.ipynb": {
+      "masked": false
+    },
+    "Model Providers/nosana_tutorial_openai_sdk.ipynb": {
+      "masked": false
+    },
+    "Model Providers/replicate_tutorial.ipynb": {
+      "masked": true
+    },
+    "Model Providers/togetherai_tutorial.ipynb": {
+      "masked": true
+    },
+    "Model Providers/zeabur_ai_hub_tutorial.ipynb": {
+      "masked": false
+    },
+    "Gateways/litellm_tutorial.ipynb": {
+      "masked": true
+    },
+    "Gateways/openrouter_tutorial.ipynb": {
+      "masked": false
+    },
+    "Frameworks/crewai_tutorial.ipynb": {
+      "masked": true
+    },
+    "Frameworks/google_adk.ipynb": {
+      "masked": true
+    },
+    "Frameworks/langchain.ipynb": {
+      "masked": false
+    },
+    "Frameworks/llamaindex_tutorial.ipynb": {
+      "masked": false
+    },
+    "Frameworks/mastra_tutorial.mdx": {
+      "masked": false
+    },
+    "Frameworks/nosana_mastra.mdx": {
+      "masked": false
+    },
+    "Frameworks/strands_agents.ipynb": {
+      "masked": true
+    },
+    "Frameworks/vercel_ai_sdk.mdx": {
+      "masked": false
+    },
+    "Chat UI Framework/gradio_tutorial.ipynb": {
+      "masked": true
+    },
+    "Chat UI Framework/copilotkit_tutorial.mdx": {
+      "masked": false
+    },
+    "Observarbility/deepeval_tutorial.ipynb": {
+      "masked": true
+    },
+    "Fine Tuning/finetuning_togetherai.ipynb": {
+      "masked": true
+    },
+    "Fine Tuning/replicate_fine_tuning.ipynb": {
+      "masked": false
+    },
+    "Audio/deepgram_tutorial.ipynb": {
+      "masked": true
+    },
+    "Browser Use/stagehand_tutorial.ipynb": {
+      "masked": false
+    }
+  },
+  "_instructions": {
+    "description": "This file controls which tutorials require authentication to view.",
+    "usage": "Set 'masked: true' for tutorials that should only be accessible to signed-in users. Set 'masked: false' for public tutorials.",
+    "default": "All tutorials are unmasked (public) by default.",
+    "example": {
+      "SectionName/tutorial_file.ipynb": {
+        "masked": true
+      }
+    },
+    "note": "When a tutorial is masked, unauthenticated users will see a message prompting them to sign in."
+  }
+}
