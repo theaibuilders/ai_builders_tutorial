@@ -12,11 +12,11 @@ Download from [qoder.com](https://qoder.com) for Windows, macOS, or Linux. Launc
 
 Qoder offers three primary modes:
 
-**Ask Mode**: Query your codebase with natural language. Ideal for understanding unfamiliar code.
+- **Ask Mode**: Query your codebase with natural language. Ideal for understanding unfamiliar code.
 
-**Agent Mode**: Interactive pair programming with real-time AI assistance for coding, debugging, and refactoring.
+- **Agent Mode**: Interactive pair programming with real-time AI assistance for coding, debugging, and refactoring.
 
-**Quest Mode**: Autonomous execution of complex, long-running tasks through specification-driven workflows.
+- **Quest Mode**: Autonomous execution of complex, long-running tasks through specification-driven workflows.
 
 ## Code Completion with NES
 
@@ -34,11 +34,10 @@ def calculate_total_price(items: list[Item], discount: float = 0.0) -> float:
     return subtotal * (1 - discount)
 ```
 
-| Action | macOS | Windows |
-|--------|-------|---------|
-| Trigger suggestion | `Option+P` | `Alt+P` |
-| Accept suggestion | `Tab` | `Tab` |
-| Reject suggestion | `Esc` | `Esc` |
+Keyboard Shortcuts:
+- Trigger suggestion: Option+P (macOS) / Alt+P (Windows)
+- Accept suggestion: Tab
+- Reject suggestion: Esc
 
 ## Inline Chat
 
@@ -86,7 +85,9 @@ The agent reads files, makes edits, runs commands, and reports results with diff
 
 ## Quest Mode
 
-Quest Mode handles complex tasks through specification-driven development.
+Quest Mode handles complex tasks through **specification-driven development**.
+
+![Qoder](/products/qoder/questmode.png)
 
 ### Workflow
 
@@ -98,20 +99,24 @@ Quest Mode handles complex tasks through specification-driven development.
 ### Example Specification
 
 ```markdown
-## Feature: User Notification System
+# Feature Design: News Card Drawer
 
-### Requirements
-- Email notifications for account events
-- In-app notification center with read/unread status
+## 1. Overview
 
-### Constraints
-- Use existing EmailService
-- Implement rate limiting (10 emails/user/hour)
+### 1.1 Purpose
+Enable users to view detailed news article information in a 
+drawer panel that slides in from the right side of the screen 
+when clicking on a news card, replacing the current external 
+link behavior.
 
-### Acceptance Criteria
-- Unit tests for all notification types
-- Integration tests for full flow
+### 1.2 Current Behavior
+Currently, clicking "Read more" on a news card opens the 
+original article URL in a new browser tab via external link.
 ```
+
+Quest Mode's spec-driven development automatically generates **Mermaid flow diagrams** to visualize data flows and UX interactions. These diagrams provide clear visual representations of the feature architecture, making it easier to understand component relationships and user journeys before implementation begins.
+
+![Qoder](/products/qoder/questmode2.png)
 
 The **Action Flow** displays execution progress. Add requirements mid-task; Qoder adjusts dynamically. The **Task Report** summarizes changes with diffs for review.
 
@@ -172,35 +177,31 @@ Search for open issues labeled "bug" and create a summary
 ```
 
 ## Keyboard Shortcuts
-
-| Action | macOS | Windows |
-|--------|-------|---------|
-| AI Chat | `Cmd+L` | `Ctrl+L` |
-| Inline Chat | `Cmd+I` | `Ctrl+I` |
-| Settings | `Cmd+Shift+,` | `Ctrl+Shift+,` |
-| Apply changes | `Cmd+Enter` | `Ctrl+Enter` |
+- **AI Chat:** `Cmd+L` (macOS) / `Ctrl+L` (Windows)
+- **Inline Chat:** `Cmd+I` (macOS) / `Ctrl+I` (Windows)
+- **Settings:** `Cmd+Shift+,` (macOS) / `Ctrl+Shift+,` (Windows)
+- **Apply changes:** `Cmd+Enter` (macOS) / `Ctrl+Enter` (Windows)
 
 ## Practical Workflows
 
-**New Projects**: Describe requirements in Quest Mode to generate project scaffolding.
+- **New Projects**: Describe requirements in Quest Mode to generate project scaffolding.
 
-**Legacy Code**: Let Repo Wiki initialize, then query architecture and dependencies.
+- **Legacy Code**: Let Repo Wiki initialize, then query architecture and dependencies.
 
-**Refactoring**: Define scope and constraints in Quest specifications:
+- **Refactoring**: Define scope and constraints in Quest specifications:
 ```
 Refactor UserRepository to Repository pattern.
 Maintain backward compatibility.
 Verify with existing test suite.
 ```
 
-## Pricing
-
-Currently in free public preview. Credit-based plans:
-- **Free**: 2-week Pro trial, unlimited completions
-- **Pro**: 2,000 monthly credits, Quest Mode, Repo Wiki
-
 ## Best Practices
 
 Write detailed Quest specifications; clear requirements improve output quality. Build rule libraries for consistent AI-generated code. Use Ask mode to understand codebases before editing with Agent mode. Monitor credit usage via the status bar.
 
 Qoder represents a shift from AI-assisted to AI-delegated development, enabling focus on architecture while delegating implementation.
+
+## Get FREE Qoder Credits
+
+🎉 **Exclusive Partnership Opportunity!** 
+AI Builders has partnered with Qoder to bring you FREE credits to experience the future of agentic coding! Don't miss out on this special offer—[claim your FREE Qoder credits now](https://www.theaibuilders.dev/qoder) and start building with AI-powered development today!
