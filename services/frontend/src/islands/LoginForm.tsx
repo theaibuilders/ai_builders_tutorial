@@ -148,7 +148,7 @@ const LoginForm: FunctionalComponent = () => {
 
         window.google.accounts.id.renderButton(
           document.getElementById('google-signin-button'),
-          { theme: 'outline', size: 'large', width: '100%' }
+          { theme: 'outline', size: 'large', width: '350' }
         );
       }
     };
@@ -202,6 +202,7 @@ const LoginForm: FunctionalComponent = () => {
             id="email"
             name="email"
             required
+            autocomplete="email"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="your@email.com"
           />
@@ -216,6 +217,7 @@ const LoginForm: FunctionalComponent = () => {
             id="password"
             name="password"
             required
+            autocomplete="current-password"
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="••••••••"
           />
