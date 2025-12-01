@@ -81,7 +81,7 @@ const LoginForm: FunctionalComponent = () => {
       }
     } catch (err) {
       error.value = 'Network error. Please try again.';
-      console.error('Login error:', err);
+      // Don't log sensitive error details
     } finally {
       isLoading.value = false;
     }
@@ -117,7 +117,7 @@ const LoginForm: FunctionalComponent = () => {
       }
     } catch (err) {
       error.value = 'Network error. Please try again.';
-      console.error('Google login error:', err);
+      // Don't log sensitive error details
     } finally {
       isLoading.value = false;
     }

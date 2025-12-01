@@ -27,7 +27,7 @@ class CircleService:
                 
                 if response.status_code == 200:
                     data = response.json()
-                    print(f"✅ Circle auth token generated for: {email}")
+                    # Token generated successfully - avoid logging email
                     return {
                         "access_token": data.get("access_token"),
                         "refresh_token": data.get("refresh_token"),
@@ -36,13 +36,15 @@ class CircleService:
                         "email": email  # Store email since we can't query it later
                     }
                 else:
-                    print(f"❌ Failed to generate token for {email}")
+                    # Failed to generate token - log without exposing user email
+                    print(f"❌ Failed to generate auth token")
                     print(f"Status: {response.status_code}")
-                    print(f"Response: {response.text}")
+                    # Don't log response text as it may contain sensitive data
                     return None
                 
             except Exception as e:
-                print(f"Error getting Circle token: {e}")
+                # Log error without exposing sensitive details
+                print(f"Error getting Circle token: {type(e).__name__}")
                 return None
     
     async def verify_member(self, access_token: str) -> Optional[Dict]:
@@ -60,7 +62,7 @@ class CircleService:
                 return None
                 
             except Exception as e:
-                print(f"Error verifying member: {e}")
+                print(f"Error verifying member: {type(e).__name__}")
                 return None
     
     async def get_member_by_email(self, email: str) -> Optional[Dict]:
@@ -86,15 +88,15 @@ class CircleService:
                     
                     members = data.get("community_members", [])
                     if members:
-                        print(f"✅ Found member: {members[0].get('email')}")
+                        print(f"✅ Found member in community")
                         return members[0]
                     else:
-                        print(f"⚠️  No member found with email: {email}")
+                        print(f"⚠️  No member found in community")
                         return None
                 return None
                 
             except Exception as e:
-                print(f"Error fetching member: {e}")
+                print(f"Error fetching member: {type(e).__name__}")
                 return None
     
     async def refresh_token(self, refresh_token: str) -> Optional[Dict]:
@@ -118,7 +120,7 @@ class CircleService:
                 return None
                 
             except Exception as e:
-                print(f"Error refreshing token: {e}")
+                print(f"Error refreshing token: {type(e).__name__}")
                 return None
 
 circle_service = CircleService()

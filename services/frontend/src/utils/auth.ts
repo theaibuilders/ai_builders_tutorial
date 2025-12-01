@@ -55,7 +55,7 @@ export class AuthService {
         return false;
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      // Don't log sensitive error details
       this.clearToken();
       currentUser.value = null;
       isAuthenticated.value = false;
@@ -79,10 +79,21 @@ export class AuthService {
         const data = await response.json();
         this.setToken(data.access_token);
         await this.checkAuth();
+        // Dispatch event for UI updates
+        window.dispatchEvent(new CustomEvent('authStatusChanged'));
         return { success: true };
       } else {
         const errorData = await response.json();
-        return { success: false, error: errorData.detail || 'Login failed' };
+        const detail = errorData.detail || 'Login failed';
+        
+        // Provide helpful error messages without exposing sensitive details
+        if (detail === 'User not found in community') {
+          return { 
+            success: false, 
+            error: 'This email is not registered in the AI Builders community. Please join the community first or check if you\'re using the correct email.' 
+          };
+        }
+        return { success: false, error: detail };
       }
     } catch (error) {
       return { success: false, error: 'Network error. Please try again.' };
@@ -107,6 +118,8 @@ export class AuthService {
         const data = await response.json();
         this.setToken(data.access_token);
         await this.checkAuth();
+        // Dispatch event for UI updates
+        window.dispatchEvent(new CustomEvent('authStatusChanged'));
         return { success: true };
       } else {
         const errorData = await response.json();
@@ -142,7 +155,7 @@ export class AuthService {
       }
       return false;
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      // Don't log sensitive token details
       return false;
     }
   }

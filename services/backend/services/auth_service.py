@@ -54,7 +54,8 @@ class AuthService:
                 "google_id": idinfo.get("sub")
             }
         except Exception as e:
-            print(f"Error verifying Google token: {e}")
+            # Log error type without exposing token details
+            print(f"Error verifying Google token: {type(e).__name__}")
             return None
 
 auth_service = AuthService()
