@@ -4,7 +4,7 @@ import type { TutorialFile, TutorialSection, AuthorMetadata } from '../types/tut
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
 const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
-const DRAFTS_DIR = path.join(process.cwd(), 'tutorials_draft');
+const DRAFTS_DIR = path.join(process.cwd(), '..', '..', 'tutorials_draft');
 const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
 const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
 const VISIBILITY_CONFIG_PATH = path.join(process.cwd(), 'tutorial-visibility.json');

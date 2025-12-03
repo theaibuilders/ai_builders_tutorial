@@ -1,0 +1,10 @@
+{
+  "build": {
+    "dockerfile": "services/backend/Dockerfile",
+    "context": "services/backend",
+    "env": {
+      "NODE_ENV": "production",
+      "FORCE_REBUILD": "2025-11-25"
+    }
+  }
+}
