@@ -1,10 +1,10 @@
 # Getting Started with AnyGen.io: Your AI Productivity Partner
 
-AnyGen.io is a comprehensive AI platform designed for professionals who need accuracy, continuity, and depth in their workflows. Unlike standard AI tools that rely on single-shot prompts, AnyGen acts as a thought partner, engaging in a conversation to understand your intent before creating documents, presentations, or data analyses.
-
-This guide covers the core concepts and workflows to help you move from idea to publishable output seamlessly.
+[AnyGen.io](https://www.anygen.io/?utm_source=GTMNowEric&invitation_code=K86KM8) is a comprehensive AI platform designed for professionals who need accuracy, continuity, and depth in their workflows. Unlike standard AI tools that rely on single-shot prompts, AnyGen acts as a thought partner, engaging in a conversation to understand your intent before creating documents, presentations, or data analyses.
 
 ![anygen](/products/anygen/anygen02.png)
+
+This guide covers the core concepts and workflows to help you move from idea to publishable output seamlessly.
 
 ## Core Concepts
 
@@ -22,17 +22,35 @@ For data tasks, trust is paramount. AnyGen does not just predict numbers; it wri
 The Document workspace is where ideas take shape. It is optimized for reports, blog posts, and strategic briefs.
 
 ### Step-by-Step
-1. **Initiate the Project**: Select **Document** from the dashboard.
-2. **Contextual Conversation**: Respond to AnyGen's initial questions.
-   * *Example:* "Who is the audience?" or "What is the key takeaway?"
+1. **Initiate the Project**: Select **Write Doc** from the dashboard.
+2. **Contextual Conversation**: Write with your own ideas or use one of the suggested prompts.
+![anygen](/products/anygen/anygen03.png)
 3. **Draft Generation**: AnyGen generates a structured draft based on the conversation.
-4. **Refinement**: Use "Edit in Flow" tools to polish the text.
+![anygen](/products/anygen/anygen04.png)
+4. **Refinement**: Select the content, and use different tools to polish the text.
+![anygen](/products/anygen/anygen05.png)
 
-### Example: Edit in Flow
-Highlight a paragraph and select a command from the floating menu:
-* **Rephrase**: "Make this sound more professional."
-* **Expand**: "Add more details about the Q3 financial results."
-* **Shorten**: "Summarize this into a bulleted list."
+### Ask AI Feature
+
+The **Ask AI** feature lets you refine specific parts of your document without rewriting from scratch. Simply highlight any text, and a floating toolbar appears with the "Ask AI" option.
+
+**How to Use It:**
+1. **Select the text** you want to modify.
+2. Click the **Ask AI** button in the floating toolbar.
+3. Type your instruction in natural language.
+4. Review and accept the AI-generated revision.
+
+**Common Use Cases:**
+
+- **Expand content**: "Add more details about the benefits"
+- **Polish wording**: "Make this sound more professional"
+- **Simplify**: "Explain this in simpler terms"
+- **Change tone**: "Rewrite this to be more persuasive"
+- **Add examples**: "Include a real-world example here"
+
+![anygen](/products/anygen/anygen06.png)
+
+> **Pro Tip**: Be specific with your instructions. Instead of "make it better," try "make this paragraph more concise while keeping the key statistics."
 
 ## Workflow 2: From Document to Presentation
 
@@ -40,10 +58,10 @@ One of AnyGen's most powerful features is converting written content into ready-
 
 ### How to Convert
 1. Open your finalized **Document**.
-2. Click the **Export to PPT** or **Generate Presentation** action.
-3. Select your visual style or template preferences.
-4. AnyGen maps your headers to slide titles and your bullet points to slide content, automatically selecting layouts that fit the information density.
-
+![anygen](/products/anygen/anygen07.png)
+2. Click the **Create** button and click the **Slides** option.
+3. AnyGen maps your headers to slide titles and your bullet points to slide content, automatically selecting layouts that fit the information density.
+![anygen](/products/anygen/anygen08.png)
 > **Tip**: Ensure your document uses clear Heading 1 and Heading 2 structures for the best slide transition.
 
 ## Workflow 3: Data Analysis with Verifiable Code
@@ -53,25 +71,60 @@ The Data Analysis module allows you to chat with your CSV files. It bridges the 
 ### The Process
 1. **Upload Data**: Drag and drop your CSV file into the Data Analysis tab.
 2. **Ask Questions**: Query your data in plain English.
-   * *Query:* "What is the average revenue per region for the last quarter?"
 3. **Verify the Output**: AnyGen displays the answer alongside the code it used to derive it.
-
+![anygen](/products/anygen/anygen09.png)
 ### Code Generation Example
 When you ask for a trend analysis, AnyGen generates and executes Python code similar to this context:
 
 ```python
 import pandas as pd
-import matplotlib.pyplot as plt
+import re
+from datetime import datetime
 
-# Load the user uploaded dataset
-df = pd.read_csv('sales_data.csv')
+FREE_EMAIL_DOMAINS = {
+    'gmail.com','googlemail.com','yahoo.com','outlook.com','hotmail.com','live.com','icloud.com','aol.com','proton.me','protonmail.com','gmx.com','mail.com','zoho.com','yandex.com','fastmail.com','pm.me','qq.com','privaterelay.appleid.com','hey.com'
+}
 
-# Group by month and sum revenue
-monthly_revenue = df.groupby('Month')['Revenue'].sum()
+BUSY_TITLE_KEYWORDS = [
+    'engineer','developer','devops','software','data','ml','ai','machine learning','scientist','analyst','product','pm','manager','lead','director','vp','chief','cto','cpo','ceo','founder','consultant','architect','security','cloud','platform','operations','ops','growth','sales','marketing'
+]
 
-# Generate insight
-print(f"Peak revenue occurred in {monthly_revenue.idxmax()} with ${monthly_revenue.max()}")
+STATUS_PENDING_KEYWORDS = ['pending','pending_approval','waitlist','waitlisted','on waitlist','unconfirmed']
+
+EMAIL_REGEX = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
+
+
+def is_valid_work_email(email: str) -> bool:
+    if not isinstance(email, str):
+        return False
+    email = email.strip()
+    if not EMAIL_REGEX.match(email):
+        return False
+    domain = email.split('@')[-1].lower()
+    if domain in FREE_EMAIL_DOMAINS:
+        return False
+    # exclude common education domains
+    if domain.endswith('.edu') or domain.endswith('.ac.uk') or domain.endswith('.edu.sg'):
+        return False
+    return True
+...
 ```
+![anygen](/products/anygen/anygen10.png)
+
+### Iterating on Data Processing Logic
+
+Notice something wrong with the analysis? You can ask AnyGen to modify the code directly. In the example above, the code excludes education domains (`.edu`, `.edu.sg`, `.ac.uk`). But what if you want to include students in your analysis?
+
+Simply tell AnyGen: *"I want people in school to also join the event, fix the code to re-do the filtering."*
+
+AnyGen will:
+1. Update the code logic to allow education domains
+2. Re-run the analysis with the corrected filters
+3. Show you the updated results
+
+![anygen](/products/anygen/anygen11.png)
+
+> **Why This Matters**: Unlike traditional AI that might hallucinate statistics, AnyGen's code-based approach means every number is traceable. You can inspect, modify, and re-run the exact logic used to generate your insights. This makes your data analysis **verifiable and reproducible**.
 
 ## Get Started with AnyGen
 

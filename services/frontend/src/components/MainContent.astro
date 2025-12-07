@@ -1827,6 +1827,11 @@ function getNbviewerUrl(filePath: string): string {
           background-color: #252830 !important;
           background: #252830 !important;
         }
+        
+        /* Toast Notification - hidden by default for unmasked content */
+        .auth-toast {
+          display: none;
+        }
       </style>
       <div class="tutorial-content">
         <div set:html={renderedContent}></div>
@@ -1861,7 +1866,7 @@ function getNbviewerUrl(filePath: string): string {
   )}
 
 <!-- Toast Notification -->
-<div id="auth-toast" class="auth-toast">
+<div id="auth-toast" class="auth-toast" style="display: none;">
   <svg class="auth-toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"/>
     <line x1="12" y1="8" x2="12" y2="12"/>
@@ -2404,7 +2409,7 @@ function getNbviewerUrl(filePath: string): string {
         overlay.style.display = 'none';
         // Hide toast if it's showing
         if (toast) {
-          toast.classList.remove('show');
+          toast.style.display = 'none';
         }
       } else if (blurContent && overlay) {
         // User is not authenticated - show blur and overlay
@@ -2412,7 +2417,7 @@ function getNbviewerUrl(filePath: string): string {
         overlay.style.display = 'flex';
         // Show toast notification (keep it visible)
         if (toast) {
-          toast.classList.add('show');
+          toast.style.display = 'flex';
         }
       }
     }
