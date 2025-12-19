@@ -429,20 +429,66 @@ class TranslationService:
         translation_status = {}
         
         for lang in [LanguageCode.ZH_CN, LanguageCode.JA_JP]:
-            metadata = await self.github.load_metadata(lang.value)
+            # First check local metadata
+            local_metadata = self._load_local_metadata(lang.value)
             
-            if source_file in metadata:
-                entry = metadata[source_file]
+            if source_file in local_metadata:
+                entry = local_metadata[source_file]
                 available_languages.append(lang)
-                translation_status[lang.value] = entry.status
+                status = entry.get('status', 'pending')
+                translation_status[lang.value] = status if status == 'completed' else 'pending'
             else:
-                translation_status[lang.value] = MetadataStatus.PENDING
+                # Fall back to GitHub metadata
+                try:
+                    github_metadata = await self.github.load_metadata(lang.value)
+                    if source_file in github_metadata:
+                        entry = github_metadata[source_file]
+                        available_languages.append(lang)
+                        translation_status[lang.value] = entry.status
+                    else:
+                        translation_status[lang.value] = MetadataStatus.PENDING
+                except Exception:
+                    translation_status[lang.value] = MetadataStatus.PENDING
         
         return AvailableTranslationsResponse(
             source_file=source_file,
             available_languages=available_languages,
             translation_status=translation_status
         )
+    
+    def _load_local_metadata(self, language: str) -> dict:
+        """
+        Load translation metadata from local filesystem
+        
+        Args:
+            language: Target language code
+            
+        Returns:
+            Dictionary of translation metadata (file_path -> entry)
+        """
+        metadata_path = FRONTEND_TUTORIALS_DIR / f'tutorials-{language}' / 'translation-metadata.json'
+        
+        try:
+            if metadata_path.exists():
+                data = json.loads(metadata_path.read_text(encoding='utf-8'))
+                
+                # Merge both structures: entries under 'translations' key AND root-level entries
+                result = {}
+                
+                # Get entries from 'translations' key if it exists
+                if 'translations' in data and isinstance(data['translations'], dict):
+                    result.update(data['translations'])
+                
+                # Also check root-level entries (for files saved with new format)
+                for key, value in data.items():
+                    if key not in ['translations', 'last_updated', 'version'] and isinstance(value, dict):
+                        result[key] = value
+                
+                return result
+        except Exception as e:
+            logger.error(f"Error loading local metadata for {language}: {e}")
+        
+        return {}
     
     async def mark_outdated(
         self,

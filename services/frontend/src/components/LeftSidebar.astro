@@ -1,5 +1,6 @@
 ---
 import SearchBar from '../components/SearchBar.astro';
+import LanguageSelector from '../islands/LanguageSelector';
 import type { TutorialFile, TutorialSection } from '../types/tutorial';
 import { scanDraftTutorialsDirectory } from '../utils/fileSystem';
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { sections, currentFile } = Astro.props;
+const currentPath = Astro.url.pathname;
 
 // Detect if we're in localhost environment
 const isLocalhost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
@@ -209,6 +211,7 @@ const hasDrafts = draftSections.length > 0;
     <div class="p-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
+          <LanguageSelector client:only="preact" currentPath={currentPath} />
           <a
             href="https://www.theaibuilders.dev/"
             target="_blank"
