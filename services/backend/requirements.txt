@@ -9,3 +9,4 @@ python-dotenv==1.0.1
 pydantic-settings==2.1.0
 email-validator>=2.1.1
 requests>=2.31.0
+openai>=1.0.0

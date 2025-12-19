@@ -20,6 +20,18 @@ class Settings(BaseSettings):
     # CORS
     FRONTEND_URL: str = "http://localhost:4321"
     
+    # Translation Service
+    ZEABUR_API_KEY: str = ""
+    ZEABUR_ENDPOINT: str = "tokyo"  # tokyo or san_francisco
+    OPENAI_API_KEY: str = ""  # Fallback to OpenAI directly if Zeabur fails
+    TRANSLATION_MODEL: str = "gpt-4o"
+    GITHUB_TOKEN: str = ""
+    GITHUB_REPO_OWNER: str = "theaibuilders"
+    GITHUB_REPO_NAME: str = "ai_builders_tutorial"
+    TRANSLATION_BATCH_SIZE: int = 5
+    TRANSLATION_RETRY_LIMIT: int = 3
+    AUTO_TRANSLATE_ENABLED: bool = False  # Start with manual mode
+    
     class Config:
         # Use .env.prod in production, .env for local development
         env_file = os.getenv("ENV_FILE", ".env")

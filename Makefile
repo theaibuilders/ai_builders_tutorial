@@ -1,4 +1,4 @@
-.PHONY: help dev-backend dev-frontend dev install-backend install-frontend install test-backend clean-backend clean-frontend clean setup
+.PHONY: help dev-backend dev-frontend dev install-backend install-frontend install test-backend clean-backend clean-frontend clean setup translate translate-status translate-check translate-config translate-test
 
 # Colors for output
 BLUE := \033[0;34m
@@ -220,6 +220,61 @@ info: ## Show project information
 	@echo "  Setup Guide: docs/CIRCLE_AUTH_SETUP.md"
 	@echo "  Quick Ref:   docs/QUICK_REFERENCE.md"
 	@echo ""
+
+# Translation Commands
+
+translate: ## Trigger translation for a file (usage: make translate FILE=path/to/file.mdx LANG=zh-cn)
+	@if [ -z "$(FILE)" ]; then \
+		echo "$(RED)Error: FILE is required$(NC)"; \
+		echo "$(YELLOW)Usage: make translate FILE=Overview/tutorial_overview.mdx LANG=zh-cn$(NC)"; \
+		echo "$(YELLOW)  FILE - Path relative to tutorials/ (required)$(NC)"; \
+		echo "$(YELLOW)  LANG - Target language: zh-cn, ja-jp (default: zh-cn)$(NC)"; \
+		exit 1; \
+	fi
+	@LANG=$${LANG:-zh-cn}; \
+	echo "$(BLUE)Triggering translation...$(NC)"; \
+	echo "  File: $(FILE)"; \
+	echo "  Language: $$LANG"; \
+	RESPONSE=$$(curl -s -X POST "http://localhost:8000/api/translations/request" \
+		-H "Content-Type: application/json" \
+		-d '{"source_files": ["$(FILE)"], "target_languages": ["'$$LANG'"], "priority": "manual"}'); \
+	echo ""; \
+	echo "$(GREEN)✓ Translation request submitted$(NC)"; \
+	echo "$$RESPONSE" | python3 -m json.tool 2>/dev/null || echo "$$RESPONSE"
+
+translate-status: ## Check translation status (usage: make translate-status ID=request-id)
+	@if [ -z "$(ID)" ]; then \
+		echo "$(RED)Error: ID is required$(NC)"; \
+		echo "$(YELLOW)Usage: make translate-status ID=abc123-def456$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)Checking translation status...$(NC)"
+	@curl -s "http://localhost:8000/api/translations/status/$(ID)" | \
+		python3 -m json.tool 2>/dev/null || \
+		curl -s "http://localhost:8000/api/translations/status/$(ID)"
+
+translate-check: ## Check available translations for a file (usage: make translate-check FILE=path/to/file.mdx)
+	@if [ -z "$(FILE)" ]; then \
+		echo "$(RED)Error: FILE is required$(NC)"; \
+		echo "$(YELLOW)Usage: make translate-check FILE=Overview/tutorial_overview.mdx$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)Checking available translations for: $(FILE)$(NC)"
+	@curl -s "http://localhost:8000/api/translations/available?source_file_path=$(FILE)" | \
+		python3 -m json.tool 2>/dev/null || \
+		curl -s "http://localhost:8000/api/translations/available?source_file_path=$(FILE)"
+
+translate-test: ## Run translation diagnostic test (shows all errors)
+	@echo "$(BLUE)Running translation diagnostic test...$(NC)"
+	@cd services/backend && \
+	. venv/bin/activate && \
+	python test_translation.py
+
+translate-config: ## Show current translation configuration
+	@echo "$(BLUE)Translation configuration:$(NC)"
+	@curl -s "http://localhost:8000/api/translations/config" | \
+		python3 -m json.tool 2>/dev/null || \
+		curl -s "http://localhost:8000/api/translations/config"
 
 # Docker Commands (for future use)
 

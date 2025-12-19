@@ -3,6 +3,7 @@ import LeftSidebar from '../components/LeftSidebar.astro';
 import MainContent from '../components/MainContent.astro';
 import RightSidebar from '../components/RightSidebar.astro';
 import LoginModal from '../islands/LoginModal';
+import LanguageSelector from '../islands/LanguageSelector';
 import type { TutorialFile, TutorialSection } from '../types/tutorial';
 
 interface Props {
@@ -343,6 +344,11 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         
         <!-- Mobile Icons -->
         <div class="flex items-center gap-2">
+          <!-- Language Selector (Mobile) -->
+          <div class="lg:hidden">
+            <LanguageSelector client:only="preact" currentPath={Astro.url.pathname} />
+          </div>
+          
           <a
             href="https://www.theaibuilders.dev/"
             target="_blank"
@@ -434,6 +440,11 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         
         <!-- Bottom Icons -->
         <div class="flex flex-col items-center gap-3 mt-auto">
+          <!-- Language Selector (Desktop - Collapsed Sidebar) -->
+          <div class="w-full flex justify-center">
+            <LanguageSelector client:only="preact" currentPath={Astro.url.pathname} />
+          </div>
+          
           <a
             href="https://www.theaibuilders.dev/"
             target="_blank"
