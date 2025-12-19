@@ -2,14 +2,16 @@
 Translation Service
 
 Main orchestration service for translation workflow.
-Coordinates between Zeabur AI Hub and GitHub storage.
+Coordinates between Zeabur AI Hub and local/GitHub storage.
 """
 
 import logging
 import json
 import asyncio
+import os
 from typing import List, Dict, Optional
 from datetime import datetime
+from pathlib import Path
 
 from models import (
     TranslationRequest,
@@ -27,6 +29,9 @@ from services.zeabur_service import ZeaburService
 from services.github_storage import GitHubStorageManager
 
 logger = logging.getLogger(__name__)
+
+# Path to frontend tutorials directory (relative to backend)
+FRONTEND_TUTORIALS_DIR = Path(__file__).parent.parent.parent / 'frontend'
 
 class TranslationService:
     """Main translation service orchestrator"""
@@ -144,8 +149,8 @@ class TranslationService:
             
             logger.info(f"Processing job {job.job_id}: {job.source_file} -> {job.target_language}")
             
-            # Read source file
-            source_content = await self.github.read_file(job.source_file, "en")
+            # Read source file from local filesystem
+            source_content = await self._read_local_source(job.source_file)
             if not source_content:
                 raise FileNotFoundError(f"Source file not found: {job.source_file}")
             
@@ -182,31 +187,27 @@ class TranslationService:
                 logger.warning(f"Translation validation failed for {job.source_file}")
                 # Continue anyway, but log the warning
             
-            # Store translated file
+            # Store translated file LOCALLY (not to GitHub)
             job.status = JobStatus.STORING
-            await self.github.write_file(
+            await self._save_local_translation(
                 job.source_file,
                 translated_content,
-                job.target_language.value,
-                f"Translation: Add {job.target_language.value} version of {job.source_file}\n\n" +
-                f"- Model: {job.model_used}\n" +
-                f"- Date: {datetime.utcnow().isoformat()}"
+                job.target_language.value
             )
             
-            # Update metadata
-            await self.github.update_translation_metadata(
+            # Update local metadata
+            await self._save_local_metadata(
                 job.source_file,
                 job.target_language.value,
                 source_hash,
-                job.model_used,
-                MetadataStatus.COMPLETED
+                job.model_used
             )
             
             # Mark job as completed
             job.status = JobStatus.COMPLETED
             job.completed_at = datetime.utcnow()
             
-            logger.info(f"Job {job.job_id} completed successfully")
+            logger.info(f"Job {job.job_id} completed successfully - saved locally")
             return True
             
         except Exception as e:
@@ -223,6 +224,100 @@ class TranslationService:
                 return await self._process_job(job)
             
             return False
+    
+    async def _read_local_source(self, file_path: str) -> Optional[str]:
+        """
+        Read source file from local tutorials directory
+        
+        Args:
+            file_path: Relative path to file (e.g., "Overview/tutorial_overview.mdx")
+            
+        Returns:
+            File content as string, or None if not found
+        """
+        local_path = FRONTEND_TUTORIALS_DIR / 'tutorials' / file_path
+        
+        try:
+            if local_path.exists():
+                return local_path.read_text(encoding='utf-8')
+            else:
+                logger.error(f"Local source file not found: {local_path}")
+                return None
+        except Exception as e:
+            logger.error(f"Error reading local source file {local_path}: {e}")
+            return None
+    
+    async def _save_local_translation(
+        self,
+        file_path: str,
+        content: str,
+        language: str
+    ):
+        """
+        Save translated file to local filesystem
+        
+        Args:
+            file_path: Relative file path
+            content: Translated content
+            language: Target language code
+        """
+        # Determine output directory based on language
+        output_dir = FRONTEND_TUTORIALS_DIR / f'tutorials-{language}'
+        output_path = output_dir / file_path
+        
+        # Create directory if needed
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Write translated file
+        output_path.write_text(content, encoding='utf-8')
+        
+        logger.info(f"Saved translation to: {output_path}")
+    
+    async def _save_local_metadata(
+        self,
+        file_path: str,
+        language: str,
+        source_hash: str,
+        model_used: str
+    ):
+        """
+        Save translation metadata to local filesystem
+        
+        Args:
+            file_path: Relative file path
+            language: Target language code
+            source_hash: Hash of source content
+            model_used: Model used for translation
+        """
+        metadata_dir = FRONTEND_TUTORIALS_DIR / f'tutorials-{language}'
+        metadata_path = metadata_dir / 'translation-metadata.json'
+        
+        # Load existing metadata or create new
+        metadata = {}
+        if metadata_path.exists():
+            try:
+                metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
+            except json.JSONDecodeError:
+                metadata = {}
+        
+        # Update metadata for this file
+        metadata[file_path] = {
+            "source_hash": source_hash,
+            "model_used": model_used,
+            "translated_at": datetime.utcnow().isoformat(),
+            "status": "completed"
+        }
+        
+        # Ensure directory exists
+        metadata_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Save metadata
+        metadata_path.write_text(
+            json.dumps(metadata, indent=2, ensure_ascii=False),
+            encoding='utf-8'
+        )
+        
+        logger.info(f"Updated local metadata at: {metadata_path}")
     
     async def _validate_translation(
         self,

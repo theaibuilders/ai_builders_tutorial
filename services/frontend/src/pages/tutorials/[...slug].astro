@@ -1,7 +1,7 @@
 ---
 import TutorialLayout from '../../layouts/TutorialLayout.astro';
 import { extractMarkdownHeadings } from '../../utils/notebook';
-import { scanTutorialsDirectory, findTutorialFile } from '../../utils/fileSystem';
+import { scanTutorialsDirectory, findTutorialFile, loadTranslatedTutorial } from '../../utils/fileSystem';
 import type { TutorialFile, TutorialSection } from '../../types/tutorial';
 
 // Disable prerendering for this page to enable dynamic content updates
@@ -537,9 +537,23 @@ Ready to learn more? Check out our comprehensive tutorials!`,
 const sections = scanTutorialsDirectory();
 let currentFile: TutorialFile | undefined;
 
+// Get language from URL parameter
+const langParam = Astro.url.searchParams.get('lang') || 'en';
+
 if (slug) {
   const fullPath = Array.isArray(slug) ? slug.join('/') : slug;
   currentFile = findTutorialFile(sections, fullPath);
+  
+  // Try to load translated version if language is not English
+  if (currentFile && langParam !== 'en') {
+    const translatedFile = loadTranslatedTutorial(currentFile, langParam);
+    if (translatedFile) {
+      console.log(`Loaded ${langParam} translation for ${fullPath}`);
+      currentFile = translatedFile;
+    } else {
+      console.log(`No ${langParam} translation available for ${fullPath}, using English`);
+    }
+  }
 }
 
 // Extract headings for TOC

@@ -19,6 +19,12 @@
       "status": "completed"
     }
   },
-  "last_updated": "2025-12-19T08:28:46.612122",
-  "version": "1.0"
+  "last_updated": "2025-12-19T08:37:07.595077",
+  "version": "1.0",
+  "Image and Video/nosana_stable_diffusion_tutorial.ipynb": {
+    "source_hash": "81b8806d1678685a5107867474bafec8f2afa3c727c157946f3cdc2e619f3a1",
+    "model_used": "gpt-4o-mini",
+    "translated_at": "2025-12-19T08:37:07.595077",
+    "status": "completed"
+  }
 }

@@ -9,6 +9,35 @@ const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
 const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
 const VISIBILITY_CONFIG_PATH = path.join(process.cwd(), 'tutorial-visibility.json');
 
+// Get tutorials directory for a specific language
+export function getTutorialsDir(language: string = 'en'): string {
+  if (language === 'en') {
+    return TUTORIALS_DIR;
+  }
+  return path.join(process.cwd(), `tutorials-${language}`);
+}
+
+// Check if a translated file exists for a given path and language
+export function getTranslatedFilePath(tutorialPath: string, language: string): string | null {
+  if (language === 'en') {
+    return null; // English is the default, no translation needed
+  }
+  
+  const translatedDir = getTutorialsDir(language);
+  
+  // Try different extensions
+  const extensions = ['.mdx', '.md', '.ipynb'];
+  for (const ext of extensions) {
+    const basePath = tutorialPath.replace(/\.(md|mdx|ipynb)$/, '');
+    const translatedPath = path.join(translatedDir, basePath + ext);
+    if (fs.existsSync(translatedPath)) {
+      return translatedPath;
+    }
+  }
+  
+  return null;
+}
+
 // Load author metadata
 function loadAuthorMetadata(): Record<string, AuthorMetadata> {
   try {
@@ -392,4 +421,58 @@ export function findTutorialFile(sections: TutorialSection[], targetPath: string
     }
   }
   return undefined;
+}
+
+// Load translated content for a tutorial file if available
+export function loadTranslatedTutorial(originalFile: TutorialFile, language: string): TutorialFile | null {
+  if (!language || language === 'en') {
+    return null; // No translation needed for English
+  }
+  
+  const translatedPath = getTranslatedFilePath(originalFile.path, language);
+  if (!translatedPath) {
+    console.log(`No translation found for ${originalFile.path} in ${language}`);
+    return null; // No translation available
+  }
+  
+  console.log(`Loading translated file from: ${translatedPath}`);
+  
+  try {
+    const isNotebook = translatedPath.endsWith('.ipynb');
+    const isMarkdown = translatedPath.endsWith('.md') || translatedPath.endsWith('.mdx');
+    
+    if (isMarkdown) {
+      const content = readMarkdownFile(translatedPath);
+      if (content) {
+        const metadata = extractMarkdownMetadata(content, originalFile.path);
+        return {
+          ...originalFile,
+          content,
+          metadata: {
+            ...originalFile.metadata,
+            ...metadata,
+            title: metadata.title || originalFile.metadata.title
+          }
+        };
+      }
+    } else if (isNotebook) {
+      const notebook = readNotebookFile(translatedPath);
+      if (notebook) {
+        const metadata = extractNotebookMetadata(notebook, originalFile.path);
+        return {
+          ...originalFile,
+          notebook,
+          metadata: {
+            ...originalFile.metadata,
+            ...metadata,
+            title: metadata.title || originalFile.metadata.title
+          }
+        };
+      }
+    }
+  } catch (error) {
+    console.error(`Error loading translated file ${translatedPath}:`, error);
+  }
+  
+  return null;
 }
