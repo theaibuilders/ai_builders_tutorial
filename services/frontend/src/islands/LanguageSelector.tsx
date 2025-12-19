@@ -88,8 +88,8 @@ export default function LanguageSelector({ currentPath }: LanguageSelectorProps)
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Menu - positioned above the button */}
-          <div className="absolute bottom-full left-0 mb-2 w-28 bg-dark-bg border border-dark-border rounded-lg shadow-xl z-50 py-1">
+          {/* Menu - opens downward on mobile, upward on desktop */}
+          <div className="absolute right-0 w-28 bg-dark-bg border border-dark-border rounded-lg shadow-xl z-50 py-1 top-full mt-2 md:top-auto md:bottom-full md:mt-0 md:mb-2">
             {LANGUAGES.map((lang) => {
               const isActive = lang.code === currentLanguage;
               

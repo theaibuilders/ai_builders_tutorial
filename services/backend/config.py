@@ -36,6 +36,7 @@ class Settings(BaseSettings):
         # Use .env.prod in production, .env for local development
         env_file = os.getenv("ENV_FILE", ".env")
         env_file_encoding = "utf-8"
+        extra = "ignore"  # Ignore extra fields from Doppler or other sources
 
 @lru_cache()
 def get_settings():
