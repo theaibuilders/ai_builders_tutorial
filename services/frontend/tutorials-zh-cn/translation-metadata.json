@@ -8,8 +8,17 @@
       "source_hash": "8b21a828546ca3c640e245d87b65fbcb183ee8ff742522f9f3d8db6bc7ad2661",
       "model_used": "gpt-4o-mini",
       "status": "completed"
+    },
+    "Frameworks/nosana_mastra.mdx": {
+      "original_path": "Frameworks/nosana_mastra.mdx",
+      "translated_path": "services/frontend/tutorials-zh-cn/Frameworks/nosana_mastra.mdx",
+      "language": "zh-cn",
+      "translation_date": "2025-12-19T08:28:46.612092",
+      "source_hash": "b8edbb1274dce98731d464963fddb41657a1716bcee1327e2f5a4f2e845f9ce8",
+      "model_used": "gpt-4o-mini",
+      "status": "completed"
     }
   },
-  "last_updated": "2025-12-19T08:07:11.297259",
+  "last_updated": "2025-12-19T08:28:46.612122",
   "version": "1.0"
 }
