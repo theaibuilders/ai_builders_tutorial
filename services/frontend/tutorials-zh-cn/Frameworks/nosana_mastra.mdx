@@ -1,6 +1,6 @@
-# Nosana x Mastra: 构建智能 AI 代理
+# Nosana x Mastra: 构建智能 智能体
 
-本教程将指导您使用 Mastra 框架构建智能 AI 代理，并利用 Nosana 的去中心化 GPU 网络中的开源模型。
+本教程将指导您使用 Mastra 框架构建智能 智能体，并利用 Nosana 的去中心化 GPU 网络中的开源模型。
 
 ![nosana-mastra](/products/nosana/nosana_mastra.png)
 
@@ -8,7 +8,7 @@
 
 ### 什么是 Nosana？
 
-[Nosana](https://nosana.com/?utm_source=aibuilders) 是一个建立在 Solana 上的去中心化 GPU 市场，连接 GPU 拥有者与 AI 开发者。通过利用全球未充分利用的消费级 GPU，Nosana 提供比传统云服务提供商低至 85% 的成本的经济高效的 AI 推理计算能力。该网络通过 Docker 容器处理 AI 工作负载，提供动态定价和无缝集成以支持生产部署。
+[Nosana](https://nosana.com/?utm_source=aibuilders) 是一个建立在 Solana 区块链上的去中心化 GPU 市场，连接 GPU 拥有者与 AI 开发者。通过利用全球未充分利用的消费级 GPU，Nosana 提供比传统云服务提供商低至 85% 的成本的经济高效的 AI 计算能力。该网络通过 Docker 容器处理 AI 工作负载，提供动态定价和无缝集成以支持生产部署。
 
 主要特点包括：
 - **去中心化基础设施**：建立在 Solana 区块链上的点对点 GPU 共享
@@ -18,12 +18,12 @@
 
 ### 什么是 Mastra？
 
-Mastra 是一个开源的 TypeScript 框架，旨在构建生产就绪的 AI 代理和工作流。由 Gatsby 团队创建，Mastra 提供了一个全面的工具包，包括代理、工作流、内存系统、工具集成和内置可观察性。该框架支持模型上下文协议（MCP），以实现无缝工具集成，并包括一个本地游乐场用于测试。
+Mastra 是一个开源的 TypeScript 智能体 框架，旨在构建生产就绪的 智能体和工作流. Mastra 提供了一个全面的工具包，包括 Agent、工作流、内存系统、工具集成和内置可观察性。该框架支持模型上下文协议（MCP），以实现无缝工具集成，并包括一个本地 Playground 用于测试。
 
-核心原语：
-- **代理**：使用 LLM 和工具解决任务的自主系统
-- **工作流**：基于状态机的编排，具有挂起/恢复功能
-- **工具**：类型安全的函数，代理执行以与外部系统交互
+核心功能：
+- **Agent**：使用 LLM 和工具解决任务的自主系统
+- **工作流**：基于 State Machine 的编排，具有挂起/恢复功能
+- **工具**：类型安全的函数，Agent 执行以与外部系统交互
 - **内存**：持久的对话历史和语义回忆
 - **MCP 集成**：用于连接外部服务的通用插件系统
 
@@ -47,17 +47,17 @@ npm create mastra@latest my-agent-project
 在设置过程中，您将看到以下提示：
 
 ```
-我们应该在哪里创建 Mastra 文件？（默认：src/）
+Where should we create the Mastra files? (default: src/)
 │  src/
 │
-◇  选择一个默认提供者：
+◇  Select a default provider:
 │  OpenAI
 │
-◇  输入您的 OpenAI API 密钥？
-│  暂时跳过
+◇  Enter your OpenAI API key?
+│  Skip for now
 │
-◇  让您的 IDE 成为 Mastra 专家？（安装 Mastra 的 MCP 服务器）
-│  暂时跳过
+◇  Make your IDE into a Mastra expert? (Installs Mastra's MCP server)
+│  Skip for now
 ```
 
 使用您喜欢的 IDE 打开您的项目：
@@ -67,18 +67,17 @@ cd my-agent-project
 ```
 ### 在 Nosana 上部署 GPT-OSS 20B 模型
 
-在配置代理之前，您需要在 Nosana 的基础设施上部署 GPT-OSS 20B 模型：
+在配置智能体之前，您需要在 Nosana 的基础设施上部署 GPT-OSS 20B 模型：
 
 ![nosana-template](/products/nosana/nosana-template.png)
 
 1. 导航到 [Nosana Dashboard](https://nosana.com/dashboard?utm_source=aibuilders)
 2. 使用您的 Nosana 账户登录
-3. 转到 **推理** 部分
-4. 点击 **部署新模型**
-5. 从可用模型模板中选择 **GPT-OSS 20B**
-6. 选择您首选的 GPU 配置（推荐：NVIDIA RTX 4090 或更高）
-7. 点击 **部署** 并等待模型被配置（通常需要 2-5 分钟）
-8. 部署完成后，复制 **API 端点 URL** - 它将类似于：
+3. 打开 **Deploy** 页面
+4. 从可用模型模板中选择 **GPT-OSS 20B**
+5. 选择您首选的 GPU 配置（推荐：NVIDIA RTX 4090 或更高）
+6. 点击 **部署** 并等待模型被配置（通常需要 2-5 分钟）
+7. 部署完成后，复制 **API 端点 URL** - 它将类似于：
    ```
    https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci
    ```
@@ -102,14 +101,16 @@ MODEL_NAME_AT_ENDPOINT=gpt-oss:20b
 由于 Mastra 没有将 Ollama 作为默认模板，您可以使用以下提示与 AI 助手一起配置您的项目以使用 Ollama 模型：
 
 ```
-我需要配置我的 Mastra 项目以使用 Ollama 而不是 OpenAI。
-请帮助我：
+I need to configure my Mastra project to use Ollama instead of OpenAI.
+Please help me:
 
-1. 更新代理配置文件以使用 Ollama，设置如下：
+1. Update the agent configuration files to use Ollama with the following
+   settings:
    - API URL: process.env.OLLAMA_API_URL
-   - 模型: process.env.MODEL_NAME_AT_ENDPOINT
-2. 更新任何导入和模型初始化以使用来自 @ai-sdk/ollama 的 Ollama 提供者
-3. 确保项目中的所有代理都配置为使用此 Ollama 设置
+   - Model: process.env.MODEL_NAME_AT_ENDPOINT
+2. Update any imports and model initialization to use the Ollama provider
+   from @ai-sdk/ollama
+3. Ensure all agents in the project are configured to use this Ollama setup
 ```
 
 ### 启动您的 Mastra 项目
@@ -124,23 +125,23 @@ pnpm run dev
 
 ```
 ...
- mastra  0.17.7 在 XXXX 毫秒内准备就绪
+ mastra  0.17.7 ready in XXXX ms
 
-│ 游乐场: http://localhost:4111/
+│ Playground: http://localhost:4111/
 │ API:        http://localhost:4111/api
 ```
 
-点击控制台输出中显示的 `Playground` 链接 (http://localhost:4111/)，您应该会看到 `gtp-oss:20b` 列为您默认天气代理的模型。
+点击控制台输出中显示的 `Playground` 链接 (http://localhost:4111/)，您应该会看到 `gtp-oss:20b` 列为您默认天气智能体的模型。
 ![mastra_gpt_oss_20b](/products/nosana/mastra_gpt_oss_20b.png)
 
 如果您向模型询问诸如 `新加坡今天的天气怎么样？` 的问题，它应该会向您展示新加坡今天天气状况的工具响应。
 ![mastra_weather_test](/products/nosana/mastra_weather_test.png)
 
-## 构建您的第一个代理
+## 构建您的第一个智能体
 
-### 创建自定义代理
+### 创建自定义智能体
 
-Mastra 中的代理是将 LLM 与工具结合以完成任务的自主系统。创建一个新的代理文件：
+Mastra 中的智能体是将 LLM 与工具结合以完成任务的自主系统。创建一个新的智能体文件：
 
 ```typescript
 // src/mastra/agents/assistant.ts
@@ -148,14 +149,14 @@ import { Agent } from '@mastra/core/agent';
 import { openai } from '@ai-sdk/openai';
 
 export const assistantAgent = new Agent({
-  name: '个人助理',
-  instructions: `您是一个有帮助的个人助理，可以：
-    - 回答有关各种主题的问题
-    - 帮助管理任务
-    - 提供建议
+  name: 'Personal Assistant',
+  instructions: `You are a helpful personal assistant that can:
+    - Answer questions about various topics
+    - Help with task management
+    - Provide recommendations
     
-    在回答中始终保持简洁和准确。
-    在需要时使用可用工具来完成任务。`,
+    Always be concise and accurate in your responses.
+    Use available tools when needed to accomplish tasks.`,
   model: openai('gpt-4o-mini'),
   tools: {},
 });
@@ -163,7 +164,7 @@ export const assistantAgent = new Agent({
 
 ### 实现自定义工具
 
-工具通过连接到外部 API 和服务来扩展代理的能力。创建一个用于获取数据的工具：
+工具通过连接到外部 API 和服务来扩展智能体的能力。创建一个用于获取数据的工具：
 
 ```typescript
 // src/mastra/tools/index.ts
@@ -172,12 +173,12 @@ import { z } from 'zod';
 
 export const searchTool = createTool({
   id: 'web-search',
-  description: '在给定主题上搜索网络信息',
+  description: 'Search the web for information on a given topic',
   inputSchema: z.object({
-    query: z.string().describe('搜索查询'),
+    query: z.string().describe('The search query'),
   }),
   outputSchema: z.object({
-    results: z.string().describe('搜索结果摘要'),
+    results: z.string().describe('Search results summary'),
   }),
   execute: async ({ context }) => {
     const { query } = context;
@@ -187,16 +188,16 @@ export const searchTool = createTool({
     const data = await response.json();
     
     return {
-      results: data.summary || '未找到结果',
+      results: data.summary || 'No results found',
     };
   },
 });
 
 export const calculatorTool = createTool({
   id: 'calculator',
-  description: '执行数学计算',
+  description: 'Perform mathematical calculations',
   inputSchema: z.object({
-    expression: z.string().describe('要评估的数学表达式'),
+    expression: z.string().describe('Mathematical expression to evaluate'),
   }),
   outputSchema: z.object({
     result: z.number(),
@@ -207,27 +208,27 @@ export const calculatorTool = createTool({
       const result = eval(expression);
       return { result: parseFloat(result) };
     } catch (error) {
-      throw new Error('无效的数学表达式');
+      throw new Error('Invalid mathematical expression');
     }
   },
 });
 ```
 
-将工具添加到您的代理中：
+将工具添加到您的智能体中：
 
 ```typescript
 import { assistantAgent } from './agents/assistant';
 import { searchTool, calculatorTool } from './tools';
 
 export const enhancedAgent = new Agent({
-  name: '增强助手',
+  name: 'Enhanced Assistant',
   instructions: assistantAgent.instructions,
   model: openai('gpt-4o-mini'),
   tools: { searchTool, calculatorTool },
 });
 ```
 ### 创建研究工作流
-工作流通过控制流逻辑编排代理和工具执行的复杂序列。
+工作流通过控制流逻辑编排智能体和工具执行的复杂序列。
 
 ```typescript
 // src/mastra/workflows/research.ts
@@ -242,7 +243,7 @@ const researchStep = new Step({
     const { topic } = context.triggerData;
     
     const result = await researchAgent.generate(
-      `研究关于: ${topic} 的全面信息`
+      `Research comprehensive information about: ${topic}`
     );
     
     return { research: result.text };
@@ -255,7 +256,7 @@ const writeStep = new Step({
     const research = context.getStepResult('research')?.research;
     
     const result = await writerAgent.generate(
-      `使用此研究撰写详细文章: ${research}`
+      `Write a detailed article using this research: ${research}`
     );
     
     return { article: result.text };
@@ -277,34 +278,34 @@ export const researchWorkflow = createWorkflow({
 
 ```typescript
 const result = await researchWorkflow.execute({
-  triggerData: { topic: '量子计算' },
+  triggerData: { topic: 'Quantum Computing' },
 });
 
 console.log(result.results.write.article);
 ```
 
-### 添加代理内存
+### 添加 Agent 记忆
 
-内存使代理能够在对话中保持上下文并回忆以前的互动。
+内存使智能体能够在对话中保持上下文并回忆以前的互动。
 
 ```typescript
 import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 
 export const memoryAgent = new Agent({
-  name: '内存启用助手',
-  instructions: '您记得过去的对话并提供个性化的响应。',
+  name: 'Memory-Enabled Assistant',
+  instructions: 'You remember past conversations and provide personalized responses.',
   model: openai('gpt-4o-mini'),
   memory: new Memory(),
   tools: {},
 });
 ```
 
-在对话中使用内存：
+在对话中使用记忆：
 
 ```typescript
 const response = await memoryAgent.generate(
-  '我的名字是 Alex，我在金融行业工作',
+  'My name is Alex and I work in finance',
   {
     memory: {
       thread: 'user-123',
@@ -314,7 +315,7 @@ const response = await memoryAgent.generate(
 );
 
 const followUp = await memoryAgent.generate(
-  '我说过我的职业是什么？',
+  'What did I say my profession was?',
   {
     memory: {
       thread: 'user-123',
@@ -326,19 +327,19 @@ const followUp = await memoryAgent.generate(
 
 ## 测试和验证
 
-### 使用 Mastra 游乐场
+### 使用 Mastra Playground
 
-Mastra 游乐场提供交互式测试功能：
+Mastra Playground提供交互式测试功能：
 
 1. 导航到 `http://localhost:4111`
-2. 使用不同的提示测试代理
+2. 使用不同的提示测试智能体
 3. 检查工具调用和执行跟踪
-4. 调试代理决策过程
+4. 调试智能体决策过程
 5. 监控工作流执行步骤
 
 ### 实现评估
 
-评估帮助衡量和跟踪代理性能：
+评估帮助衡量和跟踪智能体性能：
 
 ```typescript
 import { createEval } from '@mastra/core';
@@ -358,9 +359,9 @@ const accuracyEval = createEval({
 
 ## 最佳实践和提示
 
-### 代理设计
+### 智能体设计
 - 编写清晰、详细的系统提示，定义角色和能力
-- 从简单的代理开始，逐渐增加复杂性
+- 从简单的智能体开始，逐渐增加复杂性
 - 在集成之前单独测试工具
 
 ### 工具实现
@@ -377,18 +378,18 @@ const accuracyEval = createEval({
 
 ## 结论
 
-您已经学习了如何使用 Mastra 框架和 Nosana 的开源模型构建智能 AI 代理。本教程涵盖了设置开发环境、创建自定义代理、实现工具和工作流、添加内存功能以及使用 Mastra 游乐场在本地测试一切。
+您已经学习了如何使用 Mastra 框架和 Nosana 的开源模型构建智能智能体。本教程涵盖了设置开发环境、创建自定义智能体、实现工具和工作流、添加内存功能以及使用 Mastra Playground 在本地测试一切。
 
 关键要点包括：
-- 理解 Mastra 的核心原语：代理、工具、工作流和内存
+- 理解 Mastra 的核心功能：智能体、工具、工作流和记忆
 - 通过 Ollama 连接到 Nosana 的开源模型
-- 构建具有特定能力的自定义代理
+- 构建具有特定能力的自定义智能体
 - 创建具有类型安全的工具，使用 Zod 模式
 - 实现多步骤工作流
-- 使用游乐场测试和验证代理
+- 使用Playground测试和验证智能体
 
 ## 下一步
 
-要继续您的 Mastra 之旅：
+要继续您的智能体构建之旅：
 - 尝试不同的 Nosana 模型和配置
 - 构建更复杂的工作流和集成
