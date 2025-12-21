@@ -32,39 +32,97 @@ Mastra 是一个开源的 TypeScript 智能体框架，旨在构建生产就绪�
 ### 先决条件
 
 确保您已安装以下内容：
-- Node.js 18+ 和 npm/pnpm
+- Node.js 20+ 和 npm/pnpm
 - 用于版本控制的 Git
 - 带有预加载积分的 Nosana 账户（以部署和访问 GPT-OSS 模型）
 
-### 初始化您的 Mastra 项目
+### 创建项目目录
 
-使用 CLI 创建一个新的 Mastra 项目：
-
-```bash
-npm create mastra@latest my-agent-project
-```
-
-在设置过程中，您将看到以下提示：
-
-```
-Where should we create the Mastra files? (default: src/)
-│  src/
-│
-◇  Select a default provider:
-│  OpenAI
-│
-◇  Enter your OpenAI API key?
-│  Skip for now
-│
-◇  Make your IDE into a Mastra expert? (Installs Mastra's MCP server)
-│  Skip for now
-```
-
-使用您喜欢的 IDE 打开您的项目：
+创建一个新的项目目录并初始化：
 
 ```bash
+mkdir my-agent-project
 cd my-agent-project
 ```
+
+### 创建项目文件
+
+首先，创建 `package.json` 文件：
+
+```json
+{
+  "name": "my-agent-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@mastra/core": "^0.23.3",
+    "@mastra/evals": "^0.14.2",
+    "@mastra/libsql": "^0.16.1",
+    "@mastra/loggers": "^0.10.18",
+    "@mastra/memory": "^0.15.10",
+    "ollama-ai-provider-v2": "^1.5.2",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "mastra": "^0.17.7",
+    "typescript": "^5.9.3"
+  }
+}
+```
+
+创建 `tsconfig.json` 文件：
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "outDir": "dist"
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
+```
+
+创建 `.env.example` 文件：
+
+```bash
+# For Nosana Ollama Endpoint with GPT-OSS 20B
+OLLAMA_API_URL=https://YOUR_OWN_NOSANA_URL.node.k8s.prd.nos.ci/api
+MODEL_NAME_AT_ENDPOINT=gpt-oss:20b
+```
+
+### 创建项目目录结构
+
+```bash
+mkdir -p src/mastra/agents
+mkdir -p src/mastra/tools
+mkdir -p src/mastra/workflows
+mkdir -p src/mastra/scorers
+```
+
 ### 在 Nosana 上部署 GPT-OSS 20B 模型
 
 在配置智能体之前，您需要在 Nosana 的基础设施上部署 GPT-OSS 20B 模型：
@@ -98,19 +156,592 @@ MODEL_NAME_AT_ENDPOINT=gpt-oss:20b
   <strong>⚠️ 重要：</strong> 请记得在 Nosana URL 的末尾添加一个额外的 <code>/api</code>，否则您的模型端点将无法正常工作。
 </div>
 
-由于 Mastra 没有将 Ollama 作为默认模板，您可以使用以下提示与 AI 助手一起配置您的项目以使用 Ollama 模型：
+## 构建智能体代码
 
+### 创建天气工具
+
+创建文件 `src/mastra/tools/weather-tool.ts`：
+
+```typescript
+import { createTool } from '@mastra/core/tools';
+import { z } from 'zod';
+
+interface GeocodingResponse {
+  results: {
+    latitude: number;
+    longitude: number;
+    name: string;
+  }[];
+}
+interface WeatherResponse {
+  current: {
+    time: string;
+    temperature_2m: number;
+    apparent_temperature: number;
+    relative_humidity_2m: number;
+    wind_speed_10m: number;
+    wind_gusts_10m: number;
+    weather_code: number;
+  };
+}
+
+export const weatherTool = createTool({
+  id: 'get-weather',
+  description: 'Get current weather for a location',
+  inputSchema: z.object({
+    location: z.string().describe('City name'),
+  }),
+  outputSchema: z.object({
+    temperature: z.number(),
+    feelsLike: z.number(),
+    humidity: z.number(),
+    windSpeed: z.number(),
+    windGust: z.number(),
+    conditions: z.string(),
+    location: z.string(),
+  }),
+  execute: async ({ context }) => {
+    return await getWeather(context.location);
+  },
+});
+
+const getWeather = async (location: string) => {
+  const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
+  const geocodingResponse = await fetch(geocodingUrl);
+  const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+
+  if (!geocodingData.results?.[0]) {
+    throw new Error(`Location '${location}' not found`);
+  }
+
+  const { latitude, longitude, name } = geocodingData.results[0];
+
+  const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,weather_code`;
+
+  const response = await fetch(weatherUrl);
+  const data = (await response.json()) as WeatherResponse;
+
+  return {
+    temperature: data.current.temperature_2m,
+    feelsLike: data.current.apparent_temperature,
+    humidity: data.current.relative_humidity_2m,
+    windSpeed: data.current.wind_speed_10m,
+    windGust: data.current.wind_gusts_10m,
+    conditions: getWeatherCondition(data.current.weather_code),
+    location: name,
+  };
+};
+
+function getWeatherCondition(code: number): string {
+  const conditions: Record<number, string> = {
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Foggy',
+    48: 'Depositing rime fog',
+    51: 'Light drizzle',
+    53: 'Moderate drizzle',
+    55: 'Dense drizzle',
+    56: 'Light freezing drizzle',
+    57: 'Dense freezing drizzle',
+    61: 'Slight rain',
+    63: 'Moderate rain',
+    65: 'Heavy rain',
+    66: 'Light freezing rain',
+    67: 'Heavy freezing rain',
+    71: 'Slight snow fall',
+    73: 'Moderate snow fall',
+    75: 'Heavy snow fall',
+    77: 'Snow grains',
+    80: 'Slight rain showers',
+    81: 'Moderate rain showers',
+    82: 'Violent rain showers',
+    85: 'Slight snow showers',
+    86: 'Heavy snow showers',
+    95: 'Thunderstorm',
+    96: 'Thunderstorm with slight hail',
+    99: 'Thunderstorm with heavy hail',
+  };
+  return conditions[code] || 'Unknown';
+}
 ```
-I need to configure my Mastra project to use Ollama instead of OpenAI.
-Please help me:
 
-1. Update the agent configuration files to use Ollama with the following
-   settings:
-   - API URL: process.env.OLLAMA_API_URL
-   - Model: process.env.MODEL_NAME_AT_ENDPOINT
-2. Update any imports and model initialization to use the Ollama provider
-   using npm install ollama-ai-provider --legacy-peer-deps
-3. Ensure all agents in the project are configured to use this Ollama setup
+### 创建计算器工具
+
+创建文件 `src/mastra/tools/calculator-tool.ts`：
+
+```typescript
+import { createTool } from '@mastra/core/tools';
+import { z } from 'zod';
+
+export const calculatorTool = createTool({
+  id: 'calculate',
+  description: 'Performs mathematical calculations and evaluates mathematical expressions. Supports basic arithmetic operations (addition, subtraction, multiplication, division), exponentiation, square roots, and common mathematical functions.',
+  inputSchema: z.object({
+    expression: z.string().describe('The mathematical expression to evaluate (e.g., "2 + 2", "sqrt(16)", "10 * 5 + 3")'),
+  }),
+  outputSchema: z.object({
+    result: z.number(),
+    expression: z.string(),
+  }),
+  execute: async ({ context }) => {
+    return calculate(context.expression);
+  },
+});
+
+function calculate(expression: string): { result: number; expression: string } {
+  try {
+    // Clean the expression
+    const cleanExpression = expression.trim();
+
+    // Replace common mathematical notations
+    let processedExpression = cleanExpression
+      .replace(/\^/g, '**')  // Convert ^ to ** for exponentiation
+      .replace(/×/g, '*')    // Replace × with *
+      .replace(/÷/g, '/')    // Replace ÷ with /
+      .replace(/sqrt\(([^)]+)\)/g, 'Math.sqrt($1)')  // Handle sqrt
+      .replace(/pow\(([^,]+),\s*([^)]+)\)/g, 'Math.pow($1, $2)')  // Handle pow
+      .replace(/abs\(([^)]+)\)/g, 'Math.abs($1)')  // Handle abs
+      .replace(/floor\(([^)]+)\)/g, 'Math.floor($1)')  // Handle floor
+      .replace(/ceil\(([^)]+)\)/g, 'Math.ceil($1)')  // Handle ceil
+      .replace(/round\(([^)]+)\)/g, 'Math.round($1)')  // Handle round
+      .replace(/sin\(([^)]+)\)/g, 'Math.sin($1)')  // Handle sin
+      .replace(/cos\(([^)]+)\)/g, 'Math.cos($1)')  // Handle cos
+      .replace(/tan\(([^)]+)\)/g, 'Math.tan($1)')  // Handle tan
+      .replace(/log\(([^)]+)\)/g, 'Math.log($1)')  // Handle natural log
+      .replace(/ln\(([^)]+)\)/g, 'Math.log($1)')  // Handle ln (natural log)
+      .replace(/log10\(([^)]+)\)/g, 'Math.log10($1)')  // Handle log base 10
+      .replace(/exp\(([^)]+)\)/g, 'Math.exp($1)')  // Handle exp
+      .replace(/pi/gi, 'Math.PI')  // Replace pi with Math.PI
+      .replace(/e(?!\d)/gi, 'Math.E');  // Replace e with Math.E (but not in numbers like 1e5)
+
+    // Validate that the expression only contains allowed characters
+    const allowedPattern = /^[\d+\-*/(). \t\nMath.a-zA-Z_]+$/;
+    if (!allowedPattern.test(processedExpression)) {
+      throw new Error('Expression contains invalid characters');
+    }
+
+    // Use Function constructor for safer evaluation than eval
+    // This still evaluates code, but in a more controlled way
+    const result = new Function(`'use strict'; return (${processedExpression})`)();
+
+    // Validate the result is a number
+    if (typeof result !== 'number' || !isFinite(result)) {
+      throw new Error('Expression did not evaluate to a valid number');
+    }
+
+    return {
+      result: result,
+      expression: cleanExpression,
+    };
+  } catch (error) {
+    throw new Error(`Failed to calculate expression: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+```
+
+### 创建评分器
+
+创建文件 `src/mastra/scorers/weather-scorer.ts`：
+
+```typescript
+import { z } from 'zod';
+import { createToolCallAccuracyScorerCode } from '@mastra/evals/scorers/code';
+import { createCompletenessScorer } from '@mastra/evals/scorers/code';
+import { createScorer } from '@mastra/core/scores';
+import { createOllama } from 'ollama-ai-provider-v2';
+
+const ollama = createOllama({
+  baseURL: process.env.OLLAMA_API_URL,
+});
+
+export const toolCallAppropriatenessScorer = createToolCallAccuracyScorerCode({
+  expectedTool: 'weatherTool',
+  strictMode: false,
+});
+
+export const completenessScorer = createCompletenessScorer();
+
+// Custom LLM-judged scorer: evaluates if non-English locations are translated appropriately
+export const translationScorer = createScorer({
+  name: 'Translation Quality',
+  description:
+    'Checks that non-English location names are translated and used correctly',
+  type: 'agent',
+  judge: {
+    model: ollama(process.env.MODEL_NAME_AT_ENDPOINT),
+    instructions:
+      'You are an expert evaluator of translation quality for geographic locations. ' +
+      'Determine whether the user text mentions a non-English location and whether the assistant correctly uses an English translation of that location. ' +
+      'Be lenient with transliteration differences and diacritics. ' +
+      'Return only the structured JSON matching the provided schema.',
+  },
+})
+  .preprocess(({ run }) => {
+    const userText = (run.input?.inputMessages?.[0]?.content as string) || '';
+    const assistantText = (run.output?.[0]?.content as string) || '';
+    return { userText, assistantText };
+  })
+  .analyze({
+    description:
+      'Extract location names and detect language/translation adequacy',
+    outputSchema: z.object({
+      nonEnglish: z.boolean(),
+      translated: z.boolean(),
+      confidence: z.number().min(0).max(1).default(1),
+      explanation: z.string().default(''),
+    }),
+    createPrompt: ({ results }) => `
+            You are evaluating if a weather assistant correctly handled translation of a non-English location.
+            User text:
+            """
+            ${results.preprocessStepResult.userText}
+            """
+            Assistant response:
+            """
+            ${results.preprocessStepResult.assistantText}
+            """
+            Tasks:
+            1) Identify if the user mentioned a location that appears non-English.
+            2) If non-English, check whether the assistant used a correct English translation of that location in its response.
+            3) Be lenient with transliteration differences (e.g., accents/diacritics).
+            Return JSON with fields:
+            {
+            "nonEnglish": boolean,
+            "translated": boolean,
+            "confidence": number, // 0-1
+            "explanation": string
+            }
+        `,
+  })
+  .generateScore(({ results }) => {
+    const r = (results as any)?.analyzeStepResult || {};
+    if (!r.nonEnglish) return 1; // If not applicable, full credit
+    if (r.translated)
+      return Math.max(0, Math.min(1, 0.7 + 0.3 * (r.confidence ?? 1)));
+    return 0; // Non-English but not translated
+  })
+  .generateReason(({ results, score }) => {
+    const r = (results as any)?.analyzeStepResult || {};
+    return `Translation scoring: nonEnglish=${r.nonEnglish ?? false}, translated=${r.translated ?? false}, confidence=${r.confidence ?? 0}. Score=${score}. ${r.explanation ?? ''}`;
+  });
+
+export const scorers = {
+  toolCallAppropriatenessScorer,
+  completenessScorer,
+  translationScorer,
+};
+```
+
+### 创建天气智能体
+
+创建文件 `src/mastra/agents/weather-agent.ts`：
+
+```typescript
+import { Agent } from '@mastra/core/agent';
+import { Memory } from '@mastra/memory';
+import { LibSQLStore } from '@mastra/libsql';
+import { weatherTool } from '../tools/weather-tool';
+import { calculatorTool } from '../tools/calculator-tool';
+import { scorers } from '../scorers/weather-scorer';
+import { createOllama } from 'ollama-ai-provider-v2';
+
+const ollama = createOllama({
+  baseURL: process.env.OLLAMA_API_URL,
+});
+
+export const weatherAgent = new Agent({
+  name: 'Weather Agent',
+  instructions: `
+      You are a helpful assistant that provides accurate weather information and can perform mathematical calculations.
+
+      Your primary functions are:
+      1. Help users get weather details for specific locations
+      2. Perform mathematical calculations and solve math problems
+
+      When handling weather requests:
+      - Always ask for a location if none is provided
+      - If the location name isn't in English, please translate it
+      - If giving a location with multiple parts (e.g. "New York, NY"), use the most relevant part (e.g. "New York")
+      - Include relevant details like humidity, wind conditions, and precipitation
+      - Keep responses concise but informative
+      - If the user asks for activities and provides the weather forecast, suggest activities based on the weather forecast.
+      - If the user asks for activities, respond in the format they request.
+      - Use the weatherTool to fetch current weather data.
+
+      When handling math or calculation requests:
+      - Use the calculatorTool for any mathematical operations, expressions, or calculations
+      - Support basic arithmetic (addition, subtraction, multiplication, division)
+      - Support advanced operations (exponentiation, square roots, trigonometric functions)
+      - Show the calculation result clearly to the user
+      - If the user asks for step-by-step solutions, explain your reasoning
+`,
+  model: ollama(process.env.MODEL_NAME_AT_ENDPOINT),
+  tools: { weatherTool, calculatorTool },
+  scorers: {
+    toolCallAppropriateness: {
+      scorer: scorers.toolCallAppropriatenessScorer,
+      sampling: {
+        type: 'ratio',
+        rate: 1,
+      },
+    },
+    completeness: {
+      scorer: scorers.completenessScorer,
+      sampling: {
+        type: 'ratio',
+        rate: 1,
+      },
+    },
+    translation: {
+      scorer: scorers.translationScorer,
+      sampling: {
+        type: 'ratio',
+        rate: 1,
+      },
+    },
+  },
+  memory: new Memory({
+    storage: new LibSQLStore({
+      url: 'file:../mastra.db', // path is relative to the .mastra/output directory
+    }),
+  }),
+});
+```
+
+### 创建天气工作流
+
+创建文件 `src/mastra/workflows/weather-workflow.ts`：
+
+```typescript
+import { createStep, createWorkflow } from '@mastra/core/workflows';
+import { z } from 'zod';
+
+const forecastSchema = z.object({
+  date: z.string(),
+  maxTemp: z.number(),
+  minTemp: z.number(),
+  precipitationChance: z.number(),
+  condition: z.string(),
+  location: z.string(),
+});
+
+function getWeatherCondition(code: number): string {
+  const conditions: Record<number, string> = {
+    0: 'Clear sky',
+    1: 'Mainly clear',
+    2: 'Partly cloudy',
+    3: 'Overcast',
+    45: 'Foggy',
+    48: 'Depositing rime fog',
+    51: 'Light drizzle',
+    53: 'Moderate drizzle',
+    55: 'Dense drizzle',
+    61: 'Slight rain',
+    63: 'Moderate rain',
+    65: 'Heavy rain',
+    71: 'Slight snow fall',
+    73: 'Moderate snow fall',
+    75: 'Heavy snow fall',
+    95: 'Thunderstorm',
+  };
+  return conditions[code] || 'Unknown';
+}
+
+const fetchWeather = createStep({
+  id: 'fetch-weather',
+  description: 'Fetches weather forecast for a given city',
+  inputSchema: z.object({
+    city: z.string().describe('The city to get the weather for'),
+  }),
+  outputSchema: forecastSchema,
+  execute: async ({ inputData }) => {
+    if (!inputData) {
+      throw new Error('Input data not found');
+    }
+
+    const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(inputData.city)}&count=1`;
+    const geocodingResponse = await fetch(geocodingUrl);
+    const geocodingData = (await geocodingResponse.json()) as {
+      results: { latitude: number; longitude: number; name: string }[];
+    };
+
+    if (!geocodingData.results?.[0]) {
+      throw new Error(`Location '${inputData.city}' not found`);
+    }
+
+    const { latitude, longitude, name } = geocodingData.results[0];
+
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=precipitation,weathercode&timezone=auto,&hourly=precipitation_probability,temperature_2m`;
+    const response = await fetch(weatherUrl);
+    const data = (await response.json()) as {
+      current: {
+        time: string;
+        precipitation: number;
+        weathercode: number;
+      };
+      hourly: {
+        precipitation_probability: number[];
+        temperature_2m: number[];
+      };
+    };
+
+    const forecast = {
+      date: new Date().toISOString(),
+      maxTemp: Math.max(...data.hourly.temperature_2m),
+      minTemp: Math.min(...data.hourly.temperature_2m),
+      condition: getWeatherCondition(data.current.weathercode),
+      precipitationChance: data.hourly.precipitation_probability.reduce(
+        (acc, curr) => Math.max(acc, curr),
+        0,
+      ),
+      location: name,
+    };
+
+    return forecast;
+  },
+});
+
+const planActivities = createStep({
+  id: 'plan-activities',
+  description: 'Suggests activities based on weather conditions',
+  inputSchema: forecastSchema,
+  outputSchema: z.object({
+    activities: z.string(),
+  }),
+  execute: async ({ inputData, mastra }) => {
+    const forecast = inputData;
+
+    if (!forecast) {
+      throw new Error('Forecast data not found');
+    }
+
+    const agent = mastra?.getAgent('weatherAgent');
+    if (!agent) {
+      throw new Error('Weather agent not found');
+    }
+
+    const prompt = `Based on the following weather forecast for ${forecast.location}, suggest appropriate activities:
+      ${JSON.stringify(forecast, null, 2)}
+      For each day in the forecast, structure your response exactly as follows:
+
+      📅 [Day, Month Date, Year]
+      ═══════════════════════════
+
+      🌡️ WEATHER SUMMARY
+      • Conditions: [brief description]
+      • Temperature: [X°C/Y°F to A°C/B°F]
+      • Precipitation: [X% chance]
+
+      🌅 MORNING ACTIVITIES
+      Outdoor:
+      • [Activity Name] - [Brief description including specific location/route]
+        Best timing: [specific time range]
+        Note: [relevant weather consideration]
+
+      🌞 AFTERNOON ACTIVITIES
+      Outdoor:
+      • [Activity Name] - [Brief description including specific location/route]
+        Best timing: [specific time range]
+        Note: [relevant weather consideration]
+
+      🏠 INDOOR ALTERNATIVES
+      • [Activity Name] - [Brief description including specific venue]
+        Ideal for: [weather condition that would trigger this alternative]
+
+      ⚠️ SPECIAL CONSIDERATIONS
+      • [Any relevant weather warnings, UV index, wind conditions, etc.]
+
+      Guidelines:
+      - Suggest 2-3 time-specific outdoor activities per day
+      - Include 1-2 indoor backup options
+      - For precipitation >50%, lead with indoor activities
+      - All activities must be specific to the location
+      - Include specific venues, trails, or locations
+      - Consider activity intensity based on temperature
+      - Keep descriptions concise but informative
+
+      Maintain this exact formatting for consistency, using the emoji and section headers as shown.`;
+
+    const response = await agent.stream([
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ]);
+
+    let activitiesText = '';
+
+    for await (const chunk of response.textStream) {
+      process.stdout.write(chunk);
+      activitiesText += chunk;
+    }
+
+    return {
+      activities: activitiesText,
+    };
+  },
+});
+
+const weatherWorkflow = createWorkflow({
+  id: 'weather-workflow',
+  inputSchema: z.object({
+    city: z.string().describe('The city to get the weather for'),
+  }),
+  outputSchema: z.object({
+    activities: z.string(),
+  }),
+})
+  .then(fetchWeather)
+  .then(planActivities);
+
+weatherWorkflow.commit();
+
+export { weatherWorkflow };
+```
+
+### 创建 Mastra 入口文件
+
+创建文件 `src/mastra/index.ts`：
+
+```typescript
+import { Mastra } from '@mastra/core/mastra';
+import { PinoLogger } from '@mastra/loggers';
+import { LibSQLStore } from '@mastra/libsql';
+import { weatherWorkflow } from './workflows/weather-workflow';
+import { weatherAgent } from './agents/weather-agent';
+import { toolCallAppropriatenessScorer, completenessScorer, translationScorer } from './scorers/weather-scorer';
+
+export const mastra = new Mastra({
+  workflows: { weatherWorkflow },
+  agents: { weatherAgent },
+  scorers: { toolCallAppropriatenessScorer, completenessScorer, translationScorer },
+  storage: new LibSQLStore({
+    // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
+    url: ":memory:",
+  }),
+  logger: new PinoLogger({
+    name: 'Mastra',
+    level: 'info',
+  }),
+  telemetry: {
+    // Telemetry is deprecated and will be removed in the Nov 4th release
+    enabled: false, 
+  },
+  observability: {
+    // Enables DefaultExporter and CloudExporter for AI tracing
+    default: { enabled: true }, 
+  },
+});
+```
+
+### 安装依赖
+
+安装所有项目依赖：
+
+```bash
+npm install
 ```
 
 ### 启动您的 Mastra 项目
@@ -118,7 +749,7 @@ Please help me:
 在您设置好项目后，只需运行以下命令以启动一切：
 
 ```bash
-pnpm run dev
+npm run dev
 ```
 
 您应该会看到类似以下的输出：
@@ -137,194 +768,6 @@ pnpm run dev
 如果您向模型询问诸如 `新加坡今天的天气怎么样？` 的问题，它应该会向您展示新加坡今天天气状况的工具响应。
 ![mastra_weather_test](/products/nosana/mastra_weather_test.png)
 
-## 构建您的第一个智能体
-
-### 创建自定义智能体
-
-Mastra 中的智能体是将 LLM 与工具结合以完成任务的自主系统。创建一个新的智能体文件：
-
-```typescript
-// src/mastra/agents/assistant.ts
-import { Agent } from '@mastra/core/agent';
-import { openai } from '@ai-sdk/openai';
-
-export const assistantAgent = new Agent({
-  name: 'Personal Assistant',
-  instructions: `You are a helpful personal assistant that can:
-    - Answer questions about various topics
-    - Help with task management
-    - Provide recommendations
-    
-    Always be concise and accurate in your responses.
-    Use available tools when needed to accomplish tasks.`,
-  model: openai('gpt-4o-mini'),
-  tools: {},
-});
-```
-
-### 实现自定义工具
-
-工具通过连接到外部 API 和服务来扩展智能体的能力。创建一个用于获取数据的工具：
-
-```typescript
-// src/mastra/tools/index.ts
-import { createTool } from '@mastra/core';
-import { z } from 'zod';
-
-export const searchTool = createTool({
-  id: 'web-search',
-  description: 'Search the web for information on a given topic',
-  inputSchema: z.object({
-    query: z.string().describe('The search query'),
-  }),
-  outputSchema: z.object({
-    results: z.string().describe('Search results summary'),
-  }),
-  execute: async ({ context }) => {
-    const { query } = context;
-    const response = await fetch(
-      `https://api.example.com/search?q=${encodeURIComponent(query)}`
-    );
-    const data = await response.json();
-    
-    return {
-      results: data.summary || 'No results found',
-    };
-  },
-});
-
-export const calculatorTool = createTool({
-  id: 'calculator',
-  description: 'Perform mathematical calculations',
-  inputSchema: z.object({
-    expression: z.string().describe('Mathematical expression to evaluate'),
-  }),
-  outputSchema: z.object({
-    result: z.number(),
-  }),
-  execute: async ({ context }) => {
-    const { expression } = context;
-    try {
-      const result = eval(expression);
-      return { result: parseFloat(result) };
-    } catch (error) {
-      throw new Error('Invalid mathematical expression');
-    }
-  },
-});
-```
-
-将工具添加到您的智能体中：
-
-```typescript
-import { assistantAgent } from './agents/assistant';
-import { searchTool, calculatorTool } from './tools';
-
-export const enhancedAgent = new Agent({
-  name: 'Enhanced Assistant',
-  instructions: assistantAgent.instructions,
-  model: openai('gpt-4o-mini'),
-  tools: { searchTool, calculatorTool },
-});
-```
-### 创建研究工作流
-工作流通过控制流逻辑编排智能体和工具执行的复杂序列。
-
-```typescript
-// src/mastra/workflows/research.ts
-import { Step, Workflow, createWorkflow } from '@mastra/core/workflows';
-import { z } from 'zod';
-import { researchAgent } from '../agents/research';
-import { writerAgent } from '../agents/writer';
-
-const researchStep = new Step({
-  id: 'research',
-  execute: async ({ context }) => {
-    const { topic } = context.triggerData;
-    
-    const result = await researchAgent.generate(
-      `Research comprehensive information about: ${topic}`
-    );
-    
-    return { research: result.text };
-  },
-});
-
-const writeStep = new Step({
-  id: 'write',
-  execute: async ({ context }) => {
-    const research = context.getStepResult('research')?.research;
-    
-    const result = await writerAgent.generate(
-      `Write a detailed article using this research: ${research}`
-    );
-    
-    return { article: result.text };
-  },
-});
-
-export const researchWorkflow = createWorkflow({
-  name: 'research-and-write',
-  triggerSchema: z.object({
-    topic: z.string(),
-  }),
-})
-  .then(researchStep)
-  .then(writeStep)
-  .commit();
-```
-
-以编程方式执行工作流：
-
-```typescript
-const result = await researchWorkflow.execute({
-  triggerData: { topic: 'Quantum Computing' },
-});
-
-console.log(result.results.write.article);
-```
-
-### 添加 Agent 记忆
-
-记忆使智能体能够在对话中保持上下文并回忆以前的互动。
-
-```typescript
-import { Agent } from '@mastra/core/agent';
-import { Memory } from '@mastra/memory';
-
-export const memoryAgent = new Agent({
-  name: 'Memory-Enabled Assistant',
-  instructions: 'You remember past conversations and provide personalized responses.',
-  model: openai('gpt-4o-mini'),
-  memory: new Memory(),
-  tools: {},
-});
-```
-
-在对话中使用记忆：
-
-```typescript
-const response = await memoryAgent.generate(
-  'My name is Alex and I work in finance',
-  {
-    memory: {
-      thread: 'user-123',
-      resourceid: 'conversation',
-    },
-  }
-);
-
-const followUp = await memoryAgent.generate(
-  'What did I say my profession was?',
-  {
-    memory: {
-      thread: 'user-123',
-      resourceid: 'conversation',
-    },
-  }
-);
-```
-
 ## 测试和验证
 
 ### 使用 Mastra Playground
@@ -337,24 +780,59 @@ Mastra Playground提供交互式测试功能：
 4. 调试智能体决策过程
 5. 监控工作流执行步骤
 
-### 实现评估
+### 测试天气智能体
 
-评估帮助衡量和跟踪智能体性能：
+尝试以下提示来测试智能体的不同功能：
 
-```typescript
-import { createEval } from '@mastra/core';
+**天气查询：**
+- "What's the weather in Tokyo?"
+- "北京今天天气怎么样？"
+- "Tell me the weather conditions in London"
 
-const accuracyEval = createEval({
-  name: 'response-accuracy',
-  evaluate: async ({ output, expected }) => {
-    const score = calculateSimilarity(output, expected);
-    return {
-      score,
-      passed: score > 0.8,
-      metadata: { output, expected },
-    };
-  },
-});
+**数学计算：**
+- "Calculate 25 * 4 + 10"
+- "What is sqrt(144)?"
+- "Compute 2^10"
+
+**工作流测试：**
+- 在 Playground 中选择 `weather-workflow`
+- 输入城市名称（如 "Singapore"）
+- 观察工作流获取天气数据并生成活动建议
+
+## Docker 部署
+
+创建 `Dockerfile`：
+
+```dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code and config files
+COPY . .
+
+# Expose ports for API and Playground
+EXPOSE 3000 4111
+
+# Set environment variables
+ENV HOST=0.0.0.0
+ENV PORT=4111
+
+# Use dev mode to serve the playground (dev mode includes the playground interface)
+CMD ["sh", "-c", "HOST=0.0.0.0 npm run dev"]
+```
+
+构建并运行 Docker 容器：
+
+```bash
+docker build -t mastra-agent .
+docker run -p 4111:4111 --env-file .env mastra-agent
 ```
 
 ## 最佳实践和提示
