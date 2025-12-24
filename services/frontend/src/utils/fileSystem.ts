@@ -4,7 +4,7 @@ import type { TutorialFile, TutorialSection, AuthorMetadata } from '../types/tut
 import { convertVSCodeNotebookToJupyter } from './notebookConverter';
 
 const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
-const DRAFTS_DIR = path.join(process.cwd(), '..', '..', 'tutorials_draft');
+const DRAFTS_DIR = path.join(process.cwd(), 'tutorials-draft');
 const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
 const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
 const VISIBILITY_CONFIG_PATH = path.join(process.cwd(), 'tutorial-visibility.json');
@@ -344,7 +344,60 @@ export function scanDraftTutorialsDirectory(): TutorialSection[] {
       return sections;
     }
 
-    const sectionDirs = fs.readdirSync(DRAFTS_DIR).filter(item => {
+    // First, scan for files directly in the drafts root directory
+    const rootFiles: TutorialFile[] = [];
+    const rootItems = fs.readdirSync(DRAFTS_DIR);
+    
+    for (const item of rootItems) {
+      const fullPath = path.join(DRAFTS_DIR, item);
+      const isFile = fs.statSync(fullPath).isFile();
+      
+      if (isFile && (item.endsWith('.md') || item.endsWith('.mdx') || item.endsWith('.ipynb'))) {
+        const relativePath = item;
+        try {
+          if (item.endsWith('.md') || item.endsWith('.mdx')) {
+            const content = readMarkdownFile(fullPath);
+            if (content) {
+              const metadata = extractMarkdownMetadata(content, relativePath);
+              rootFiles.push({
+                path: relativePath,
+                name: item,
+                type: 'markdown',
+                content,
+                metadata
+              });
+            }
+          } else if (item.endsWith('.ipynb')) {
+            const notebook = readNotebookFile(fullPath);
+            if (notebook) {
+              const metadata = extractNotebookMetadata(notebook, relativePath);
+              rootFiles.push({
+                path: relativePath,
+                name: item,
+                type: 'notebook',
+                notebook,
+                metadata
+              });
+            }
+          }
+        } catch (error) {
+          console.error(`Error processing draft file ${fullPath}:`, error);
+        }
+      }
+    }
+    
+    // Add root files as "Drafts" section
+    if (rootFiles.length > 0) {
+      rootFiles.sort((a, b) => a.name.localeCompare(b.name));
+      sections.push({
+        name: 'Drafts',
+        path: '',
+        files: rootFiles
+      });
+    }
+
+    // Then scan subdirectories
+    const sectionDirs = rootItems.filter(item => {
       const fullPath = path.join(DRAFTS_DIR, item);
       return fs.statSync(fullPath).isDirectory();
     });
@@ -401,8 +454,12 @@ export function scanDraftTutorialsDirectory(): TutorialSection[] {
       });
     }
 
-    // Sort sections alphabetically
-    sections.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort sections alphabetically (but keep Drafts first)
+    sections.sort((a, b) => {
+      if (a.name === 'Drafts') return -1;
+      if (b.name === 'Drafts') return 1;
+      return a.name.localeCompare(b.name);
+    });
   } catch (error) {
     console.error('Error scanning drafts directory:', error);
   }

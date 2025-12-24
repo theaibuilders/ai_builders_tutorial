@@ -1,0 +1,197 @@
+# Building AI-Powered Web Apps with Momen
+
+Momen is a no-code/low-code platform that integrates a visual frontend editor, a managed backend database, and native AI agent capabilities. This guide covers the end-to-end workflow for building a scalable AI application, such as a custom chatbot or content generator.
+
+## 1. Data Modeling
+
+The database is the foundation of the application. Momen manages the backend infrastructure automatically based on the schema defined in the visual editor.
+
+### Creating the Schema
+
+Navigate to the **Data** tab. For a standard conversational application, three primary tables are required:
+
+**1. Users Table (System Default)**
+This table handles authentication, login sessions, and user profiles. It is pre-configured by Momen.
+
+**2. Conversations Table**
+Stores the metadata for distinct chat sessions.
+* **topic** (Text): The title or summary of the chat session.
+* **user_id** (Relation): Links the conversation to a specific record in the Users table.
+
+**3. Messages Table**
+Stores individual chat bubbles within a session.
+* **content** (Text): The message body.
+* **role** (Text): Differentiates between 'user' and 'assistant'.
+* **conversation_id** (Relation): Links the message to the Conversations table.
+* **timestamp** (Date/Time): Automatically generated to order messages.
+
+## 2. Building the Visual Interface
+
+Momen uses a responsive layout system based on Flexbox.
+
+### Layout Fundamentals
+
+**Containers**
+Use the `Container` component to structure the page.
+* **Direction:** Set to `Column` for vertical stacking (standard for mobile/web flows) or `Row` for horizontal alignment.
+* **Alignment:** Use Main Axis and Cross Axis settings to center content or space it evenly.
+
+**Sizing**
+* **Fill:** The element takes up 100% of the available space from its parent.
+* **Fit:** The element shrinks to fit its own content.
+* **Fixed:** Specific pixel or percentage width/height.
+
+### Constructing a Chat UI
+
+**1. Message List**
+* Drag a `Column` container to the canvas.
+* Insert a `List` component inside the container.
+* **Data Source:** Bind this to the `Messages` table. Use filters to show only messages matching the current `conversation_id`.
+* **Item Design:** Inside the List Item, place a `Text` component bound to `item.content`.
+* **Conditional Styling:** Select the text container and apply conditions. If `item.role == 'user'`, set the background color to blue and align right. If `item.role == 'assistant'`, set background to gray and align left.
+
+**2. Input Area**
+* Place a `Row` container at the bottom of the page.
+* Add an `Input` component (rename variable to `userInput`).
+* Add a `Button` component (label as "Send").
+
+## 3. AI Agent Configuration
+
+Momen allows "Bring Your Own Model" (BYOM) or the use of native AI points.
+
+### Agent Setup
+
+1.  Navigate to the **AI** tab and create a new Agent.
+2.  **Model:** Select GPT-4 or similar high-reasoning models.
+3.  **Prompt:** Define the system persona. You can inject dynamic data from your database (e.g., a KnowledgeBase table) into the context for RAG (Retrieval-Augmented Generation).
+
+### Structured JSON Output
+
+To make the AI response usable in logic flows, instruct the model to return JSON.
+
+**System Prompt Example:**
+You are a coding assistant. You must reply in the following JSON format:
+```json
+{
+  "thought": "Brief reasoning here",
+  "code_snippet": "The code solution",
+  "explanation": "Detailed explanation"
+}
+```
+
+In the **Output Configuration**, map these JSON keys to variables. This allows the Actionflow to extract specific parts of the answer (e.g., displaying the code snippet in a specific code block component).
+
+## 4. Logic and Actionflows
+
+Actionflows define the behavior of the application, connecting UI events to backend logic.
+
+### Message Submission Workflow
+
+Select the "Send" button and configure the `On Click` event:
+
+**Step 1: Save User Message**
+* **Action:** Create Data
+* **Target:** `Messages` table
+* **Mapping:**
+    * `content`: Bind to `userInput`
+    * `role`: Set to static value "user"
+    * `conversation_id`: Bind to current conversation ID
+
+**Step 2: Trigger AI**
+* **Action:** AI Agent
+* **Selection:** Choose the Agent configured in Section 3.
+* **Input:** Bind `userInput` to the agent's prompt input.
+
+**Step 3: Save AI Response**
+* **Action:** Create Data
+* **Target:** `Messages` table
+* **Mapping:**
+    * `content`: Bind to `Action.Output` (the result from Step 2)
+    * `role`: Set to static value "assistant"
+    * `conversation_id`: Bind to current conversation ID
+
+**Step 4: Reset UI**
+* **Action:** Set State
+* **Target:** `userInput`
+* **Value:** Empty string (to clear the input box).
+
+## 5. Custom Code Extensions
+
+When the visual editor limitations are reached, Momen supports custom React components. This is essential for features like complex charts, rich text editors, or syntax highlighting.
+
+### Development Lifecycle
+
+1.  **CLI Setup:** Use the Momen CLI to generate a local React project.
+2.  **Coding:** Write standard React/TypeScript code.
+3.  **Deploy:** Push the component to the Momen cloud, making it available in the visual editor's "Custom" library.
+
+### Example: Markdown Renderer
+
+To render AI responses nicely, a custom Markdown component is often required.
+
+```tsx
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+interface MarkdownProps {
+  content: string;
+}
+
+const MarkdownRenderer: React.FC<MarkdownProps> = ({ content }) => {
+  return (
+    <div className="markdown-body" style={{ width: '100%', fontSize: '14px' }}>
+      <ReactMarkdown
+        components={{
+          code({node, inline, className, children, ...props}) {
+            const match = /language-(\w+)/.exec(className || '')
+            return !inline && match ? (
+              <SyntaxHighlighter
+                style={vscDarkPlus}
+                language={match[1]}
+                PreTag="div"
+                {...props}
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
+            ) : (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            )
+          }
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+};
+
+export default MarkdownRenderer;
+```
+
+Once pushed, drag this component into the List Item created in Section 2 and bind its `content` prop to `item.content`.
+
+## 6. API Integration
+
+Momen acts as a secure backend proxy for external APIs.
+
+1.  **Configuration:** Go to the **API** tab. Enter the Base URL, Headers (e.g., Authorization tokens), and Endpoints.
+2.  **Usage:** In any Actionflow, add a `Request API` node.
+3.  **Data Handling:** The response from the API is available immediately in the subsequent steps of the Actionflow, allowing you to save it to the database or display it via Page States.
+
+## 7. Deployment
+
+**Preview**
+Clicking **Preview** generates a temporary build. This is useful for testing logic and layout responsiveness without affecting the live environment.
+
+**Publish**
+Clicking **Publish** deploys the application to the production environment. Momen automatically handles:
+* SSL Certification
+* CDN Content Delivery
+* Database Scaling
+
+**Domain Mapping**
+In the project settings, you can configure a custom domain (CNAME record) to whitelist the application for public access.
