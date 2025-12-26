@@ -142,24 +142,20 @@ The Chat Bot page is organized with the following component hierarchy:
 ├── ChatBot View
 └── Bottom View
 ```
-UNTIL HERE
+
 ### Layout Fundamentals
 
-**Containers**
-Use the `Container` component to structure the page.
-* **Direction:** Set to `Column` for vertical stacking or `Row` for horizontal alignment.
-* **Alignment:** Use Main Axis and Cross Axis settings to center content or space it evenly.
-
-**Sizing**
-* **Fill:** The element takes up 100% of the available space from its parent.
-* **Fit:** The element shrinks to fit its own content.
-* **Fixed:** Specific pixel or percentage width/height.
+Use the `Container - View` component to structure the page.
+* **Direction:** Select Down Arrow for vertical stacking or Right Arrow Arrow for horizontal alignment.
+* **Alignment:** Select Stack, Space-between, Evenly, or Space-around.
 
 ### ChatBot View Components
 
+![momen-3](/products/momen/momen-3.png)
+
 **1. Record List**
-* Contains the `Record List` component bound to the `Record` table.
-* **Data Source:** Filters records by the current user's Account Id.
+* Contains the `Container - List` component bound to the `Record` table.
+* **Data Source:** Filters records by the current user's user id (In-Page Data -> Page Variable -> userid)
 * Uses `Record Conditional Container` to switch between welcome state and chat state.
 
 **2. WelcomeCase**
@@ -182,65 +178,218 @@ Displayed during active conversation:
 
 Momen allows "Bring Your Own Model" (BYOM) or the use of native AI points. For the AI Knowledge Base, we configure an agent that can answer questions based on the Momen Tutorial content.
 
+![momen-4](/products/momen/momen-4.png)
+
 ### Agent Setup
 
-1.  Navigate to the **AI** tab and create a new Agent.
-2.  **Model:** Select GPT-4 or similar high-reasoning models.
-3.  **Knowledge Base:** Connect the agent to the `Momen Tutorial` table to enable RAG (Retrieval-Augmented Generation). The agent will search through the `Title` and `Content` fields to find relevant information.
-4.  **Prompt:** Define the system persona for a helpful knowledge base assistant.
+1. Navigate to the **AI** tab and create a new Agent.
+2. **Name:** `Momen AI knowledge base`
+3. **Model:** Select `GPT 4o` from the dropdown.
+4. **Temperature:** Set to `0` for consistent, deterministic responses.
 
-### Structured JSON Output
+### Inputs Configuration
 
-To make the AI response usable in logic flows, instruct the model to return JSON.
+Define the input variables that will be passed to the agent: Name: question, Type: Text
 
-**System Prompt Example:**
+Text-based inputs are used as variables in your Prompt template and Contexts, while Image and Video inputs will be automatically appended to the end of the prompt.
+
+### Prompt Template
+
+The prompt template defines how the AI agent behaves and processes user questions.
+
+**Role:**
 ```
-You are a helpful Momen AI assistant. Answer questions about Momen based on the provided knowledge base.
-You must reply in the following JSON format:
-{
-  "answer": "Your detailed answer here",
-  "sources": ["List of referenced article titles"],
-  "followup_questions": ["Suggested follow-up question 1", "Suggested follow-up question 2"]
-}
+An AI assistant to help users with various issues they encounter while using the no-code tool Momen.
 ```
 
-In the **Output Configuration**, map these JSON keys to variables. This allows the Actionflow to extract specific parts of the answer and display follow-up suggestions.
+**Goals:**
+```
+Based on the user's question [Input/question], the first step is to classify the user's question according to the Question classification rules found in the provided context, with an addition that includes data retrieval from airtable, google sheets, and notion page.
+
+Question classification rules:
+
+PROJECT_CONSTRUCTION: These questions typically involve using the Momen no-code platform to build specific types of applications. For example, users may ask how to use Momen to create an AI-based shopping assistant, game forum website, etc. These questions are generally about the entire process of building a complete project, encompassing multiple steps from concept to implementation.
+
+FUNCTION_IMPLEMENTATION: These questions are focused on how to implement specific functions on the Momen platform. For example, users may ask about implementing data training, chat functions, login features, tracking browsing counts, creating shopping mall carousel images, etc. These questions are more specific, concentrating on the implementation details of one or a few functions.
+
+MOMENT_FUNCTION_ANALYSIS: This one focuses more on mastering the techniques and details associated with using specific functions or components in Momen. For instance, questions might pertain to configuring hyperlinks, displaying data on pages, utilizing countdown components, adding backend data, the impact of remote data, etc. These inquiries concentrate on a profound comprehension of specific implementation functions in Momen.
+
+COMPUTING_POWER: Questions in this category mainly focus on Momen platform's performance parameters, computing resources (computing power), and related costs. For example, inquiries might concern the relationship between Momen's performance and databases, the cost of AppToken, the features and limitations of Momen's basic free version (like support for payment functions, presence of watermarks), the free and paid standards of Momen AI, the contents of package upgrades (such as payment functions), Momen platform's traffic limits, whether platform usage is free, whether sample production requires payment, and Momen's overall pricing structure.
+
+COMPETITIVE_COMPARISON: These questions often involve comparisons between Momen and other no-code platforms or development tools in terms of functions, performance, pricing, etc.
+
+ERROR_MESSAGES: These questions involve specific error messages encountered while using the Momen platform. For example, users may encounter error prompts when deleting table relationships, such as missing specific properties or fields; or token limitation errors when using AI models. These questions usually require specific technical support to resolve and may indicate challenging aspects of using the platform or areas for improvement.
+
+The second step is to answer the user's question [Input/question] based on the relevant content found in the project's database.
+```
+
+**Constraints:**
+```
+Please write the results of the first step's question classification into the "question_type" field. Then, provide concise and accurate answers to the user's question only based on the provided knowledge base content only, with proper line breaks. If you cannot find an answer, respond with "Sorry, your question is too broad. Please try asking more specific questions." Regardless of whether you find an answer or not, include the response in the "answer" field.
+```
+
+### Contexts
+
+The content retrieved from the knowledge base will be sent to the large model along with preset prompts, providing the background knowledge needed to perform tasks.
+
+* **Data:** Connect to 1 data source (e.g., Momen Tutorial table)
+* **API:** Connect to 3 API sources (e.g., Airtable, Google Sheets, Notion)
+
+### Tools
+
+The LLM will autonomously decide whether to use tools and which tools to use based on the specific context:
+
+* **Actionflow:** Execute custom actionflows
+* **API:** Call external APIs
+* **Agent:** Invoke other AI agents
+
+### Outputs Configuration
+
+Set the output type to **Structured** to receive a structured JSON response:
+
+```
+OBJECT(2) body
+  ├── STRING answer
+  └── STRING question_type
+```
+
+This structured output allows the Actionflow to extract:
+- `answer`: The AI's response to display to the user
+- `question_type`: The classification category for analytics and routing
 
 ## 4. Logic and Actionflows
 
 Actionflows define the behavior of the application, connecting UI events to backend logic.
 
-### Question Submission Workflow
+![momen-5](/products/momen/momen-5.png)
 
-Select the "Send" button in the Bottom View and configure the `On Click` event:
+### Send Button On Click Workflow
 
-**Step 1: Create Record**
-* **Action:** Create Data
-* **Target:** `Record` table
-* **Mapping:**
-    * `Context`: Bind to the user's input text
-    * `Role`: Set to static value "user"
-    * `Account Id`: Bind to current user's ID
-    * `Question_Type`: Set based on question category
+Select the "Send" button in the Bottom View and configure the `On Click` event. The complete flow includes validation, rate limiting, and user authentication checks.
 
-**Step 2: Trigger AI Agent**
-* **Action:** AI Agent
-* **Selection:** Choose the Knowledge Base Agent configured in Section 3.
-* **Input:** Bind the user's question to the agent's prompt input.
-* **Context:** Include relevant `Momen Tutorial` content for RAG.
+#### Level 1: Input Validation
 
-**Step 3: Save AI Response**
-* **Action:** Create Data
-* **Target:** `Record` table
-* **Mapping:**
-    * `Context`: Bind to `Action.Output.answer` (the AI response)
-    * `Role`: Set to static value "assistant"
-    * `Account Id`: Bind to current user's ID
+```
+On click
+    └── Condition: Check if question is null
+            ├── question null → Show toast ("Please enter a question")
+            └── question not null → Continue to Level 2
+```
 
-**Step 4: Update UI State**
-* **Action:** Set State
-* **Target:** Clear the input field
-* **Value:** Empty string
+#### Level 2: Rate Limiting
+
+```
+Condition: Check message count
+    ├── count >= 5 → Show toast ("Rate limit reached")
+    └── count < 5 → Continue to Level 3
+```
+
+#### Level 3: User Authentication Check
+
+```
+Condition: Check if userid is null
+    ├── userid null → Anonymous User Flow
+    └── userid not null → Authenticated User Flow
+```
+
+### Anonymous User Flow (userid null)
+
+When the user is not logged in:
+
+```
+1. Mutation → Insert Record (Create anonymous user session)
+   │
+   ├── Set page variable (Store session info)
+   └── Mutation → Insert Record (Save user's question)
+       │
+       ├── Refresh (Update record list)
+       ├── Scroll to bottom (Show latest message)
+       ├── Set page variable (Update state)
+       └── Mutation → Insert Record (Create AI placeholder)
+           │
+           └── AI (Trigger AI Agent)
+               │
+               └── Mutation → Update Record (Save AI response)
+                   │
+                   ├── Scroll to bottom
+                   └── Set input component value (Clear input)
+```
+
+### Authenticated User Flow (userid not null)
+
+When the user is logged in:
+
+```
+1. Mutation → Insert Record (Save user's question to Record table)
+   │
+   ├── Refresh (Update record list)
+   ├── Scroll to bottom (Show latest message)
+   ├── Set page variable (Update loading state)
+   └── Mutation → Insert Record (Create AI response placeholder)
+       │
+       ├── Refresh
+       └── AI (Trigger AI Agent with question input)
+           │
+           └── Mutation → Update Record (Update placeholder with AI response)
+               │
+               ├── Refresh (Final refresh)
+               ├── Scroll to bottom (Scroll to AI response)
+               └── Set input component value (Clear input field)
+```
+
+### Actionflow Node Details
+
+<table>
+  <thead>
+    <tr>
+      <th>Node</th>
+      <th>Action</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Mutation → Insert Record</strong></td>
+      <td>Create Data</td>
+      <td>Inserts a new record into the Record table with user's question or AI response</td>
+    </tr>
+    <tr>
+      <td><strong>Refresh</strong></td>
+      <td>Refresh Data</td>
+      <td>Refreshes the Record List to show new messages</td>
+    </tr>
+    <tr>
+      <td><strong>Scroll to bottom</strong></td>
+      <td>UI Action</td>
+      <td>Scrolls the chat view to display the latest message</td>
+    </tr>
+    <tr>
+      <td><strong>Set page variable</strong></td>
+      <td>Set State</td>
+      <td>Updates page variables like loading state or user session</td>
+    </tr>
+    <tr>
+      <td><strong>AI</strong></td>
+      <td>AI Agent</td>
+      <td>Triggers the Momen AI knowledge base agent with the question input</td>
+    </tr>
+    <tr>
+      <td><strong>Mutation → Update Record</strong></td>
+      <td>Update Data</td>
+      <td>Updates the AI placeholder record with the actual response</td>
+    </tr>
+    <tr>
+      <td><strong>Set input component value</strong></td>
+      <td>UI Action</td>
+      <td>Clears the input field after submission</td>
+    </tr>
+    <tr>
+      <td><strong>Show toast</strong></td>
+      <td>UI Action</td>
+      <td>Displays error or info messages to the user</td>
+    </tr>
+  </tbody>
+</table>
 
 ### Starter Question Click Handler
 

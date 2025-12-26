@@ -1057,6 +1057,31 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     @apply italic text-blue-400;
   }
   
+  /* Table styles with borders */
+  :global(table) {
+    @apply w-full border-collapse my-6;
+  }
+    
+  :global(thead) {
+    @apply bg-dark-surface;
+  }
+    
+  :global(th) {
+    @apply px-4 py-3 text-left font-semibold text-dark-text border border-dark-border;
+  }
+    
+  :global(td) {
+    @apply px-4 py-3 text-dark-secondary border border-dark-border;
+  }
+    
+  :global(tbody tr:hover) {
+    @apply bg-dark-hover;
+  }
+    
+  :global(tbody tr:nth-child(even)) {
+    @apply bg-dark-surface/30;
+  }
+  
   /* Mobile-specific improvements */
   @media (max-width: 640px) {
     /* Improve touch targets */
@@ -1077,9 +1102,14 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     
     /* Ensure tables are scrollable on mobile */
     :global(table) {
+      display: table;
+      width: 100%;
+    }
+    
+    :global(.table-wrapper) {
       display: block;
       overflow-x: auto;
-      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
     }
   }
   
