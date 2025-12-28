@@ -1,0 +1,156 @@
+# Build A Client Intake Automator with Momen
+
+This tutorial guides you through building **The Client Intake Automator** on Momen. By following these steps, you will create an AI-powered application that chats with prospects, qualifies them based on your criteria, and routes qualified leads to a paid consultation booking flow.
+
+## 1. Data Modeling (The Backend)
+
+We need to store lead details, chat history, and booking status. Navigate to the **Data** page in Momen and define the following tables.
+
+### A. Users (Standard)
+
+Momen provides this by default. We will use this to track returning leads or admins.
+
+* `role` (Text): To distinguish between 'client' and 'admin'.
+
+### B. Leads Table (New)
+
+Stores the profile and qualification status of the potential client.
+
+* `name` (Text)
+* `email` (Text)
+* `budget` (Text): Captured by AI.
+* `qualification_status` (Text): Options: 'New', 'In-conversation', 'Qualified', 'Unqualified'.
+* `qualification_reason` (Text): AI's reasoning for the score.
+* `payment_status` (Text): 'Unpaid', 'Paid'.
+* `relations`: Link to **Users** (optional) and **Conversations**.
+
+### C. Chat History (Standard AI Schema)
+
+You need tables to store the conversation so the AI remembers context (similar to the Knowledge Base tutorial).
+
+* **Conversation**: `id`, `lead_id` (Relation to Leads), `created_at`.
+* **Message**: `id`, `conversation_id`, `role` (user/assistant), `content` (Text), `created_at`.
+
+
+
+## 2. AI Agent Configuration (The Brain)
+
+This is the core of your automation. We will build an agent that behaves like a Sales Representative.
+
+1. Navigate to the **AI** tab and create a new Agent named **"Intake Specialist"**.
+2. **Model:** Select `GPT-4o` (best for reasoning and structured data extraction).
+3. **Temperature:** `0.2` (Low temperature prevents the AI from hallucinating services you don't offer).
+
+### Prompt Engineering
+
+We need the AI to ask questions one by one and then output a structured decision.
+
+**System Prompt:**
+
+```text
+You are an expert Sales Intake Specialist for [Your Agency Name].
+Your goal is to qualify leads for our paid consultation ($150).
+
+Qualification Criteria (BANT):
+1. Budget: Must have at least $5,000 budget.
+2. Timeline: Ready to start within 3 months.
+3. Need: Must be looking for [Specific Service, e.g., Web App Development].
+
+Instructions:
+- Ask one question at a time. Do not overwhelm the user.
+- Start by asking for their name and what they are looking to build.
+- Once you have gathered enough information (Budget, Timeline, Need), make a qualification decision.
+- Be professional, empathetic, and concise.
+
+```
+
+### Structured Output (Crucial Step)
+
+To automate the UI (showing the "Pay" button), the AI must return machine-readable data. Set the **Output Type** to **Json Mode** or define a **Structure**:
+
+```json
+{
+  "reply_text": "The text response to show the user...",
+  "conversation_stage": "intro" | "qualifying" | "completed",
+  "is_qualified": boolean,
+  "summary": "Short summary of client needs"
+}
+
+```
+
+## 3. Building the Visual Interface
+
+### View 1: The Client Chat Interface
+
+1. **Layout:** Use a `Split Container` or simple `Column`.
+* **Top/Center:** A `List View` bound to the **Message** table (filtered by the current Conversation ID).
+* **Bottom:** An `Input Box` and a `Send Button`.
+
+
+2. **The "Success" State (Conditional UI):**
+* Add a `Container` below the chat area.
+* **Condition:** Set this container to be **Visible** only if `Leads.qualification_status == 'Qualified'`.
+* **Content:** Inside this container, add a card that says: *"Great news! You're a perfect fit. Please secure your consultation slot below."*
+* **Button:** Add a "Book & Pay" button.
+
+
+
+### View 2: Admin Dashboard (Restricted)
+
+1. Create a new page called **Dashboard**.
+2. **Permissions:** In Page Settings, restrict access to `User.role == 'admin'`.
+3. **Components:**
+* **Stats:** Cards showing "Total Leads", "Qualified Leads", "Revenue".
+* **Table:** A `Data Table` connected to the **Leads** table. Show columns: Name, Budget, Status, Payment Status.
+
+
+
+
+
+## 4. Logic & Actionflows
+
+This is where we connect the UI to the AI and Stripe.
+
+### Workflow A: Handling User Messages
+
+When the user clicks **Send** on the Chat page:
+
+1. **Create Record:** Insert user's text into the `Message` table.
+2. **AI Request:** Trigger the **Intake Specialist** agent. Pass the `Conversation History` as context.
+3. **Update Logic (The "Smart" Part):**
+* The AI returns the JSON object.
+* **Create Record:** Insert the `reply_text` into the `Message` table (so the user sees the reply).
+* **Update Record:** Update the **Leads** table with the `is_qualified` status and `summary` from the JSON.
+* *Result:* If the AI decides the user is qualified, the `Leads` table updates, and the "Book & Pay" button (from View 1) automatically appears.
+
+
+
+### Workflow B: Booking & Payment (Stripe)
+
+When the qualified user clicks **"Book & Pay"**:
+
+1. **Momen Stripe Integration:**
+* Use the **Stripe Payment** action node.
+* **Amount:** $150 (or your fee).
+* **Product Name:** "Consultation Call".
+* **Success URL:** Redirect to a "Thank You / Booking Confirmed" page.
+
+
+2. **Post-Payment Actions:**
+* **Update Record:** Set `Leads.payment_status` to 'Paid'.
+* **Webhook (Calendly/Google):** Use an **API Request** node to trigger a webhook (e.g., to Zapier or Calendly) to send the calendar invite link to the user's email.
+
+
+
+
+
+## 5. Summary of Real-World Value
+
+By building this, you have replaced the manual "discovery call" grind.
+
+* **Before:** You talk to 10 people, 2 are qualified, 1 pays. (10 hours wasted).
+* **After:** The AI talks to 100 people. It filters out 80. It asks the 20 qualified ones to pay. You wake up to 3 paid bookings on your calendar.
+
+### Next Step
+
+**Would you like me to generate the specific JSON schema for the AI Agent's structured output so you can copy-paste it directly into Momen?**
