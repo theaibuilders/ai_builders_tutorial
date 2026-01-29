@@ -3,6 +3,10 @@
 ## Overview
 In this tutorial, you'll build a complete **Deep Research AI Agent** — a full-stack application with a Python FastAPI backend and React frontend that can search the web and provide intelligent answers to your questions. The agent uses an LLM to decide when web search is needed, extracts search queries, fetches real-time results via BrightData's SERP API, and synthesizes comprehensive answers using the RAG (Retrieval-Augmented Generation) pattern.
 
+The application includes a user-controlled "Web Search" checkbox that lets you toggle between:
+- **Enabled**: Agent searches the web using BrightData and synthesizes information
+- **Disabled**: Agent relies only on the LLM model's knowledge without web search
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        USER INTERFACE (React)                        │
@@ -49,11 +53,15 @@ mkdir deep-research-agent
 - **VS Code + Copilot**: File → Open Folder
 - **Windsurf**: File → Open Folder
 
+### Step 3: Open the AI Chat Interface
+
+- **Cursor**: Press `Cmd+K` (Mac) or `Ctrl+K` (Windows) for inline, or `Cmd+L` / `Ctrl+L` for chat
+- **GitHub Copilot**: Click the Copilot icon or press `Cmd+I` / `Ctrl+I`
+- **Windsurf**: Press `Cmd+L` / `Ctrl+L` for Cascade
+
 ## Vibe Coding Prompts
 
 Follow these prompts in order. Copy each prompt into your AI coding assistant and let it generate the code!
-
-
 
 ### Prompt 1: Project Setup
 
@@ -95,8 +103,6 @@ Create the requirements.txt with the necessary dependencies.
 **Expected Output:**
 A `requirements.txt` file with FastAPI, uvicorn, httpx, python-dotenv, and pydantic.
 
-
-
 ### Prompt 3: Environment Configuration
 
 > **Goal:** Set up environment variables
@@ -112,8 +118,6 @@ Create a .env.example template and a .env file in the backend folder. Also inclu
 **Expected Output:**
 - `.env.example` file with placeholder values
 - `.env` file ready to be filled in
-
-
 
 ### Prompt 4: LLM Client
 
@@ -265,8 +269,6 @@ Make it look polished and professional.
 **Expected Output:**
 An `App.css` file with complete styling.
 
-
-
 ### Prompt 11: Development Commands
 
 > **Goal:** Create convenient commands for development
@@ -283,6 +285,36 @@ Make it easy to get started with just "make install" and "make dev".
 
 **Expected Output:**
 A `Makefile` with install and dev commands for both services.
+
+### Prompt 12: Add Web Search Toggle
+
+> **Goal:** Add user control over web search functionality
+
+```
+Add a "Web Search" checkbox to the frontend that allows users to control whether the AI agent uses BrightData for web search.
+
+Frontend changes (services/frontend/src/App.tsx):
+- Add a checkbox state (useWebSearch) that defaults to true
+- Add a checkbox UI above the input field with a clear label and description
+- Send the checkbox state (use_web_search) in the API request body
+- Update the loading message to show different text based on whether web search is enabled
+
+Backend changes (services/backend/main.py):
+- Update the QueryRequest model to accept an optional use_web_search boolean (defaults to True)
+- Pass this parameter to the agent
+
+Backend changes (services/backend/agent.py):
+- Update the run() method to accept a use_web_search parameter
+- If use_web_search is False, skip all web search logic and answer directly with the LLM
+- Add logging to show whether web search is enabled or disabled
+
+This feature lets users compare answers with and without web search.
+```
+
+**Expected Output:**
+- Updated `App.tsx` with a "Web Search" checkbox
+- Updated `main.py` with the new request parameter
+- Updated `agent.py` with conditional web search logic
 
 
 
@@ -314,8 +346,6 @@ deep-research-agent/
 │       └── vite.config.ts
 └── Makefile
 ```
-
-
 
 ## Running the Project
 
@@ -372,107 +402,14 @@ VITE ready in XXX ms
 ### Step 5: Test the Application
 
 1. Open http://localhost:5173 in your browser
-2. Type a question like "What are the latest developments in AI?"
-3. Click "Ask" and watch the magic happen!
-
-### AI-Generated Code Issues
-
-If the AI generates incorrect code:
-
-1. **Be More Specific**: Add more details to your prompt
-2. **Show Examples**: Include example input/output in your prompt
-3. **Ask for Fixes**: Describe the error and ask for a fix
-4. **Request Explanations**: Ask the AI to explain its code
-5. **Iterate**: Build incrementally, testing each step
-
-**Example Fix Prompt:**
-```
-The agent.py file has an error on line X: [error message]
-Please fix this error. The issue seems to be [your observation].
-```
-
-
-
-## Best Practices for Vibe Coding
-
-### 1. Be Specific and Detailed
-```
-❌ "Create a web scraper"
-✅ "Create a Python class that fetches Google search results via BrightData API using httpx, handles errors gracefully, and returns parsed JSON"
-```
-
-### 2. Provide Context
-```
-✅ "This file will be imported by agent.py which expects a search_web(query) async method"
-```
-
-### 3. Request Comments
-```
-✅ "Include detailed comments explaining the OpenAI API format"
-```
-
-### 4. Specify Technologies
-```
-✅ "Use httpx for async HTTP, not requests"
-✅ "Use useState hooks, not class components"
-```
-
-### 5. Ask for Error Handling
-```
-✅ "Handle HTTP errors, timeouts, and invalid responses gracefully"
-```
-
-### 6. Test Incrementally
-- Test each component before moving to the next
-- Verify imports work
-- Check for syntax errors immediately
-
-### 7. Use Follow-up Prompts
-```
-"The code looks good but it's missing error handling for empty responses. Please add that."
-```
-
-### 8. Keep Chat Context
-- Keep related prompts in the same chat session
-- Reference previous code: "Update the agent.py we just created to add logging"
-
-## Architecture Deep Dive
-
-### AI Agent Pattern
-
-The `WebSearchAgent` implements the **ReAct** (Reasoning + Acting) pattern:
-
-1. **Perceive**: Receive user query
-2. **Reason**: Should I search the web?
-3. **Act**: Execute web search if needed
-4. **Synthesize**: Generate final answer
-
-### RAG (Retrieval-Augmented Generation)
-
-The agent uses RAG to ground LLM responses in real data:
-
-1. **Retrieve**: Fetch search results from the web
-2. **Augment**: Inject results into the prompt as context
-3. **Generate**: LLM creates answer based on retrieved facts
-
-### Why This Architecture?
-
-- **Modularity**: Each component (LLM, Scraper, Agent) is independent
-- **Testability**: Components can be tested in isolation
-- **Flexibility**: Easy to swap LLM providers or search APIs
-- **Scalability**: Async design handles concurrent requests
-
-
+2. You'll see a "Web Search" checkbox (checked by default)
+3. Type a question like "What are the latest developments in AI?"
+4. Click "Ask" and watch the magic happen!
 
 ## Resources
 
-- **Zeabur AI Hub**: https://zeabur.com/ai
+- **Zeabur AI Hub**: https://zeabur.com
 - **BrightData**: https://brightdata.com
-- **FastAPI Docs**: https://fastapi.tiangolo.com
-- **React Docs**: https://react.dev
-- **Vite Docs**: https://vitejs.dev
-
-
 
 ## Congratulations! 🎉
 
@@ -484,6 +421,18 @@ You've successfully vibe-coded a complete AI-powered research agent! This projec
 - ✅ Web scraping with BrightData
 - ✅ AI Agent architecture (ReAct pattern)
 - ✅ RAG (Retrieval-Augmented Generation)
+- ✅ User-controlled feature toggles
 - ✅ Full-stack development with AI assistance
+
+## Next Steps
+
+Want to extend your agent? Try these ideas:
+
+- Add source citations showing which websites were used
+- Implement streaming responses for real-time answers
+- Add conversation memory to maintain context across queries
+- Support multiple search engines (Google, Bing, DuckDuckGo)
+- Add user authentication and query history storage
+- Deploy to production (Zeabur, Vercel, Railway, etc.)
 
 **Share your creation and tag us @theaibuildersdev!**
