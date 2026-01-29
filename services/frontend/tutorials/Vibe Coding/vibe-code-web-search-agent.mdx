@@ -31,7 +31,7 @@ Before starting, ensure you have:
 - **Python 3.10+** installed
 - **Node.js 18+** installed
 - **API Keys** (will be provided at the workshop or get your own):
-  - [Zeabur AI Hub](https://zeabur.com/events?code=BUILDERS0129) - for LLM access (OpenAI-compatible API)
+  - [Zeabur AI Hub](https://zeabur.com/?utm_source=aibuilders) - for LLM access (OpenAI-compatible API)
   - [BrightData](https://get.brightdata.com/aibuilders10) - for web search capabilities
 
 ### AI Coding IDEs
@@ -63,6 +63,8 @@ mkdir deep-research-agent
 ## Vibe Coding Prompts
 
 Follow these prompts in order. Copy each prompt into your AI coding assistant and let it generate the code!
+
+> **Note:** These prompts include important technical details and fixes that ensure your implementation works correctly on the first try. The prompts may seem detailed, but this ensures you won't encounter common errors during development.
 
 ### Prompt 1: Project Setup
 
@@ -112,11 +114,15 @@ I need to store API keys for two services:
 2. BrightData - a web scraping service (token: BRIGHTDATA_API_TOKEN)
 
 Create a .env.example template and a .env file in the backend folder. Also include a ZEABUR_MODEL variable defaulting to gpt-4o-mini.
+
+Also create a config.py file that uses pydantic-settings to load these environment variables.
+IMPORTANT: For the CORS_ORIGINS field, use Union[List[str], str] type and add a @field_validator to parse comma-separated strings from .env into a list. This prevents parsing errors.
 ```
 
 **Expected Output:**
 - `.env.example` file with placeholder values
 - `.env` file ready to be filled in
+- `config.py` with Settings class and CORS validator
 
 ### Prompt 4: LLM Client
 
@@ -155,6 +161,14 @@ The API uses Bearer token authentication and needs these parameters:
 - zone: "serp_api1"
 - format: "json"
 - data_format: "parsed_light"
+
+IMPORTANT fixes to include:
+1. Import and use urllib.parse.quote_plus to URL-encode the search query before building the Google search URL
+2. Do NOT include a "language" parameter (BrightData rejects it)
+3. BrightData returns response with structure {status_code, headers, body}. In _parse_search_results:
+   - Check if data has a 'body' field and extract it
+   - If body is a JSON string, parse it with json.loads()
+   - Then look for 'organic' or 'organic_results' field for the search results
 ```
 
 **Expected Output:**
@@ -174,6 +188,9 @@ Create services/backend/agent.py with an agent that:
 4. If no: answers directly from the LLM's knowledge
 
 The agent should use the LLM client and web scraper we created. Add logging so I can see what the agent is doing at each step.
+
+IMPORTANT: The answer() method should accept a use_web_search parameter (defaults to True). 
+If use_web_search is False, skip the web search decision logic entirely and go straight to answering from LLM knowledge.
 ```
 
 **Expected Output:**
@@ -189,10 +206,18 @@ An `agent.py` file with an intelligent agent that orchestrates LLM reasoning and
 Create a FastAPI server in services/backend/main.py that:
 - Has a POST /api/query endpoint that accepts a question and returns the agent's answer
 - Has health check endpoints (GET / and GET /health)
-- Loads the API keys from environment variables
+- Loads the API keys from environment variables using the config.py settings
 - Enables CORS so the frontend can call it
 
-The request should be {"query": "..."} and response should be {"answer": "..."}.
+The request should be {"query": "...", "use_web_search": true} and response should be {"answer": "..."}.
+
+IMPORTANT: Do NOT use the deprecated @app.on_event("startup") and @app.on_event("shutdown") decorators.
+Instead, use the modern approach:
+1. Import asynccontextmanager from contextlib
+2. Create a lifespan async context manager function that handles startup and shutdown
+3. Pass it to FastAPI as: app = FastAPI(lifespan=lifespan)
+
+This prevents deprecation warnings.
 ```
 
 **Expected Output:**
@@ -278,6 +303,12 @@ Create a Makefile in the project root with commands to:
 - Run both together
 
 Make it easy to get started with just "make install" and "make dev".
+
+IMPORTANT: Add command aliases so both of these work:
+- make run-backend AND make dev-backend (both do the same thing)
+- make run-frontend AND make dev-frontend (both do the same thing)
+
+This ensures consistency with different naming conventions.
 ```
 
 **Expected Output:**
@@ -433,3 +464,37 @@ Want to extend your agent? Try these ideas:
 - Deploy to production (Zeabur, Vercel, Railway, etc.)
 
 **Share your creation and tag us @theaibuildersdev!**
+
+---
+
+## Technical Notes (For Instructors)
+
+These prompts have been enhanced with specific technical details to ensure error-free implementation:
+
+### Built-in Fixes
+
+1. **Prompt 3** - CORS validator using pydantic field_validator to parse comma-separated strings
+2. **Prompt 5** - URL encoding with quote_plus, removed unsupported language parameter, BrightData response body extraction and JSON parsing
+3. **Prompt 6** - use_web_search parameter for conditional search logic
+4. **Prompt 7** - Modern FastAPI lifespan handler instead of deprecated on_event decorators
+5. **Prompt 11** - Command aliases (dev-backend/run-backend, dev-frontend/run-frontend)
+6. **Prompt 12** - Complete web search toggle implementation
+
+### Why These Fixes Matter
+
+- **CORS Validator**: Prevents `SettingsError` when loading environment variables
+- **URL Encoding**: Handles search queries with spaces and special characters
+- **Response Parsing**: Correctly extracts search results from BrightData's nested response structure
+- **Lifespan Handler**: Eliminates deprecation warnings in FastAPI 0.109+
+- **Command Aliases**: Supports both naming conventions for better UX
+
+### Verification
+
+After students complete all prompts, they can verify everything works by running:
+```bash
+make install
+make dev-backend  # Terminal 1
+make dev-frontend # Terminal 2
+```
+
+The app should start without errors and be fully functional at http://localhost:3000
