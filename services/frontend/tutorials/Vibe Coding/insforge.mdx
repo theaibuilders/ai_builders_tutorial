@@ -1,0 +1,738 @@
+# InsForge: Building Full-Stack Applications with AI-optimized Backend
+
+InsForge is an AI-optimized Backend-as-a-Service (BaaS) platform that provides PostgreSQL databases, JWT authentication, file storage, and serverless functions designed specifically for AI coding agents. By integrating via the Model Context Protocol (MCP), you can build complete applications using natural language prompts.
+
+## What You'll Build
+
+In this tutorial, you'll create a task management application with:
+- User authentication (sign-up, login, JWT sessions)
+- Database operations (CRUD for tasks)
+- File storage (task attachments)
+- Real-time updates
+
+## Prerequisites
+
+- Node.js 18+ installed
+- An AI coding assistant that supports MCP (Claude Code, Cursor, Cline, Windsurf, Qoder, or Roo Code)
+- Basic TypeScript/JavaScript knowledge
+- Docker (for local development) or an InsForge cloud account
+
+## Project Structure
+
+```
+task-manager/
+├── backend/                    # InsForge configuration
+│   └── .env                   # Environment variables
+├── src/
+│   ├── lib/
+│   │   └── insforge.ts       # InsForge SDK client
+│   ├── components/
+│   │   ├── Auth.tsx          # Authentication UI
+│   │   ├── TaskList.tsx      # Task display
+│   │   └── TaskForm.tsx      # Task creation
+│   ├── types/
+│   │   └── task.ts           # TypeScript types
+│   └── App.tsx               # Main application
+├── package.json
+└── tsconfig.json
+```
+
+## Part 1: Setting Up InsForge
+
+### Option A: Cloud Setup (Recommended for Beginners)
+
+1. Visit [insforge.dev](https://insforge.dev) and create an account
+2. Create a new project in the dashboard
+3. Copy your API key and base URL
+![insforge](/products/insforge/insforge-1.png)
+
+### Option B: Local Docker Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/InsForge/InsForge.git
+cd InsForge
+
+# Configure environment
+cp .env.example .env
+
+# Start services
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Your InsForge backend will be available at `http://localhost:7130`.
+
+## Part 2: Installing the MCP Server
+
+The MCP server enables your AI coding assistant to interact directly with InsForge's backend services.
+
+### Automatic Installation (Recommended)
+
+Choose your AI tool and run the appropriate command:
+
+```bash
+# For Claude Code
+npx @insforge/install --client claude-code \
+  --env API_KEY=your_api_key \
+  --env API_BASE_URL=your_api_base_url
+
+# For Cursor
+npx @insforge/install --client cursor \
+  --env API_KEY=your_api_key \
+  --env API_BASE_URL=your_api_base_url
+
+# For Cline (VS Code)
+npx @insforge/install --client cline \
+  --env API_KEY=your_api_key \
+  --env API_BASE_URL=your_api_base_url
+
+# For Windsurf
+npx @insforge/install --client windsurf \
+  --env API_KEY=your_api_key \
+  --env API_BASE_URL=your_api_base_url
+
+# For Qoder
+npx @insforge/install --client qoder \
+  --env API_KEY=your_api_key \
+  --env API_BASE_URL=your_api_base_url
+```
+
+### Manual Configuration
+
+If automatic installation fails, manually add this to your MCP config:
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+```json
+{
+  "mcpServers": {
+    "insforge": {
+      "command": "npx",
+      "args": ["-y", "@insforge/mcp@latest"],
+      "env": {
+        "API_KEY": "your-api-key",
+        "API_BASE_URL": "your_api_base_url"
+      }
+    }
+  }
+}
+```
+
+**Cursor** (`.cursorrules` in your project):
+
+```
+You have access to Insforge backend at your_api_base_url
+Use the MCP tools to interact with the database, auth, and storage.
+```
+
+**Qoder** (MCP settings in Qoder IDE):
+
+Add to your Qoder MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "insforge": {
+      "command": "npx",
+      "args": ["-y", "@insforge/mcp@latest"],
+      "env": {
+        "API_KEY": "your-api-key",
+        "API_BASE_URL": "your_api_base_url"
+      }
+    }
+  }
+}
+```
+
+### Verify Installation
+
+Ask your AI assistant:
+```
+What InsForge tools are available through MCP?
+```
+
+You should see tools like: `createTable`, `insertRow`, `uploadFile`, `queryRows`, `fetchDocs`, etc.
+
+## Part 3: Project Setup
+
+### Initialize the Project
+
+```bash
+mkdir task-manager
+cd task-manager
+npm init -y
+```
+
+### Install Dependencies
+
+```bash
+npm install @insforge/sdk react react-dom
+npm install -D typescript @types/react @types/react-dom vite
+```
+
+### Configure TypeScript
+
+**`tsconfig.json`:**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"]
+}
+```
+
+### Package Scripts
+
+Update **`package.json`**:
+
+```json
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  }
+}
+```
+
+## Part 4: InsForge SDK Integration
+
+### Create SDK Client
+
+**`src/lib/insforge.ts`:**
+
+```typescript
+import { createClient } from '@insforge/sdk';
+
+const baseUrl = import.meta.env.VITE_INSFORGE_BASE_URL || 'http://localhost:7130';
+
+export const insforge = createClient({
+  baseUrl,
+  auth: {
+    // Optional: auto-refresh tokens
+    autoRefreshToken: true,
+    persistSession: true
+  }
+});
+
+// Type-safe database client
+export const db = insforge.database;
+
+// Storage client for file uploads
+export const storage = insforge.storage;
+
+// Auth client for user management
+export const auth = insforge.auth;
+```
+
+### Define TypeScript Types
+
+**`src/types/task.ts`:**
+
+```typescript
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  priority: 'low' | 'medium' | 'high';
+  due_date: string;
+  user_id: string;
+  attachment_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  created_at: string;
+}
+
+export type CreateTaskInput = Omit<Task, 'id' | 'created_at' | 'updated_at'>;
+export type UpdateTaskInput = Partial<CreateTaskInput>;
+```
+
+## Part 5: Database Schema via MCP
+
+### Ask Your AI Assistant
+
+Prompt your AI coding assistant:
+
+```
+Using InsForge MCP tools, create a tasks table with these columns:
+- id (uuid, primary key)
+- title (text, required)
+- description (text)
+- status (text, default 'pending')
+- priority (text, default 'medium')
+- due_date (timestamp)
+- user_id (uuid, foreign key to auth.users)
+- attachment_url (text)
+- created_at (timestamp with timezone, default now())
+- updated_at (timestamp with timezone, default now())
+
+Enable Row Level Security so users only see their own tasks.
+```
+
+The AI will use MCP tools to execute the schema creation automatically.
+
+### Manual SQL (Alternative)
+
+If you prefer manual control, run this SQL:
+
+```sql
+CREATE TABLE tasks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT DEFAULT 'pending',
+  priority TEXT DEFAULT 'medium',
+  due_date TIMESTAMP,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  attachment_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable Row Level Security
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+
+-- Users can only access their own tasks
+CREATE POLICY "Users can view own tasks" ON tasks
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own tasks" ON tasks
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own tasks" ON tasks
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own tasks" ON tasks
+  FOR DELETE USING (auth.uid() = user_id);
+```
+
+## Part 6: Authentication Components
+
+**`src/components/Auth.tsx`:**
+
+```typescript
+import React, { useState } from 'react';
+import { auth } from '../lib/insforge';
+
+export function Auth() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (mode === 'signup') {
+        const { data, error } = await auth.signUp({ email, password });
+        if (error) throw error;
+        alert('Check your email for verification link!');
+      } else {
+        const { data, error } = await auth.signIn({ email, password });
+        if (error) throw error;
+        window.location.reload(); // Reload to show authenticated state
+      }
+    } catch (error: any) {
+      alert(error.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <form onSubmit={handleAuth}>
+        <h2>{mode === 'signin' ? 'Sign In' : 'Sign Up'}</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          minLength={6}
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? 'Loading...' : mode === 'signin' ? 'Sign In' : 'Sign Up'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+        >
+          {mode === 'signin' ? 'Need an account?' : 'Have an account?'}
+        </button>
+      </form>
+    </div>
+  );
+}
+```
+
+## Part 7: Task Management Components
+
+**`src/components/TaskForm.tsx`:**
+
+```typescript
+import React, { useState } from 'react';
+import { db, storage } from '../lib/insforge';
+import type { CreateTaskInput } from '../types/task';
+
+interface TaskFormProps {
+  onTaskCreated: () => void;
+}
+
+export function TaskForm({ onTaskCreated }: TaskFormProps) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [dueDate, setDueDate] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      let attachmentUrl: string | undefined;
+
+      // Upload file if provided
+      if (file) {
+        const { data, error } = await storage
+          .from('task-attachments')
+          .upload(`${Date.now()}-${file.name}`, file);
+        
+        if (error) throw error;
+        attachmentUrl = data.url;
+      }
+
+      // Create task
+      const { error } = await db.from('tasks').insert({
+        title,
+        description,
+        priority,
+        due_date: dueDate,
+        status: 'pending',
+        attachment_url: attachmentUrl
+      });
+
+      if (error) throw error;
+
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setDueDate('');
+      setFile(null);
+      onTaskCreated();
+    } catch (error: any) {
+      alert(error.message || 'Failed to create task');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="task-form">
+      <input
+        type="text"
+        placeholder="Task title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+      />
+      <textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <select value={priority} onChange={(e) => setPriority(e.target.value as any)}>
+        <option value="low">Low Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="high">High Priority</option>
+      </select>
+      <input
+        type="date"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+      />
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Creating...' : 'Create Task'}
+      </button>
+    </form>
+  );
+}
+```
+
+**`src/components/TaskList.tsx`:**
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import { db } from '../lib/insforge';
+import type { Task } from '../types/task';
+
+export function TaskList() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      const { data, error } = await db
+        .from('tasks')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTasks(data || []);
+    } catch (error: any) {
+      console.error('Failed to load tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (id: string, status: Task['status']) => {
+    try {
+      const { error } = await db
+        .from('tasks')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      if (error) throw error;
+      loadTasks(); // Refresh list
+    } catch (error: any) {
+      alert(error.message || 'Failed to update task');
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    if (!confirm('Delete this task?')) return;
+
+    try {
+      const { error } = await db.from('tasks').delete().eq('id', id);
+      if (error) throw error;
+      loadTasks();
+    } catch (error: any) {
+      alert(error.message || 'Failed to delete task');
+    }
+  };
+
+  if (loading) return <div>Loading tasks...</div>;
+
+  return (
+    <div className="task-list">
+      {tasks.length === 0 ? (
+        <p>No tasks yet. Create one to get started!</p>
+      ) : (
+        tasks.map((task) => (
+          <div key={task.id} className="task-item">
+            <h3>{task.title}</h3>
+            <p>{task.description}</p>
+            <div className="task-meta">
+              <span className={`priority-${task.priority}`}>{task.priority}</span>
+              <span className={`status-${task.status}`}>{task.status}</span>
+              {task.due_date && <span>Due: {new Date(task.due_date).toLocaleDateString()}</span>}
+            </div>
+            {task.attachment_url && (
+              <a href={task.attachment_url} target="_blank" rel="noopener noreferrer">
+                View Attachment
+              </a>
+            )}
+            <div className="task-actions">
+              <button onClick={() => updateStatus(task.id, 'in_progress')}>
+                Start
+              </button>
+              <button onClick={() => updateStatus(task.id, 'completed')}>
+                Complete
+              </button>
+              <button onClick={() => deleteTask(task.id)}>Delete</button>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+```
+
+## Part 8: Main Application
+
+**`src/App.tsx`:**
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import { Auth } from './components/Auth';
+import { TaskForm } from './components/TaskForm';
+import { TaskList } from './components/TaskList';
+import { auth } from './lib/insforge';
+
+export default function App() {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing session
+    auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: listener } = auth.onAuthStateChange((event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
+  if (!session) return <Auth />;
+
+  return (
+    <div className="app">
+      <header>
+        <h1>Task Manager</h1>
+        <button onClick={() => auth.signOut()}>Sign Out</button>
+      </header>
+      <main>
+        <TaskForm onTaskCreated={() => window.location.reload()} />
+        <TaskList />
+      </main>
+    </div>
+  );
+}
+```
+
+## Part 9: Environment Configuration
+
+**`.env.local`:**
+
+```bash
+VITE_INSFORGE_BASE_URL=your_api_base_url
+# Or for local development:
+# VITE_INSFORGE_BASE_URL=http://localhost:7130
+```
+
+## Part 10: Running the Application
+
+```bash
+# Development
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Advanced Features
+
+### Real-Time Updates
+
+```typescript
+import { insforge } from './lib/insforge';
+
+// Subscribe to task changes
+const subscription = insforge
+  .channel('tasks')
+  .on('postgres_changes', {
+    event: '*',
+    schema: 'public',
+    table: 'tasks'
+  }, (payload) => {
+    console.log('Task changed:', payload);
+    loadTasks(); // Refresh your task list
+  })
+  .subscribe();
+
+// Clean up
+return () => subscription.unsubscribe();
+```
+
+### AI Integration (Generate Task Descriptions)
+
+```typescript
+const { data, error } = await insforge.ai.generateText({
+  model: 'gpt-4',
+  prompt: `Generate a detailed task description for: ${title}`,
+  maxTokens: 150
+});
+```
+
+## Troubleshooting
+
+### MCP Connection Issues
+- Verify API key and base URL are correct
+- Restart your AI coding assistant after configuration changes
+- Check that `@insforge/mcp` package is installed
+
+### Database Errors
+- Ensure tables are created via MCP or SQL
+- Verify Row Level Security policies allow access
+- Check user is authenticated before database operations
+
+### File Upload Failures
+- Create storage bucket via InsForge dashboard or MCP
+- Verify file size is under limit (default 50MB)
+- Check MIME type is allowed
+
+## Next Steps
+
+- Explore [InsForge Documentation](https://docs.insforge.dev)
+- Join the [Discord Community](https://discord.gg/MPxwj5xVvW)
+- Check out [Example Projects](https://docs.insforge.dev/examples/overview)
+- Review [API Reference](https://docs.insforge.dev/api-reference/admin/list-tables)
+
+## Key Takeaways
+
+- InsForge provides a complete backend with PostgreSQL, auth, and storage
+- MCP integration enables AI assistants to manage backend infrastructure
+- SDK provides type-safe database and storage operations
+- Row Level Security ensures data isolation between users
+- Real-time subscriptions keep UIs synchronized
+
+With InsForge and MCP, you can build production-ready full-stack applications using natural language prompts and minimal code.
