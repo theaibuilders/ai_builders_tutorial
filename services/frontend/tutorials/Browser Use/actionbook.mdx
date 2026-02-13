@@ -1,0 +1,392 @@
+# Actionbook: Build Your First AI Browser Agent 
+
+In this tutorial you will build a small Node.js AI agent that uses the **Actionbook CLI** to search Google — entirely on your local machine. By the end you will understand what action manuals are, how the CLI controls your browser, and how to wire everything together with an LLM.
+
+![Actionbook Banner](/products/actionbook/actionbook-1.png)
+
+> **What you will build:** A command-line agent you run with `node agent.mjs "your query"`. It fetches a verified Google search selector from Actionbook, opens your real browser, types the query, and prints what it finds.
+
+## How Actionbook Works
+
+Without Actionbook an AI agent has to download an entire HTML page, parse it, and guess which element to click — burning tokens and hallucinating. Actionbook gives the agent a pre-computed **action manual** instead: a small JSON document with exact CSS selectors and step-by-step instructions for a specific website task.
+
+```
+Your Agent
+  │
+  ├─ actionbook search "google search bar"   ──►  Actionbook API
+  │                                                    │
+  ├─ actionbook get "google.com:/:default"   ◄──  Action Manual (tiny JSON)
+  │                                               • step-by-step instructions
+  │                                               • verified CSS selectors
+  │
+  └─ actionbook browser open / type / click  ──►  Your real Chrome/Edge/Brave
+                                                   (connected via CDP — no driver install)
+```
+
+The CLI is written in Rust and connects to the browser you already have installed — nothing extra to download.
+
+
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- **Node.js 18+** — check with `node --version`
+- **Chrome, Brave, Edge, or Arc** already installed on your machine
+- **An OpenAI API key** (free tier works) — you will store it in `.env`
+- A terminal (macOS Terminal, Windows PowerShell, or Linux shell)
+
+
+
+## Project Structure
+
+Here is every file you will create in this tutorial:
+
+```
+my-actionbook-agent/
+├── agent.mjs          ← the AI agent that orchestrates everything
+├── browser.mjs        ← thin wrapper around Actionbook CLI commands
+├── .env               ← your API key (never commit this)
+└── package.json
+```
+
+
+
+## Step 1 — Install the Actionbook CLI
+
+Open your terminal and run:
+
+```bash
+npm install -g @actionbookdev/cli
+```
+
+Verify the install worked:
+
+```bash
+actionbook --version
+```
+
+You should see a version number printed. If you see a "command not found" error, make sure your npm global bin directory is on your `PATH` (run `npm bin -g` to find it).
+
+
+
+## Step 2 — Try the CLI Manually
+
+Before writing any code, let's explore Actionbook interactively so you understand what your agent will do automatically.
+
+**Search for action manuals:**
+```bash
+actionbook search "google search bar"
+```
+
+You will see a list of results. Each result has an **area ID** like `google.com:/:default`. Copy the ID of the top result.
+
+**Fetch the full action manual:**
+```bash
+actionbook get "google.com:/:default"
+```
+
+This prints a plain-text description of the Google homepage — the steps to interact with it and the exact CSS selectors for each element. This is what your agent will read instead of the raw HTML.
+
+**Open your browser and interact with it:**
+```bash
+# Open Google in your existing Chrome/Brave/Edge
+actionbook browser open "https://www.google.com"
+
+# See the accessibility tree (element refs + selectors)
+actionbook browser snapshot
+
+# Type into the search box using a selector from the manual
+actionbook browser type "textarea[name='q']" "Actionbook browser agent"
+
+# Take a screenshot to verify
+actionbook browser screenshot ./result.png
+
+# Always close when you are done
+actionbook browser close
+```
+
+> **What just happened?** The CLI connected to your real browser via Chrome DevTools Protocol (CDP). No WebDriver, no Selenium, no separate Chromium download — it used the browser you already have.
+
+
+
+## Step 3 — Create the Project
+
+```bash
+mkdir my-actionbook-agent
+cd my-actionbook-agent
+npm init -y
+npm install openai dotenv
+```
+
+**`package.json`** — add `"type": "module"` so you can use ES modules:
+
+```json
+{
+  "name": "my-actionbook-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node agent.mjs"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "dotenv": "^16.0.0"
+  }
+}
+```
+
+**`.env`** — paste your key here:
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+```
+
+
+
+## Step 4 — `browser.mjs` — CLI Wrapper
+
+This file wraps each Actionbook CLI command in a JavaScript function so your agent can call them easily.
+
+```js
+// browser.mjs
+// Wraps Actionbook CLI commands so the agent can call them from JS.
+import { execSync } from "node:child_process";
+
+// Run a CLI command and return its stdout as a string.
+// opts.stdio = "inherit" lets you see live output in the terminal.
+function run(cmd, opts = {}) {
+  return execSync(cmd, { encoding: "utf8", ...opts });
+}
+
+// ── Action Manual Commands ───────────────────────────────────────────────────
+
+/** Search for action manuals. Returns raw text output from the CLI. */
+export function searchActions(query) {
+  console.log(`[actionbook] Searching: "${query}"`);
+  return run(`actionbook search "${query}"`);
+}
+
+/** Fetch the full action manual for an area ID (e.g. "google.com:/:default"). */
+export function getManual(areaId) {
+  console.log(`[actionbook] Getting manual: ${areaId}`);
+  return run(`actionbook get "${areaId}"`);
+}
+
+// ── Browser Commands ─────────────────────────────────────────────────────────
+
+/** Open a URL in your existing Chrome/Brave/Edge browser. */
+export function browserOpen(url) {
+  console.log(`[actionbook] Opening: ${url}`);
+  run(`actionbook browser open "${url}"`, { stdio: "inherit" });
+}
+
+/** Navigate the current tab to a new URL (no new tab). */
+export function browserGoto(url) {
+  run(`actionbook browser goto "${url}"`, { stdio: "inherit" });
+}
+
+/** Type text into the element matching selector. */
+export function browserType(selector, text) {
+  console.log(`[actionbook] Typing "${text}" into ${selector}`);
+  run(`actionbook browser type "${selector}" "${text}"`);
+}
+
+/** Click the element matching selector. */
+export function browserClick(selector) {
+  console.log(`[actionbook] Clicking ${selector}`);
+  run(`actionbook browser click "${selector}"`);
+}
+
+/** Wait for an element to appear on the page. */
+export function browserWait(selector) {
+  run(`actionbook browser wait "${selector}"`);
+}
+
+/** Take a screenshot. Returns path string. */
+export function browserScreenshot(path = "./screenshot.png") {
+  run(`actionbook browser screenshot "${path}"`);
+  return path;
+}
+
+/** Get an accessibility tree snapshot — useful for debugging selectors. */
+export function browserSnapshot() {
+  return run(`actionbook browser snapshot`);
+}
+
+/** Close the browser session. ALWAYS call this when done. */
+export function browserClose() {
+  console.log(`[actionbook] Closing browser.`);
+  try {
+    run(`actionbook browser close`);
+  } catch {
+    // Ignore errors on close — browser may already be shut down.
+  }
+}
+```
+
+
+
+## Step 5 — `agent.mjs` — The AI Agent
+
+This is the brain. It sends the action manual to the LLM, asks it which selector to use, then uses `browser.mjs` to execute the task.
+
+```js
+// agent.mjs
+import "dotenv/config";
+import OpenAI from "openai";
+import {
+  searchActions,
+  getManual,
+  browserOpen,
+  browserType,
+  browserClick,
+  browserWait,
+  browserScreenshot,
+  browserClose,
+} from "./browser.mjs";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ── Step 1: Ask the LLM which selector to use ───────────────────────────────
+
+async function askLLMForSelector(manual, task) {
+  console.log("\n[agent] Asking LLM to pick the right selector...");
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",            // cheap and fast for beginners
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a browser automation expert. " +
+          "Given an action manual, extract the CSS selector for the requested element. " +
+          "Reply with ONLY the selector string — no explanation, no backticks.",
+      },
+      {
+        role: "user",
+        content: `Task: ${task}\n\nAction Manual:\n${manual}`,
+      },
+    ],
+    max_tokens: 60,
+  });
+
+  const selector = response.choices[0].message.content.trim();
+  console.log(`[agent] LLM chose selector: ${selector}`);
+  return selector;
+}
+
+// ── Step 2: Use the selector to automate the browser ────────────────────────
+
+async function runSearchTask(query) {
+  console.log(`\n🤖 Agent starting task: search Google for "${query}"\n`);
+
+  // 2a. Find the relevant action manual
+  const searchResults = searchActions("google search bar");
+
+  // Parse the first area ID from the search output
+  // Output lines look like: "google.com:/:default  –  Google homepage"
+  const firstLine = searchResults.split("\n").find((l) => l.includes("google"));
+  const areaId = firstLine?.split(/\s+/)[0] ?? "google.com:/:default";
+  console.log(`[agent] Using area: ${areaId}`);
+
+  // 2b. Fetch the full manual for that area
+  const manual = getManual(areaId);
+
+  // 2c. Ask the LLM to extract the search-box selector from the manual
+  const searchBoxSelector = await askLLMForSelector(
+    manual,
+    "The CSS selector for the Google search text input"
+  );
+
+  // 2d. Execute browser actions
+  try {
+    browserOpen("https://www.google.com");
+
+    // Wait until the search box is on the page before typing
+    browserWait(searchBoxSelector);
+    browserType(searchBoxSelector, query);
+
+    // Press Enter by clicking the search button (or use keyboard shortcut)
+    browserClick("input[name='btnK'], button[aria-label='Google Search']");
+
+    // Wait for results to load
+    browserWait("div#search");
+
+    // Take a screenshot as proof
+    const shot = browserScreenshot("./search-result.png");
+    console.log(`\n✅ Done! Screenshot saved to ${shot}`);
+    console.log(`   Open it to see the search results for: "${query}"`);
+  } finally {
+    // Always close — even if something throws above
+    browserClose();
+  }
+}
+
+// ── Entry point ──────────────────────────────────────────────────────────────
+
+const query = process.argv[2] ?? "Actionbook browser agent";
+runSearchTask(query).catch((err) => {
+  console.error("\n❌ Agent error:", err.message);
+  browserClose();
+  process.exit(1);
+});
+```
+
+
+
+## Step 6 — Run the Agent
+
+Make sure Chrome (or Brave/Edge) is installed, then run:
+
+```bash
+node agent.mjs "open source AI agents"
+```
+
+You will see the agent log each step as it goes:
+
+```
+🤖 Agent starting task: search Google for "open source AI agents"
+
+[actionbook] Searching: "google search bar"
+[agent] Using area: google.com:/:default
+[actionbook] Getting manual: google.com:/:default
+[agent] Asking LLM to pick the right selector...
+[agent] LLM chose selector: textarea[name='q']
+[actionbook] Opening: https://www.google.com
+[actionbook] Typing "open source AI agents" into textarea[name='q']
+[actionbook] Clicking input[name='btnK']...
+[actionbook] Closing browser.
+
+✅ Done! Screenshot saved to ./search-result.png
+```
+
+Open `search-result.png` and you will see a real Google results page.
+
+
+
+## Step 7 — Understand What Each Part Does
+
+- **`browser.mjs`** — Translates JS function calls into `actionbook` CLI commands
+- **`agent.mjs`** — Orchestrates the workflow: search → get manual → ask LLM → execute
+- **`.env`** — Stores secrets — never commit this file
+
+**Why does the agent ask the LLM?** The action manual describes the page in plain English and lists selectors. The LLM reads that description and extracts exactly the selector you need — this is safer than guessing. In production you would cache this step so you don't pay for an LLM call on every run.
+
+**What is CDP?** Chrome DevTools Protocol is the same protocol your browser's DevTools uses. Actionbook speaks CDP natively, so it can open tabs, click, type, and screenshot without any driver or browser extension.
+
+## Next Steps
+
+Now that your first agent works, here is what to try next:
+
+- **Add more sites** — run `actionbook search "linkedin login"` and automate LinkedIn.
+- **Loop over queries** — read a list of search terms from a file and run the agent for each.
+- **Chain actions** — after the search, ask the LLM to pick a result link and follow it.
+- **Add the MCP server** — once comfortable with the CLI, add the MCP server to Cursor or Claude Code so your AI IDE can call Actionbook for you automatically.
+
+## Resources
+
+- [Actionbook GitHub](https://github.com/actionbook/actionbook) — source code, issue tracker
+- [Actionbook Docs](https://actionbook.dev/docs) — full CLI and MCP reference
+- [Discord Community](https://discord.gg/7sKKp7XQ2d) — ask questions, share agents
+- [Request a Website](https://actionbook.dev/request-website) — suggest sites to index
