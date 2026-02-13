@@ -1,0 +1,593 @@
+# Acontext: Building Self-Learning AI Agents
+
+Acontext is an open-source **Context Data Platform** for AI agents — think of it as Supabase, but purpose-built for agent context. It provides unified storage for messages, files, and skills, with built-in context engineering and observability so agents improve with every interaction.
+
+## Core Concepts
+
+Acontext organizes agent context around five primitives:
+
+- **Session** — Conversation thread that stores all messages, tool calls, and artifacts
+- **Disk** — Filesystem-like artifact storage for agent-generated files
+- **Space** — Knowledge base where distilled skills are indexed and retrieved
+- **Task** — Auto-extracted execution unit with status (`pending → success / failed`)
+- **Skill Block** — Reusable SOP derived from successful task completions
+
+The learning loop is: **Store → Observe → Learn → Act**. Every session feeds experience into a Space, the background Experience Agent distills skills, and future runs start with proven patterns.
+
+## Project Structure
+
+```
+acontext-agent/
+├── .env                    # API keys and config
+├── requirements.txt        # Python dependencies
+├── main.py                 # Entry point
+├── agent/
+│   ├── __init__.py
+│   ├── client.py           # Acontext client setup
+│   ├── session.py          # Session & message management
+│   ├── disk.py             # Artifact / file operations
+│   └── skills.py           # Space creation and skill search
+├── tools/
+│   ├── __init__.py
+│   └── weather.py          # Example tool implementation
+└── README.md
+```
+
+## Setup
+
+<Steps>
+
+### Step 1: Create Project Directory
+
+First, create the project directory structure:
+
+```bash
+# Create main project directory
+mkdir acontext-agent
+cd acontext-agent
+
+# Create subdirectories
+mkdir agent
+mkdir tools
+
+# Create __init__.py files to make them Python packages
+touch agent/__init__.py
+touch tools/__init__.py
+```
+
+### Step 2: Create requirements.txt
+
+Create a `requirements.txt` file in your project root:
+
+```txt
+# requirements.txt
+acontext>=0.1.0
+openai>=1.0.0
+python-dotenv>=1.0.0
+```
+
+### Step 3: Install Dependencies
+
+Install all required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4: Get Your API Keys
+
+<Callout type="info">
+Get a free Acontext API key at [dash.acontext.io](https://dash.acontext.io). You'll also need an OpenAI API key from [platform.openai.com](https://platform.openai.com).
+</Callout>
+
+For self-hosted Docker backend (optional):
+```bash
+curl -fsSL https://install.acontext.io | sh && acontext server up
+```
+
+### Step 5: Configure Environment Variables
+
+Create a `.env` file in your project root:
+
+```bash
+# .env
+ACONTEXT_API_KEY=sk-ac-your-api-key-here
+OPENAI_API_KEY=sk-your-openai-key
+
+# For self-hosted Docker backend (optional)
+# ACONTEXT_BASE_URL=http://localhost:8029/api/v1
+```
+
+### Step 6: Initialize the Acontext Client
+
+Create `agent/client.py` to set up the Acontext client:
+
+```python
+# agent/client.py
+import os
+from acontext import AcontextClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+def get_client() -> AcontextClient:
+    """
+    Initialize and return an Acontext client.
+    Uses cloud API by default, or self-hosted URL if configured.
+    """
+    api_key = os.getenv("ACONTEXT_API_KEY")
+    base_url = os.getenv("ACONTEXT_BASE_URL")  # None uses cloud default
+
+    if base_url:
+        # Use self-hosted instance
+        return AcontextClient(base_url=base_url, api_key=api_key)
+    
+    # Use cloud API
+    return AcontextClient(api_key=api_key)
+```
+
+</Steps>
+
+### Step 7: Create Session Management Module
+
+Create `agent/session.py` to manage conversation sessions and messages:
+
+```python
+# agent/session.py
+from acontext import AcontextClient
+
+def create_session(client: AcontextClient, space_id: str | None = None) -> str:
+    """
+    Create a new session to track a conversation.
+    
+    Args:
+        client: Acontext client instance
+        space_id: Optional Space ID to link session for skill learning
+    
+    Returns:
+        Session ID string
+    """
+    session = client.sessions.create(space_id=space_id)
+    return session.id
+
+def store_message(client: AcontextClient, session_id: str, role: str, content: str):
+    """
+    Store a message in the session.
+    Messages are stored in OpenAI format and auto-converted on retrieval.
+    
+    Args:
+        client: Acontext client instance
+        session_id: ID of the session
+        role: Message role ('user', 'assistant', 'system')
+        content: Message content
+    """
+    client.sessions.store_message(
+        session_id=session_id,
+        blob={"role": role, "content": content},
+        format="openai",
+    )
+
+def get_messages(client: AcontextClient, session_id: str, format: str = "openai") -> list:
+    """
+    Retrieve all messages from a session.
+    
+    Args:
+        client: Acontext client instance
+        session_id: ID of the session
+        format: Output format - 'openai', 'anthropic', or 'gemini'
+    
+    Returns:
+        List of messages in requested format
+    """
+    result = client.sessions.get_messages(session_id=session_id, format=format)
+    return result.messages
+
+def get_compressed_messages(client: AcontextClient, session_id: str) -> dict:
+    """
+    Retrieve context-window-managed messages with automatic compression.
+    This applies strategies to keep messages within token limits.
+    
+    Args:
+        client: Acontext client instance
+        session_id: ID of the session
+    
+    Returns:
+        Dict with 'messages' list and 'tokens' count
+    """
+    result = client.sessions.get_messages(
+        session_id=session_id,
+        edit_strategies=[
+            # Keep only the 3 most recent tool results
+            {"type": "remove_tool_result", "params": {"keep_recent_n_tool_results": 3}},
+            # Enforce 30k token limit
+            {"type": "token_limit", "params": {"limit_tokens": 30000}},
+        ],
+    )
+    return {"messages": result.messages, "tokens": result.this_time_tokens}
+
+def get_session_summary(client: AcontextClient, session_id: str) -> str:
+    """
+    Get a compact summary of the session for context injection.
+    
+    Args:
+        client: Acontext client instance
+        session_id: ID of the session
+    
+    Returns:
+        Summary text
+    """
+    summary = client.sessions.get_session_summary(session_id=session_id, limit=5)
+    return summary.content
+```
+
+### Step 8: Create Disk Management Module
+
+Create `agent/disk.py` for filesystem-like artifact storage:
+
+```python
+# agent/disk.py
+import os
+from acontext import AcontextClient
+
+def create_disk(client: AcontextClient, name: str = "agent-artifacts") -> str:
+    """
+    Create an isolated storage group for agent-generated files.
+    Think of this as creating a virtual filesystem for your agent.
+    
+    Args:
+        client: Acontext client instance
+        name: Name for the disk storage
+    
+    Returns:
+        Disk ID string
+    """
+    disk = client.disks.create(name=name)
+    return disk.id
+
+def upload_artifact(
+    client: AcontextClient, disk_id: str, filename: str, content: str
+) -> str:
+    """
+    Upload a text artifact (code, reports, markdown) to the agent's Disk.
+    
+    Args:
+        client: Acontext client instance
+        disk_id: ID of the disk
+        filename: Name for the file
+        content: File content as string
+    
+    Returns:
+        Artifact ID string
+    """
+    artifact = client.disks.upload_artifact(
+        disk_id=disk_id,
+        filename=filename,
+        content=content.encode("utf-8"),
+        mime_type="text/plain",
+    )
+    return artifact.id
+
+def list_artifacts(client: AcontextClient, disk_id: str) -> list[dict]:
+    """
+    List all artifacts stored in the Disk.
+    
+    Args:
+        client: Acontext client instance
+        disk_id: ID of the disk
+    
+    Returns:
+        List of artifact metadata dicts
+    """
+    artifacts = client.disks.list_artifacts(disk_id=disk_id)
+    return [{"id": a.id, "name": a.filename, "size": a.size} for a in artifacts]
+
+def download_artifact(client: AcontextClient, artifact_id: str) -> str:
+    """
+    Download artifact content as a string.
+    
+    Args:
+        client: Acontext client instance
+        artifact_id: ID of the artifact to download
+    
+    Returns:
+        Artifact content as string
+    """
+    content = client.disks.download_artifact(artifact_id=artifact_id)
+    return content.decode("utf-8")
+```
+
+### Step 9: Create Skill Space Module
+
+Create `agent/skills.py` for learning from past experiences:
+
+```python
+# agent/skills.py
+from acontext import AcontextClient
+
+def create_space(client: AcontextClient, name: str = "agent-skills") -> str:
+    """
+    Create a knowledge Space for storing and retrieving distilled skills.
+    This is where your agent's learned patterns accumulate over time.
+    
+    Args:
+        client: Acontext client instance
+        name: Name for the skill space
+    
+    Returns:
+        Space ID string
+    """
+    space = client.spaces.create(name=name)
+    return space.id
+
+def search_skills(
+    client: AcontextClient, space_id: str, query: str, mode: str = "semantic"
+) -> list[dict]:
+    """
+    Search for relevant skills before executing a task.
+    This lets your agent recall past successful patterns.
+    
+    Args:
+        client: Acontext client instance
+        space_id: ID of the skill space
+        query: Search query describing the current task
+        mode: Search mode:
+            - 'semantic': Fast single-skill lookup
+            - 'agentic': Multi-skill combination for complex tasks
+    
+    Returns:
+        List of relevant skill dicts with title, content, and score
+    """
+    results = client.spaces.experience_search(
+        space_id=space_id,
+        query=query,
+        mode=mode,
+    )
+    return [{"title": r.title, "content": r.content, "score": r.score} for r in results]
+
+def format_skills_as_context(skills: list[dict]) -> str:
+    """
+    Format retrieved skills into a system-prompt-friendly string.
+    This prepares the context to inject into your agent's prompt.
+    
+    Args:
+        skills: List of skill dicts from search_skills()
+    
+    Returns:
+        Formatted string ready for prompt injection
+    """
+    if not skills:
+        return ""
+    lines = ["## Relevant Past Experience\n"]
+    for skill in skills:
+        lines.append(f"### {skill['title']}\n{skill['content']}\n")
+    return "\n".join(lines)
+```
+
+### Step 10: Create Example Tool
+
+Create `tools/weather.py` as an example tool for your agent:
+
+```python
+# tools/weather.py
+import json
+
+# Tool definition in OpenAI function calling format
+WEATHER_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "Get current weather for a city",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "City name"}
+            },
+            "required": ["location"],
+        },
+    },
+}
+
+def handle_get_weather(arguments: str) -> str:
+    """
+    Handle weather tool calls from the agent.
+    
+    Args:
+        arguments: JSON string with tool arguments
+    
+    Returns:
+        JSON string with weather data
+    
+    Note:
+        Replace this mock implementation with a real weather API call
+        (e.g., OpenWeatherMap, WeatherAPI, etc.)
+    """
+    args = json.loads(arguments)
+    
+    # Mock response - replace with actual API call
+    return json.dumps({
+        "location": args["location"], 
+        "temp": "22°C", 
+        "condition": "Sunny"
+    })
+```
+
+### Step 11: Create the Main Agent
+
+Create `main.py` to tie everything together:
+
+```python
+# main.py
+import os
+import json
+from openai import OpenAI
+from dotenv import load_dotenv
+
+# Import our custom modules
+from agent.client import get_client
+from agent.session import (
+    create_session, store_message,
+    get_compressed_messages, get_session_summary,
+)
+from agent.disk import create_disk, upload_artifact
+from agent.skills import create_space, search_skills, format_skills_as_context
+from tools.weather import WEATHER_TOOL, handle_get_weather
+
+# Load environment variables
+load_dotenv()
+
+# Initialize clients
+ac     = get_client()  # Acontext client
+openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # OpenAI client
+
+def run_agent(user_input: str, session_id: str, disk_id: str, space_id: str) -> str:
+    """
+    Main agent execution flow with self-learning capabilities.
+    
+    Args:
+        user_input: User's query or command
+        session_id: Current conversation session
+        disk_id: Storage disk for artifacts
+        space_id: Skill space for learning
+    
+    Returns:
+        Agent's response string
+    """
+    
+    # STEP 1: Retrieve relevant skills from past successful experiences
+    # This allows the agent to learn from previous interactions
+    skills    = search_skills(ac, space_id, user_input, mode="semantic")
+    skill_ctx = format_skills_as_context(skills)
+
+    # STEP 2: Build system prompt with injected skill context
+    # Past patterns guide current execution
+    system_prompt = (
+        "You are a helpful AI agent. Use tools when needed.\n" + skill_ctx
+    )
+
+    # STEP 3: Store the user message in session history
+    store_message(ac, session_id, "user", user_input)
+
+    # STEP 4: Retrieve context-managed history
+    # Acontext automatically handles token limits and compression
+    ctx = get_compressed_messages(ac, session_id)
+    print(f"[Context] Using {ctx['tokens']} tokens")
+
+    # STEP 5: Call LLM with full context
+    response = openai.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "system", "content": system_prompt}] + ctx["messages"],
+        tools=[WEATHER_TOOL],  # Available tools for the agent
+    )
+    msg = response.choices[0].message
+
+    # STEP 6: Handle tool calls if any
+    if msg.tool_calls:
+        for tc in msg.tool_calls:
+            # Execute the tool and store the result
+            result = handle_get_weather(tc.function.arguments)
+            store_message(ac, session_id, "tool", result)
+
+        # Make a follow-up call with tool results
+        ctx2 = get_compressed_messages(ac, session_id)
+        response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": system_prompt}] + ctx2["messages"],
+        )
+        msg = response.choices[0].message
+
+    final_answer = msg.content or ""
+
+    # STEP 7: Store assistant reply and save as artifact
+    # This builds up the session history for future learning
+    store_message(ac, session_id, "assistant", final_answer)
+    upload_artifact(ac, disk_id, "last_response.txt", final_answer)
+
+    return final_answer
+
+
+def main():
+    """Initialize the agent and start interactive loop."""
+    
+    # Initialize persistent resources
+    space_id   = create_space(ac, "weather-agent-skills")     # For learning
+    session_id = create_session(ac, space_id=space_id)        # For conversation
+    disk_id    = create_disk(ac, "weather-agent-artifacts")   # For files
+
+    print("Agent ready. Type 'quit' to exit.\n")
+
+    # Interactive conversation loop
+    while True:
+        user_input = input("You: ").strip()
+        if user_input.lower() in ("quit", "exit"):
+            break
+        if not user_input:
+            continue
+
+        # Run the agent and display response
+        answer = run_agent(user_input, session_id, disk_id, space_id)
+        print(f"\nAgent: {answer}\n")
+
+    # Print session summary on exit
+    summary = get_session_summary(ac, session_id)
+    print(f"\n[Session Summary]\n{summary}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Step 12: Run Your Agent
+
+Now you're ready to run your self-learning agent!
+
+```bash
+python main.py
+```
+
+You should see:
+```
+Agent ready. Type 'quit' to exit.
+
+You: 
+```
+
+Try asking questions like:
+- "What's the weather in Tokyo?"
+- "Tell me about the weather in Paris"
+- Type `quit` to exit
+
+The agent will:
+1. Search for relevant past experiences
+2. Use learned skills to improve responses
+3. Store the conversation for future learning
+4. Save artifacts to the disk
+
+</Steps>
+
+
+## Observability Dashboard
+
+After running your agent, visit the Acontext dashboard to see what it learned:
+
+- **Cloud**: [dash.acontext.io](https://dash.acontext.io)
+- **Self-hosted**: `http://localhost:8029`
+
+The dashboard shows:
+- Auto-extracted tasks from conversations
+- Success rates and performance metrics
+- Distilled skills that were learned
+- Step-by-step trace timelines for debugging
+
+<Callout type="tip">
+Skill distillation runs 10–30 seconds after a session ends. Refresh the dashboard to see newly learned SOPs appear in your Space.
+</Callout>
+
+
+
+## Resources
+
+- [GitHub — memodb-io/Acontext](https://github.com/memodb-io/Acontext)
+- [Official Docs](https://docs.acontext.io)
+- [Example Repo](https://github.com/memodb-io/Acontext-Examples)
+- [Discord Community](https://discord.acontext.io)
