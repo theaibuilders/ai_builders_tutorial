@@ -1,29 +1,33 @@
 # Actionbook: Build Your First AI Browser Agent 
 
-In this tutorial you will build a small Node.js AI agent that uses the **Actionbook CLI** to search Google — entirely on your local machine. By the end you will understand what action manuals are, how the CLI controls your browser, and how to wire everything together with an LLM.
+In this tutorial you will build a small Node.js AI agent that uses the **Actionbook CLI** and **Action Manuals** to search Google — entirely on your local machine. By the end you will understand how action manuals provide pre-computed selectors, how the CLI controls your browser, and how to wire everything together with an LLM.
 
 ![Actionbook Banner](/products/actionbook/actionbook-1.png)
 
-> **What you will build:** A command-line agent you run with `node agent.mjs "your query"`. It fetches a verified Google search selector from Actionbook, opens your real browser, types the query, and prints what it finds.
+> **What you will build:** A command-line agent you run with `node agent.mjs "your query"`. It fetches an action manual for Google, extracts the search input selector, opens your real browser, types the query, and takes a screenshot of the results.
 
 ## How Actionbook Works
 
-Without Actionbook an AI agent has to download an entire HTML page, parse it, and guess which element to click — burning tokens and hallucinating. Actionbook gives the agent a pre-computed **action manual** instead: a small JSON document with exact CSS selectors and step-by-step instructions for a specific website task.
+Without Actionbook an AI agent has to download an entire HTML page, parse it, and guess which element to click — burning tokens and hallucinating. Actionbook gives the agent **Action Manuals** instead: pre-computed playbooks with verified selectors for each interactive element on popular websites.
 
 ```
 Your Agent
   │
-  ├─ actionbook search "google search bar"   ──►  Actionbook API
-  │                                                    │
-  ├─ actionbook get "google.com:/:default"   ◄──  Action Manual (tiny JSON)
-  │                                               • step-by-step instructions
-  │                                               • verified CSS selectors
+  ├─ actionbook search "google search"        ──►  Find available action manuals
+  │                                                 • google.com:/:default
+  │                                                 • google.com:/advanced_search:default
   │
-  └─ actionbook browser open / type / click  ──►  Your real Chrome/Edge/Brave
-                                                   (connected via CDP — no driver install)
+  ├─ actionbook get "google.com:/:default"    ◄──  Full manual with selectors
+  │                                                 • textarea_search: textarea[aria-label="Search"]
+  │                                                 • button_search: [aria-label="Google Search"]
+  │
+  ├─ actionbook browser open "google.com"     ──►  Your real Chrome/Edge/Brave
+  │                                                 (connected via CDP — no driver install)
+  │
+  └─ actionbook browser fill / press          ──►  Execute actions using verified selectors
 ```
 
-The CLI is written in Rust and connects to the browser you already have installed — nothing extra to download.
+The CLI is written in Rust and connects to the browser you already have installed — nothing extra to download. Action manuals are maintained and versioned by Actionbook, so when a site changes, the manual is updated — not your agent.
 
 
 
@@ -72,32 +76,27 @@ You should see a version number printed. If you see a "command not found" error,
 
 ## Step 2 — Try the CLI Manually
 
-Before writing any code, let's explore Actionbook interactively so you understand what your agent will do automatically.
+Before writing any code, let’s explore Actionbook interactively so you understand what your agent will do automatically.
 
-**Search for action manuals:**
+**Search for action manuals and explore them:**
 ```bash
-actionbook search "google search bar"
-```
+# Search for Google-related action manuals
+actionbook search "google search"
 
-You will see a list of results. Each result has an **area ID** like `google.com:/:default`. Copy the ID of the top result.
-
-**Fetch the full action manual:**
-```bash
+# Get the full action manual for Google homepage
 actionbook get "google.com:/:default"
 ```
-
-This prints a plain-text description of the Google homepage — the steps to interact with it and the exact CSS selectors for each element. This is what your agent will read instead of the raw HTML.
 
 **Open your browser and interact with it:**
 ```bash
 # Open Google in your existing Chrome/Brave/Edge
 actionbook browser open "https://www.google.com"
 
-# See the accessibility tree (element refs + selectors)
-actionbook browser snapshot
+# Fill the search box using a selector from the action manual
+actionbook browser fill 'textarea[aria-label="Search"]' "Actionbook browser agent"
 
-# Type into the search box using a selector from the manual
-actionbook browser type "textarea[name='q']" "Actionbook browser agent"
+# Press Enter to search
+actionbook browser press "Enter"
 
 # Take a screenshot to verify
 actionbook browser screenshot ./result.png
@@ -106,7 +105,7 @@ actionbook browser screenshot ./result.png
 actionbook browser close
 ```
 
-> **What just happened?** The CLI connected to your real browser via Chrome DevTools Protocol (CDP). No WebDriver, no Selenium, no separate Chromium download — it used the browser you already have.
+> **What just happened?** The `search` command found available action manuals for Google. The `get` command retrieved the full manual with verified selectors. The CLI then connected to your real browser via Chrome DevTools Protocol (CDP) and executed the automation using those selectors. No WebDriver, no Selenium, no separate Chromium download — it used the browser you already have.
 
 
 
@@ -144,7 +143,7 @@ OPENAI_API_KEY=sk-your-key-here
 
 
 
-## Step 4 — `browser.mjs` — CLI Wrapper
+## Step 4 — browser.mjs — CLI Wrapper
 
 This file wraps each Actionbook CLI command in a JavaScript function so your agent can call them easily.
 
@@ -181,37 +180,23 @@ export function browserOpen(url) {
   run(`actionbook browser open "${url}"`, { stdio: "inherit" });
 }
 
-/** Navigate the current tab to a new URL (no new tab). */
-export function browserGoto(url) {
-  run(`actionbook browser goto "${url}"`, { stdio: "inherit" });
+/** Fill an input field with text (official Actionbook command). */
+export function browserFill(selector, text) {
+  console.log(`[actionbook] Filling "${text}" into ${selector}`);
+  // Use single quotes for selector to avoid escaping issues with attribute selectors
+  run(`actionbook browser fill '${selector}' '${text}'`);
 }
 
-/** Type text into the element matching selector. */
-export function browserType(selector, text) {
-  console.log(`[actionbook] Typing "${text}" into ${selector}`);
-  run(`actionbook browser type "${selector}" "${text}"`);
-}
-
-/** Click the element matching selector. */
-export function browserClick(selector) {
-  console.log(`[actionbook] Clicking ${selector}`);
-  run(`actionbook browser click "${selector}"`);
-}
-
-/** Wait for an element to appear on the page. */
-export function browserWait(selector) {
-  run(`actionbook browser wait "${selector}"`);
+/** Press a key (e.g., "Enter", "Tab", "Escape"). */
+export function browserPressKey(key) {
+  console.log(`[actionbook] Pressing key: ${key}`);
+  run(`actionbook browser press "${key}"`);
 }
 
 /** Take a screenshot. Returns path string. */
 export function browserScreenshot(path = "./screenshot.png") {
   run(`actionbook browser screenshot "${path}"`);
   return path;
-}
-
-/** Get an accessibility tree snapshot — useful for debugging selectors. */
-export function browserSnapshot() {
-  return run(`actionbook browser snapshot`);
 }
 
 /** Close the browser session. ALWAYS call this when done. */
@@ -227,9 +212,9 @@ export function browserClose() {
 
 
 
-## Step 5 — `agent.mjs` — The AI Agent
+## Step 5 — agent.mjs — The AI Agent
 
-This is the brain. It sends the action manual to the LLM, asks it which selector to use, then uses `browser.mjs` to execute the task.
+This is the brain. It searches for an action manual, extracts the verified selector, then uses `browser.mjs` to execute the task.
 
 ```js
 // agent.mjs
@@ -239,86 +224,88 @@ import {
   searchActions,
   getManual,
   browserOpen,
-  browserType,
-  browserClick,
-  browserWait,
+  browserFill,
+  browserPressKey,
   browserScreenshot,
   browserClose,
 } from "./browser.mjs";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ── Step 1: Ask the LLM which selector to use ───────────────────────────────
+// ── Step 1: Parse action IDs from search results ────────────────────────────
 
-async function askLLMForSelector(manual, task) {
-  console.log("\n[agent] Asking LLM to pick the right selector...");
+function parseActionIds(searchOutput) {
+  const lines = searchOutput.split("\n");
+  const actionIds = [];
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",            // cheap and fast for beginners
-    messages: [
-      {
-        role: "system",
-        content:
-          "You are a browser automation expert. " +
-          "Given an action manual, extract the CSS selector for the requested element. " +
-          "Reply with ONLY the selector string — no explanation, no backticks.",
-      },
-      {
-        role: "user",
-        content: `Task: ${task}\n\nAction Manual:\n${manual}`,
-      },
-    ],
-    max_tokens: 60,
-  });
+  for (const line of lines) {
+    // Match "- ID: xxx" format
+    const idMatch = line.match(/^- ID:\s*(.+)$/);
+    if (idMatch) {
+      actionIds.push(idMatch[1].trim());
+      continue;
+    }
+    // Match "### xxx" header format
+    const headerMatch = line.match(/^###\s+([\w.-]+:[^\s]+)/);
+    if (headerMatch) {
+      actionIds.push(headerMatch[1].trim());
+    }
+  }
 
-  const selector = response.choices[0].message.content.trim();
-  console.log(`[agent] LLM chose selector: ${selector}`);
-  return selector;
+  return actionIds;
 }
 
-// ── Step 2: Use the selector to automate the browser ────────────────────────
+// ── Step 2: Main search task using action manuals ───────────────────────────
 
 async function runSearchTask(query) {
   console.log(`\n🤖 Agent starting task: search Google for "${query}"\n`);
 
-  // 2a. Find the relevant action manual
-  const searchResults = searchActions("google search bar");
-
-  // Parse the first area ID from the search output
-  // Output lines look like: "google.com:/:default  –  Google homepage"
-  const firstLine = searchResults.split("\n").find((l) => l.includes("google"));
-  const areaId = firstLine?.split(/\s+/)[0] ?? "google.com:/:default";
-  console.log(`[agent] Using area: ${areaId}`);
-
-  // 2b. Fetch the full manual for that area
-  const manual = getManual(areaId);
-
-  // 2c. Ask the LLM to extract the search-box selector from the manual
-  const searchBoxSelector = await askLLMForSelector(
-    manual,
-    "The CSS selector for the Google search text input"
-  );
-
-  // 2d. Execute browser actions
   try {
+    // Search for Google search action manual
+    console.log("[agent] Searching for action manual...");
+    const searchResults = searchActions("google search");
+
+    // Parse action IDs from results
+    const actionIds = parseActionIds(searchResults);
+    console.log("[agent] Found action IDs:", actionIds);
+
+    // Find the Google homepage action
+    let actionId = actionIds.find((id) => 
+      id.startsWith("google.com:/:") || id === "google.com:/:default"
+    );
+    if (!actionId) {
+      actionId = actionIds.find((id) => id.startsWith("google.com:"));
+    }
+    if (!actionId) throw new Error("No action manual found for Google");
+
+    // Get the full action manual
+    console.log(`[agent] Fetching manual for: ${actionId}`);
+    const manual = getManual(actionId);
+
+    // Extract the search input selector from the role definition
+    // The manual contains: getByRole('combobox', { name: 'Search' })
+    let searchInputSelector = '[role="combobox"]';
+    const roleMatch = manual.match(/getByRole\('combobox',\s*\{\s*name:\s*'([^']+)'\s*\}\)/);
+    if (roleMatch) {
+      const comboboxName = roleMatch[1];
+      console.log(`[agent] Found combobox name: ${comboboxName}`);
+      searchInputSelector = `textarea[aria-label="${comboboxName}"]`;
+    }
+    console.log(`[agent] Using selector: ${searchInputSelector}`);
+
+    // Execute browser automation
     browserOpen("https://www.google.com");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    // Wait until the search box is on the page before typing
-    browserWait(searchBoxSelector);
-    browserType(searchBoxSelector, query);
+    // Fill the search input and submit
+    browserFill(searchInputSelector, query);
+    browserPressKey("Enter");
 
-    // Press Enter by clicking the search button (or use keyboard shortcut)
-    browserClick("input[name='btnK'], button[aria-label='Google Search']");
-
-    // Wait for results to load
-    browserWait("div#search");
-
-    // Take a screenshot as proof
+    // Wait for results and screenshot
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const shot = browserScreenshot("./search-result.png");
     console.log(`\n✅ Done! Screenshot saved to ${shot}`);
-    console.log(`   Open it to see the search results for: "${query}"`);
   } finally {
-    // Always close — even if something throws above
     browserClose();
   }
 }
@@ -348,31 +335,36 @@ You will see the agent log each step as it goes:
 ```
 🤖 Agent starting task: search Google for "open source AI agents"
 
-[actionbook] Searching: "google search bar"
-[agent] Using area: google.com:/:default
+[agent] Searching for action manual...
+[actionbook] Searching: "google search"
+[agent] Found action IDs: [ 'google.com:/:default', ... ]
+[agent] Fetching manual for: google.com:/:default
 [actionbook] Getting manual: google.com:/:default
-[agent] Asking LLM to pick the right selector...
-[agent] LLM chose selector: textarea[name='q']
+[agent] Found combobox name: Search
+[agent] Using selector: textarea[aria-label="Search"]
 [actionbook] Opening: https://www.google.com
-[actionbook] Typing "open source AI agents" into textarea[name='q']
-[actionbook] Clicking input[name='btnK']...
-[actionbook] Closing browser.
+✓ Google
+  https://www.google.com
+[actionbook] Filling "open source AI agents" into textarea[aria-label="Search"]
+[actionbook] Pressing key: Enter
 
 ✅ Done! Screenshot saved to ./search-result.png
+[actionbook] Closing browser.
 ```
 
 Open `search-result.png` and you will see a real Google results page.
 
+![Google Search Results](/products/actionbook/actionbook-2.png)
 
 
 ## Step 7 — Understand What Each Part Does
 
-- **`browser.mjs`** — Translates JS function calls into `actionbook` CLI commands
-- **`agent.mjs`** — Orchestrates the workflow: search → get manual → ask LLM → execute
+- **`browser.mjs`** — Translates JS function calls into `actionbook` CLI commands (search, get, browser fill, etc.)
+- **`agent.mjs`** — Orchestrates the workflow: search for manual → get manual → extract selector → execute browser actions
 - **`.env`** — Stores secrets — never commit this file
 
-**Why does the agent ask the LLM?** The action manual describes the page in plain English and lists selectors. The LLM reads that description and extracts exactly the selector you need — this is safer than guessing. In production you would cache this step so you don't pay for an LLM call on every run.
-
+**Why use Action Manuals?** Action manuals are pre-computed playbooks maintained by Actionbook. They contain verified selectors that are updated when websites change. Instead of your agent guessing selectors or parsing full HTML, it uses a curated manual with high-confidence selectors — 10x faster and 100x fewer tokens.
+<br />
 **What is CDP?** Chrome DevTools Protocol is the same protocol your browser's DevTools uses. Actionbook speaks CDP natively, so it can open tabs, click, type, and screenshot without any driver or browser extension.
 
 ## Next Steps
@@ -381,7 +373,7 @@ Now that your first agent works, here is what to try next:
 
 - **Add more sites** — run `actionbook search "linkedin login"` and automate LinkedIn.
 - **Loop over queries** — read a list of search terms from a file and run the agent for each.
-- **Chain actions** — after the search, ask the LLM to pick a result link and follow it.
+- **Chain actions** — after the search, get another manual for the results page and follow a link.
 - **Add the MCP server** — once comfortable with the CLI, add the MCP server to Cursor or Claude Code so your AI IDE can call Actionbook for you automatically.
 
 ## Resources
