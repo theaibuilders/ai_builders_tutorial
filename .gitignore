@@ -32,6 +32,17 @@ tutorials/Fine Tuning/results/
 *.pth
 *.bin
 
+# Video generation outputs
+**/seedance_outputs/
+**/seedance_inputs/
+*.mp4
+*.mov
+*.avi
+
+# macOS files
+.DS_Store
+**/.DS_Store
+
 
 # START Ruler Generated Files
 /.github/copilot-instructions.md
