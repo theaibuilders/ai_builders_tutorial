@@ -9,12 +9,13 @@ export interface TranslationConfig {
 }
 
 export const translationConfig: TranslationConfig = {
-  supportedLanguages: ['en', 'zh-cn', 'ja-jp'],
+  supportedLanguages: ['en', 'zh-cn', 'ja-jp', 'ja'],
   defaultLanguage: 'en',
   languageNames: {
     'en': 'English',
     'zh-cn': '中文',
-    'ja-jp': '日本語'
+    'ja-jp': '日本語',
+    'ja': '日本語'
   }
 };
 
@@ -38,7 +39,8 @@ export function getLanguageDir(language: string): string {
   const langDirs: Record<string, string> = {
     'en': 'tutorials',
     'zh-cn': 'tutorials-zh-cn',
-    'ja-jp': 'tutorials-ja-jp'
+    'ja-jp': 'tutorials-ja',
+    'ja': 'tutorials-ja'  // Support both ja and ja-jp
   };
   
   return langDirs[language] || 'tutorials';
