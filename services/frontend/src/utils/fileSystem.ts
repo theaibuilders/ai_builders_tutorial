@@ -14,7 +14,16 @@ export function getTutorialsDir(language: string = 'en'): string {
   if (language === 'en') {
     return TUTORIALS_DIR;
   }
-  return path.join(process.cwd(), `tutorials-${language}`);
+  
+  // Map language codes to directory names
+  const langDirs: Record<string, string> = {
+    'zh-cn': 'tutorials-zh-cn',
+    'ja-jp': 'tutorials-ja',
+    'ja': 'tutorials-ja'
+  };
+  
+  const dirName = langDirs[language] || `tutorials-${language}`;
+  return path.join(process.cwd(), dirName);
 }
 
 // Check if a translated file exists for a given path and language
