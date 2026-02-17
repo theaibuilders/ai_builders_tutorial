@@ -1,0 +1,494 @@
+# バイブコードでWeb検索AIエージェントを構築・デプロイ
+
+## 概要
+このチュートリアルでは、完全な**Web検索AIエージェント**を構築します。これはPython FastAPIバックエンドとReactフロントエンドを備えたフルスタックアプリケーションで、ウェブを検索して質問に知的な回答を提供できます。エージェントはLLMを使用してWeb検索が必要かどうかを判断し、検索クエリを抽出し、BrightDataのSERP APIを通じてリアルタイム結果を取得し、RAG（検索拡張生成）パターンを使用して包括的な回答を合成します。
+
+アプリケーションにはユーザー制御の「Web検索」チェックボックスが含まれており、以下を切り替えることができます：
+- **有効**: エージェントはBrightDataを使用してWebを検索し情報を合成
+- **無効**: エージェントはLLMモデルの知識のみに依存しWeb検索を行わない
+![with-or-without-web-search](/workshops/with-or-without-web-search.png)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        ユーザーインターフェース (React)             │
+│                    "最新のAIニュースは何ですか？"                    │
+└──────────────────────────────────┬──────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      PYTHONバックエンド (FastAPI)                   │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────────────┐   │
+│  │   エージェント │────▶│    LLM      │────▶│   ウェブスクラパー    │   │
+│  │ (オーケストレータ)│    │  (脳)       │     │ (BrightData SERP)   │   │
+│  └─────────────┘     └─────────────┘     └─────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## 前提条件
+
+始める前に以下の準備ができていることを確認してください：
+
+- **Python 3.10+** がインストールされている
+- **Node.js 18+** がインストールされている
+- **APIキー** (ワークショップで提供されるか、独自に取得してください):
+  - [Zeabur AI Hub](https://zeabur.com/?utm_source=aibuilders) - LLMアクセス用 (OpenAI互換API)
+  - [BrightData](https://get.brightdata.com/aibuilders10) - ウェブ検索機能用
+
+### AIコーディングIDE
+
+お気に入りのAI搭載コーディングアシスタントを選択してください。Cursor、Claude Code、Open AI Codex、Windsurf、Replit、JetBrains AI Assistant、GitHub Copilot、Tabnine、Sourcegraph Cody、Amazon Q Developer、Aider、Cline、Qoder、CodeGeeXなど。
+
+## ワークショップ設定
+
+### ステップ1: ワークスペースを作成
+
+ターミナルを開き、新しい空のフォルダを作成してください：
+
+```bash
+mkdir deep-research-agent
+```
+
+### ステップ2: AI IDEでフォルダを開く
+
+- **Cursor**: ファイル → フォルダを開く
+- **VS Code + Copilot**: ファイル → フォルダを開く
+- **Windsurf**: ファイル → フォルダを開く
+
+### ステップ3: AIチャットインターフェースを開く
+
+- **Cursor**: `Cmd+K` (Mac) または `Ctrl+K` (Windows) を押してインライン、または `Cmd+L` / `Ctrl+L` でチャット
+- **GitHub Copilot**: Copilotアイコンをクリックするか `Cmd+I` / `Ctrl+I` を押す
+- **Windsurf**: `Cmd+L` / `Ctrl+L` でカスケード
+
+## バイブコーディングプロンプト
+
+これらのプロンプトを順番に従ってください。各プロンプトをAIコーディングアシスタントにコピーしてコード生成させてください！
+
+> **注意**: これらのプロンプトには、実装が最初から正しく動作するようにするための重要な技術的詳細と修正が含まれています。プロンプトは詳細に見えますが、これにより開発中に一般的なエラーに遭遇することを防ぎます。
+
+### プロンプト1: プロジェクトセットアップ
+
+> **目的:** プロジェクト構造を設定
+
+```
+ウェブ検索が必要なときに検索して質問に答えられるディープリサーチAIエージェントを構築したいです。
+
+バックエンドはPython、フロントエンドはReactになります。以下の構造を持つクリーンなプロジェクト構造を設定してください：
+- サービスフォルダにバックエンドとフロントエンドディレクトリ
+- 共通コマンド実行用のMakefile
+
+今のところフォルダ構造だけ作成してください。
+```
+
+**期待される出力:**
+- `services/backend/` フォルダ作成
+- `services/frontend/` フォルダ作成
+- 空の `Makefile` 作成
+
+### プロンプト2: バックエンドセットアップ
+
+> **目的:** Pythonバックエンドを初期化
+
+```
+services/backend/ にPythonバックエンドをセットアップします。
+
+必要となるのは：
+- FastAPI (ウェブサーバー用)
+- API呼び出し用の非同期HTTPクライアント
+- 環境変数サポート
+- データ検証
+
+必要な依存関係を含むrequirements.txtを作成してください。
+```
+
+**期待される出力:**
+FastAPI、uvicorn、httpx、python-dotenv、pydanticを含む `requirements.txt` ファイル
+
+### プロンプト3: 環境構成
+
+> **目的:** 環境変数を設定
+
+```
+2つのサービスのAPIキーを保存する必要があります：
+1. Zeabur AI Hub - OpenAI互換LLM API (トークン: ZEABUR_API_TOKEN)
+2. BrightData - ウェブスクレイピングサービス (トークン: BRIGHTDATA_API_TOKEN)
+
+backendフォルダに.env.exampleテンプレートと.envファイルを作成してください。また、ZEABUR_MODEL変数をgpt-4o-miniにデフォルト設定してください。
+
+また、pydantic-settingsを使用して環境変数を読み込むconfig.pyファイルも作成してください。
+重要: CORS_ORIGINSフィールドにはUnion[List[str], str]型を使用し、@field_validatorを追加して.envからのカンマ区切り文字列をリストに解析してください。これにより解析エラーを防ぎます。
+```
+
+**期待される出力:**
+- プレースホルダー値を含む `.env.example` ファイル
+- 埋め込み準備が整った `.env` ファイル
+- 設定クラスとCORSバリデータを含む `config.py`
+
+**APIキーを入力してください：**
+
+1. **Zeabur AI Hub トークン**: [Zeabur AI Hub](https://zeabur.com/ai?utm_source=aibuilders) にアクセス → サインイン → APIトークンをコピー → `ZEABUR_API_TOKEN` として貼り付け
+
+2. **BrightData トークン**: [BrightData ダッシュボード](https://brightdata.com/cp/api_tokens?utm_source=aibuilders) にアクセス → APIトークンを作成またはコピー → `BRIGHTDATA_API_TOKEN` として貼り付け
+
+### プロンプト4: LLMクライアント
+
+> **目的:** LLMとの通信クライアントを作成
+
+```
+Zeabur AI Hubと通信する必要があります。これはOpenAI互換APIです。
+
+services/backend/llm.py に以下の機能を持つPythonクライアントを作成してください：
+- プロンプト送信とレスポンス取得
+- 会話履歴のサポート (チャット)
+- エラー処理
+
+ベースURLは https://sfo1.aihub.zeabur.ai で、標準的なOpenAIチャットコンプリーション形式を使用します。HTTP呼び出しにはasync/awaitを使用してください。
+```
+
+**期待される出力:**
+LLMとのテキスト生成や会話が可能なクラスを含む `llm.py` ファイル
+
+### プロンプト5: ウェブ検索
+
+> **目的:** BrightDataを使用したウェブ検索機能を作成
+
+```
+BrightDataのSERP APIを使用してウェブ検索を行いたいです。
+
+services/backend/scraper.py に以下の機能を持つPythonクライアントを作成してください：
+- 検索クエリを受け取りGoogle検索結果を返す
+- https://api.brightdata.com/request のBrightData APIを使用
+- 解析された検索結果をJSONとして返す
+- エラー処理をクラッシュなしで行う
+
+APIはBearerトークン認証を使用し、以下のパラメータが必要です：
+- zone: "serp_api1"
+- format: "json"
+- data_format: "parsed_light"
+
+重要な修正点：
+1. urllib.parse.quote_plus をインポートして使用し、Google検索URL構築前に検索クエリをURLエンコードしてください
+2. "language"パラメータを含めないでください (BrightDataはそれを拒否します)
+3. BrightDataは {status_code, headers, body} 構造のレスポンスを返します。_parse_search_resultsで：
+   - データに 'body' フィールドがあるか確認し抽出
+   - bodyがJSON文字列の場合、json.loads()で解析
+   - 次に 'organic' または 'organic_results' フィールドを検索結果として探す
+```
+
+**期待される出力:**
+ウェブ検索と結果返しが可能なクラスを含む `scraper.py` ファイル
+
+### プロンプト6: AIエージェント
+
+> **目的:** 検索タイミングを決定するインテリジェントエージェントを構築
+
+```
+今度はすべてを統合するAIエージェントを構築します。
+
+services/backend/agent.py に以下の機能を持つエージェントを作成してください：
+1. ユーザーの質問を受け取る
+2. LLMを使用して判断: "これは現在のウェブ情報が必要ですか？"
+3. はいの場合: 検索キーワードを抽出し、ウェブ検索を行い、結果に基づいて回答
+4. いいえの場合: LLMの知識から直接回答
+
+エージェントは作成したLLMクライアントとウェブスクラッパーを使用してください。各ステップで何が起こっているか確認できるようにロギングを追加してください。
+
+重要: answer()メソッドはuse_web_searchパラメータを受け入れる必要があります (デフォルトはTrue)。
+use_web_searchがFalseの場合、ウェブ検索決定ロジックを完全にスキップしてLLMの知識から直接回答してください。
+```
+
+**期待される出力:**
+LLM推論とウェブ検索をオーケストレーションするインテリジェントエージェントを含む `agent.py` ファイル
+
+### プロンプト7: APIサーバー
+
+> **目的:** エージェントをREST APIとして公開
+
+```
+services/backend/main.py に以下の機能を持つFastAPIサーバーを作成してください：
+- 質問を受け取りエージェントの回答を返すPOST /api/queryエンドポイント
+- ヘルスチェックエンドポイント (GET / と GET /health)
+- config.py設定を使用して環境変数からAPIキーを読み込み
+- フロントエンドから呼び出せるようにCORSを有効化
+
+リクエストは {"query": "...", "use_web_search": true} で、レスポンスは {"answer": "..."} である必要があります。
+
+重要: 非推奨の@app.on_event("startup")および@app.on_event("shutdown")デコレーターを使用しないでください。
+代わりに現代的な方法を使用してください：
+1. contextlibからasynccontextmanagerをインポート
+2. スタートアップとシャットダウンを処理するlifespan非同期コンテキストマネージャー関数を作成
+3. FastAPIに渡す: app = FastAPI(lifespan=lifespan)
+
+これにより非推奨警告を回避します。
+```
+
+**期待される出力:**
+エージェントを公開するFastAPIサーバーを含む `main.py` ファイル
+
+### プロンプト8: フロントエンドセットアップ
+
+> **目的:** Reactフロントエンドを初期化
+
+```
+Viteを使用してservices/frontend/ にReact TypeScriptフロントエンドをセットアップします。
+
+必要となるのは：
+- TypeScript付きReact
+- マークダウンレンダラー (react-markdown with remark-gfm) でフォーマットされたAI応答を表示
+- API URLの環境変数サポート
+
+必要な設定ファイル (package.json, vite.config.ts, tsconfig.json, index.html) と基本的なエントリーポイントファイルを作成してください。
+```
+
+**期待される出力:**
+- Reactとマークダウン依存関係を含む `package.json`
+- ViteとTypeScript設定ファイル
+- `index.html` と `src/main.tsx` エントリーポイント
+- `VITE_API_URL=http://localhost:8000` を含む `.env` ファイル
+
+### プロンプト9: ユーザーインターフェース
+
+> **目的:** チャットインターフェースを構築
+
+```
+services/frontend/src/App.tsx にメインReactコンポーネントを作成してください。
+
+以下の機能を持つシンプルなチャットインターフェースが欲しいです：
+- 入力フィールドに質問を入力
+- 「Ask」ボタンをクリック (またはEnterを押して) 提出
+- 待機中のスピナーローディング表示
+- AIの回答をマークダウンとして表示 (表、リスト、リンク等)
+- 最近のクエリ履歴表示 (直近5件)
+エラーを適切に処理しエラーメッセージをユーザーに表示
+
+```
+
+**期待される出力:**
+完全なチャットインターフェースコンポーネントを含む `App.tsx` ファイル
+
+### プロンプト10: スタイリング
+
+> **目的:** 良い見た目にする
+
+```
+services/frontend/src/App.css にモダンでプロフェッショナルなCSSスタイルを作成してください。
+
+欲しいのは：
+- グラデーション背景 (ダークブルーからレッドトーン)
+- 中央にきれいな白カードコンテンツ
+- 良い入力フィールドとボタンスタイル
+- スピニングローダーアニメーション
+- マークダウンコンテンツの良いタイポグラフィ (見出し、リスト、表、コードブロック)
+- モバイル対応デザイン
+
+プロフェッショナルで洗練された外観にしてください。
+```
+
+**期待される出力:**
+完全なスタイルを含む `App.css` ファイル
+
+### プロンプト11: 開発コマンド
+
+> **目的:** 開発用に便利なコマンドを作成
+
+```
+ルートプロジェクトに以下のコマンドを持つMakefileを作成：
+- すべての依存関係をインストール (バックエンドとフロントエンド両方)
+- バックエンドサーバーを実行
+- フロントエンド開発サーバーを実行
+- 両方を一緒に実行
+
+"make install"と"make dev"だけで簡単に開始できるようにしてください。
+
+重要: 両方のコマンドが機能するようにコマンドエイリアスを追加：
+- make run-backend と make dev-backend (両方同じことを行う)
+- make run-frontend と make dev-frontend (両方同じことを行う)
+
+これにより異なる命名規則の整合性を確保します。
+```
+
+**期待される出力:**
+両方のサービス用のインストールとdevコマンドを含む `Makefile`
+
+### プロンプト12: ウェブ検索トグル追加
+
+> **目的:** ウェブ検索機能のユーザー制御を追加
+
+```
+フロントエンドに「Web検索」チェックボックスを追加し、AIエージェントがBrightDataを使用するかどうかをユーザーが制御できるようにします。
+
+フロントエンド変更 (services/frontend/src/App.tsx)：
+- チェックボックス状態 (useWebSearch) を追加しデフォルトをtrueに
+- 入力フィールド上部に明確なラベルと説明を持つチェックボックスUIを追加
+- チェックボックス状態 (use_web_search) をAPIリクエストボディで送信
+- ウェブ検索が有効かどうかに基づいてローディングメッセージを更新
+
+バックエンド変更 (services/backend/main.py)：
+- QueryRequestモデルを更新してオプションのuse_web_searchブール値を受け入れる (デフォルトはTrue)
+- このパラメータをエージェントに渡す
+
+バックエンド変更 (services/backend/agent.py)：
+- run()メソッドを更新してuse_web_searchパラメータを受け入れる
+- use_web_searchがFalseの場合、すべてのウェブ検索ロジックをスキップしLLMで直接回答
+- ウェブ検索が有効/無効かどうかを示すロギングを追加
+
+この機能によりユーザーはウェブ検索あり/なしでの回答を比較できます。
+```
+
+**期待される出力:**
+- 「Web検索」チェックボックスを含む更新された `App.tsx`
+- 新しいリクエストパラメータを含む更新された `main.py`
+- 条件付きウェブ検索ロジックを含む更新された `agent.py`
+
+## 検証ステップ
+
+すべてのコードを生成した後、プロジェクト構造が一致することを確認してください：
+
+```
+deep-research-agent/
+├── services/
+│   ├── backend/
+│   │   ├── .env
+│   │   ├── .env.example
+│   │   ├── agent.py
+│   │   ├── llm.py
+│   │   ├── main.py
+│   │   ├── requirements.txt
+│   │   └── scraper.py
+│   └── frontend/
+│       ├── src/
+│       │   ├── App.css
+│       │   ├── App.tsx
+│       │   ├── index.css
+│       │   └── main.tsx
+│       ├── .env
+│       ├── index.html
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── vite.config.ts
+└── Makefile
+```
+
+## プロジェクト実行
+
+### ステップ1: 環境変数を設定
+
+`services/backend/.env` を実際のAPIキーで編集してください：
+
+```env
+BRIGHTDATA_API_TOKEN=あなたの実際のbrightdataトークン
+ZEABUR_API_TOKEN=あなたの実際のzeaburトークン
+ZEABUR_MODEL=gpt-4o-mini
+PORT=8000
+```
+
+### ステップ2: 依存関係をインストール
+
+```bash
+# すべての依存関係をインストール
+make install
+
+# または個別にインストール：
+cd services/backend && pip3 install -r requirements.txt
+cd services/frontend && npm install
+```
+
+### ステップ3: バックエンドを起動
+
+```bash
+make dev-backend
+# または: cd services/backend && python3 main.py
+```
+
+以下のように表示されるはずです：
+```
+✅ 環境ロード成功
+🔗 Zeabur AI Hubに接続中: https://sfo1.aihub.zeabur.ai
+🤖 モデル使用中: gpt-4o-mini
+🚀 Web検索AIエージェントサーバーが http://localhost:8000 で実行中
+```
+
+### ステップ4: フロントエンドを起動 (新しいターミナル)
+
+```bash
+make dev-frontend
+# または: cd services/frontend && npm run dev
+```
+
+以下のように表示されるはずです：
+```
+VITE ready in XXX ms
+➜  Local:   http://localhost:5173/
+```
+
+### ステップ5: アプリケーションをテスト
+
+1. ブラウザで http://localhost:5173 を開く
+2. 「Web検索」チェックボックスが表示されます (デフォルトでチェック済み)
+3. 「AIの最新開発について」といった質問を入力
+4. 「Ask」をクリックして魔法を見ましょう！
+
+## リソース
+
+- **Zeabur AI Hub**: https://zeabur.com
+- **BrightData**: https://brightdata.com
+
+## おめでとうございます！🎉
+
+完全なAI駆動リサーチエージェントをバイブコードで作成しました！このプロジェクトは以下の内容を示しています：
+
+- ✅ FastAPIを使用したPython非同期プログラミング
+- ✅ TypeScriptを使用したReactフロントエンド
+- ✅ OpenAI互換API統合
+- ✅ BrightDataを使用したウェブスクレイピング
+- ✅ AIエージェントアーキテクチャ (ReActパターン)
+- ✅ RAG (検索拡張生成)
+- ✅ ユーザー制御機能トグル
+- ✅ AIアシスタンスによるフルスタック開発
+
+## 次のステップ
+
+エージェントを拡張したいですか？以下のアイデアを試してみてください：
+
+- 使用されたウェブサイトを示す出典情報を追加
+- リアルタイム回答のためのストリーミング応答を実装
+- 会話メモリを追加してクエリ間の文脈を維持
+- 複数の検索エンジン (Google, Bing, DuckDuckGo) サポート
+- ユーザー認証とクエリ履歴保存を追加
+- 本番環境へのデプロイ (Zeabur, Vercel, Railway等)
+
+**作成したものを共有し @theaibuildersdev をタグしてください！**
+
+---
+
+## 技術的ノート (インストラクター用)
+
+これらのプロンプトは、エラーのない実装を保証するために特定の技術的詳細で強化されています：
+
+### 組み込み修正
+
+1. **プロンプト3** - コンマ区切り文字列を解析するためのpydantic field_validatorを使用したCORSバリデータ
+2. **プロンプト5** - quote_plusによるURLエンコード、サポートされていない言語パラメータ削除、BrightDataレスポンスボディ抽出とJSON解析
+3. **プロンプト6** - 条件付き検索ロジックのためのuse_web_searchパラメータ
+4. **プロンプト7** - 非推奨on_eventデコレータの代わりの現代的なFastAPIライフスパンハンドラ
+5. **プロンプト11** - コマンドエイリアス (dev-backend/run-backend, dev-frontend/run-frontend)
+6. **プロンプト12** - 完全なウェブ検索トグル実装
+
+### これらの修正が重要な理由
+
+- **CORSバリデータ**: 環境変数読み込み時の `SettingsError` を防止
+- **URLエンコード**: スペースや特殊文字を含む検索クエリの処理
+- **レスポンス解析**: BrightDataのネストされたレスポンス構造から検索結果を正しく抽出
+- **ライフスパンハンドラ**: FastAPI 0.109+ での非推奨警告を排除
+- **コマンドエイリアス**: より良いUXのための両方の命名規則サポート
+
+### 検証
+
+学生がすべてのプロンプトを完了した後、以下を実行してすべてが機能することを確認できます：
+```bash
+make install
+make dev-backend  # ターミナル1
+make dev-frontend # ターミナル2
+```
+
+アプリはエラーなく起動し、http://localhost:3000 で完全に機能するはずです
