@@ -72,7 +72,7 @@ export default function LanguageSelector({ currentPath }: LanguageSelectorProps)
       {/* Language button - small text icon */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-8 h-8 flex items-center justify-center text-xs font-semibold text-gray-300 hover:text-white transition-colors rounded hover:bg-dark-hover"
+        className="min-w-12 h-8 px-2 flex items-center justify-center text-xs font-semibold text-gray-300 hover:text-white transition-colors rounded hover:bg-dark-hover whitespace-nowrap"
         aria-label="Select language"
         aria-expanded={isOpen}
       >
