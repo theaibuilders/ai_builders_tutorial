@@ -1,0 +1,342 @@
+# Using OpenClaw: A Complete Guide to the Gateway Dashboard
+
+## Set up OpenClaw on Zeabur:
+
+One-click deploy OpenClaw from the [OpenClaw template](https://zeabur.com/templates/VTZ4FX) (Dedicated Server required). Copy the Web UI URL from the Instructions tab and open it in your browser. Set your AI model in Settings or via environment variables, then test in Chat. Add Telegram, WhatsApp, or other channels from the Channels section when ready.
+
+![zeabur openclaw template](/products/openclaw/openclaw-1.png)
+
+This guide walks through every section of the Gateway Dashboard — what each primitive is, how it fits together, and the key actions you'll take daily.
+
+## How OpenClaw Is Structured
+
+Before diving into individual screens, understand the four core primitives that everything else builds on:
+
+- **Gateway** — The always-on control plane. Owns all channel connections, routes messages to agents, and serves the dashboard.
+- **Channels** — Messaging integrations (WhatsApp, Telegram, Discord, etc.) — how the outside world reaches your agent.
+- **Agents** — Isolated LLM instances with their own workspace, model config, and session history.
+- **Sessions** — A conversation thread. DMs collapse into a shared `main` session; group chats stay isolated.
+
+Skills, Cron Jobs, Nodes, and Tools all extend what agents can _do_ within a session.
+
+
+
+## The Sidebar at a Glance
+
+Your dashboard sidebar is organized into four groups:
+
+```
+Chat
+  └── Chat                    ← Browser-based WebChat with your agent
+
+Control
+  ├── Overview                ← Gateway status, entry points, health read
+  ├── Channels                ← WhatsApp, Telegram, Discord, Google Chat…
+  ├── Instances                ← Presence beacons from connected clients and nodes
+  ├── Sessions                 ← Active session keys and per-session overrides
+  ├── Usage                    ← Token + cost tracking
+  └── Cron Jobs                ← Schedule wakeups and recurring agent runs
+
+Agent
+  ├── Agents                  ← Manage agent workspaces, tools, and identities
+  ├── Skills                  ← Manage skill availability and API key injection
+  └── Nodes                    ← Paired devices, capabilities, command exposure
+
+Settings
+  ├── Config                  ← Full JSON config editor and settings form
+  ├── Debug                   ← Live gateway logs
+  └── Logs                     ← Persisted run history
+```
+
+
+
+## Chat
+
+The **Chat** tab is the fastest way to talk to your agent without connecting any external channel. It connects directly to the Gateway over WebSocket and starts a `main` session.
+
+Use it to:
+- Test agent behavior after a config change
+- Try out new skills before exposing them to a channel
+- Debug model responses in real time
+
+The chat UI reflects what any connected channel user would see — it's not a special mode, just a built-in channel.
+
+
+
+## Control → Overview
+
+![Overview — Gateway status, entry points, and health](/products/openclaw/overview.png)
+
+The **Overview** page shows *Gateway status, entry points, and a fast health read*. **Gateway Access** is where the dashboard connects and authenticates (WebSocket URL, Gateway Token, Default Session Key; use **Connect** and **Refresh**). The **Snapshot** card shows **STATUS**, **UPTIME**, **TICK INTERVAL**, and **LAST CHANNELS REFRESH**. Summary cards show **INSTANCES** (presence beacons in the last 5 minutes), **SESSIONS** (recent session keys tracked by the gateway), and **CRON** (e.g. Enabled, Next wake). **Notes** gives quick reminders for remote control (e.g. Tailscale serve, session hygiene, cron). **Health: OK** in the top-right means the Gateway and WebSocket control plane are responding — if it turns red, check **Settings → Debug** and **Logs**.
+
+
+
+## Control → Channels
+
+![Channels — Manage channels and settings](/products/openclaw/channels.png)
+
+Channels are how external messaging platforms connect to your Gateway. You’ll see four panels: **WhatsApp**, **Telegram**, **Discord**, and **Google Chat**. Each shows the same status fields:
+
+- **Configured** — A config entry exists in `openclaw.json` for this channel.
+- **Running** — The adapter process is actively polling or connected.
+- **Linked / Connected** — Auth credentials are valid and the session is live.
+- **Last message** — Timestamp of the most recent inbound message.
+
+### Connecting WhatsApp
+
+WhatsApp uses the **Baileys** library and authenticates via QR code scan — no bot token needed.
+
+1. Click **Show QR** in the WhatsApp panel.
+2. Open WhatsApp on your phone → Settings → Linked Devices → Link a Device.
+3. Scan the QR code shown in the dashboard.
+4. The panel will update: Linked = Yes, Connected = Yes.
+
+Use **Relink** if your session expires. Use **Wait for scan** to keep the QR alive longer on slow connections.
+
+```json
+// In your config (Settings → Config), add:
+{
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "allowFrom": ["+65XXXXXXXX"]
+    }
+  }
+}
+```
+
+> `allowFrom` is your allowlist. Only numbers listed here can message your agent. Leave it empty to allow all (not recommended in production).
+
+### Connecting Telegram
+
+Telegram uses the **grammY** library with a bot token. The error "Channel config schema unavailable" means the bot token has not been set yet.
+
+1. Open Telegram → search `@BotFather` → `/newbot`.
+2. Copy the bot token (format: `123456789:ABCdef...`).
+3. Go to **Settings → Config** and add:
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "123456789:ABCdef...",
+      "dmPolicy": "pairing",
+      "allowFrom": ["tg:YOUR_TELEGRAM_USER_ID"]
+    }
+  }
+}
+```
+
+4. Click **Save** then **Reload** in the Telegram channel panel.
+5. Open your bot in Telegram and send `/start` to complete pairing.
+
+**DM policies:**
+- `pairing` — agent sends a one-time code you must confirm (safest)
+- `allowlist` — only `allowFrom` users can reach the agent
+- `open` — anyone who finds your bot can message it (avoid on public bots)
+
+### Connecting Discord and Google Chat
+
+Discord uses a bot token from the [Discord Developer Portal](https://discord.com/developers/applications). Google Chat uses a webhook URL from your Google Workspace admin. Both follow the same pattern: add config → Save → Reload → verify Connected = Yes.
+
+
+
+## Control → Instances
+
+![Instances — Presence beacons from connected clients and nodes](/products/openclaw/instances.png)
+
+**Instances** lists presence beacons from connected clients and nodes. The **Connected Instances** section shows each instance with its ID, description (e.g. gateway host or `openclaw-control-ui` webchat), tags (e.g. `gateway`, `webchat`, `operator`), last-seen time, and reason (e.g. `self`, `connect`). Use **Refresh** to update the list.
+
+
+
+## Control → Sessions
+
+![Sessions — Inspect active sessions and adjust per-session defaults](/products/openclaw/sessions.png)
+
+Sessions are conversation threads. The **Sessions** section shows *Active session keys and per-session overrides*. Use the filters **Active within (minutes)**, **Limit**, **Include global**, and **Include unknown**, then **Refresh**. The table columns are **Key** (e.g. `agent:main:main`), **Label** (optional), **Kind** (e.g. `direct`), **Updated**, **Tokens**, **Thinking**, **Verbose**, **Reasoning**, and **Actions** (e.g. Delete). Click any session to open its full history.
+
+Sessions have two behaviors:
+- **Direct messages** from the same person collapse into a shared persistent `main` session.
+- **Group chats** each get their own isolated session, optionally sandboxed in Docker.
+
+
+
+## Control → Usage
+
+![Usage — See where tokens go, when sessions spike, and what drives cost](/products/openclaw/usage.png)
+
+The **Usage** tab breaks down token consumption by:
+- Model (e.g., `anthropic/claude-sonnet-4-5`, `openai/gpt-5.2`)
+- Agent ID
+- Channel
+- Time range (today, last 7 days, last 30 days)
+
+Use this to catch runaway cron jobs or unexpectedly expensive sessions before your API bill arrives.
+
+
+
+## Agent → Agents
+
+![Agents — Manage agent workspaces, tools, and identities](/products/openclaw/agents.png)
+
+The **Agents** page (*Manage agent workspaces, tools, and identities*) lists configured agents (e.g. **main** with a **DEFAULT** badge). Selecting an agent shows tabs: **Overview**, **Files**, **Tools**, **Skills**, **Channels**, **Cron Jobs**. The **Overview** tab shows *Workspace paths and identity metadata* (Workspace, Primary Model, Default, Identity Name, Identity Emoji, Skills Filter) and *Model Selection* (**Primary model (default)**, **Fallbacks (comma-separated)**). Use **Chat**, **Reload Config**, and **Save** to apply changes.
+
+An **Agent** is an isolated LLM instance with its own workspace, model config, system prompt/persona, and tool/skill access. Your default agent is `main`. You can define additional agents and bind them to specific channels or accounts:
+
+```json
+{
+  "agents": {
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "workspace": "~/.openclaw/workspace-main",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-5",
+          "fallbacks": ["openai/gpt-5.2"]
+        }
+      },
+      {
+        "id": "work",
+        "workspace": "~/.openclaw/workspace-work",
+        "model": {
+          "primary": "openai/gpt-5.2"
+        }
+      }
+    ]
+  },
+  "bindings": [
+    { "agentId": "work", "match": { "channel": "slack" } },
+    { "agentId": "main", "match": { "channel": "telegram" } }
+  ]
+}
+```
+
+This routes all Slack messages to the `work` agent and all Telegram messages to `main` — each with its own isolated file workspace and memory.
+
+
+
+## Agent → Skills
+
+![Skills — Manage skill availability and API key injection](/products/openclaw/skills.png)
+
+Skills extend what your agent can do beyond basic chat. There are three types:
+
+- **Bundled** — Ships with OpenClaw. Enable in config.
+- **Managed** — ClawHub marketplace (3,500+ skills). Install with `openclaw skills install <name>`.
+- **Workspace** — Local files in your workspace. Drop a `SKILL.md` and scripts in the workspace.
+
+The Skills panel in the dashboard shows all installed skills with their status (enabled/disabled) and a one-click toggle.
+
+**Commonly used built-in skills:**
+
+- `web-search` — Brave Search API integration for live web queries
+- `browser` — headless Chrome control for scraping and automation
+- `file-manager` — read/write files in the agent workspace
+- `shell` — execute bash commands (use with caution)
+- `gmail` — read and send email via Gmail Pub/Sub webhook
+
+To install a skill from ClawHub via the terminal:
+
+```bash
+openclaw skills install brave-search
+openclaw skills install github-pr-summary
+openclaw skills list
+```
+
+To write a **workspace skill**, create a `SKILL.md` in your workspace root describing what the skill does. The agent reads it automatically on startup.
+
+
+
+## Agent → Nodes
+
+![Nodes — Paired devices, capabilities, and command exposure](/products/openclaw/nodes.png)
+
+**Nodes** are companion device connections — macOS, iOS, or Android apps that extend the agent's senses and actuators:
+
+- `camera.snap` — take a photo from the device camera
+- `screen.record` — capture a screen recording
+- `location.get` — get the device's current GPS coordinates
+- `notifications.send` — push a notification to the device
+
+Nodes appear in this panel once a companion app connects to your Gateway. On Zeabur, you'll need to ensure your deployment URL is accessible from the device running the companion app.
+
+
+
+## Settings → Config
+
+![Config — Full JSON config editor and settings form](/products/openclaw/config.png)
+
+The **Config** page is a form-rendered view of your `openclaw.json`. The **Settings** panel shows validation (e.g. *valid*, *No changes*) and categories such as **All Settings**, **Environment**, **Agents**, **Authentication**, **Channels**, **Messages**, **Commands**, **Hooks**, **Skills**, **Tools**. Use the **Form** / **Raw** toggle to switch between the structured form and raw JSON. **Reload**, **Save**, **Apply**, and **Update** are in the top bar. A **Setup Wizard** section shows setup wizard state and history. Changes here hot-reload the Gateway — no restart needed for most settings.
+
+Key sections of the config:
+
+```json
+{
+  "gateway": {
+    "port": 18789,
+    "auth": { "token": "your-secret-token" }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace",
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-5"
+      },
+      "sandbox": {
+        "mode": "non-main"
+      }
+    }
+  },
+  "channels": {
+    "telegram": { "enabled": true, "botToken": "..." },
+    "whatsapp": { "enabled": true, "allowFrom": ["+65XXXXXXXX"] }
+  },
+  "tools": {
+    "web": {
+      "search": { "apiKey": "BSA_YOUR_BRAVE_KEY" }
+    }
+  }
+}
+```
+
+`sandbox.mode: "non-main"` runs group chats inside per-session Docker containers, keeping your host safe from arbitrary code execution in shared contexts.
+
+
+
+## Control → Cron Jobs
+
+![Cron Jobs — Schedule wakeups and recurring agent runs](/products/openclaw/cron-jobs.png)
+
+Cron Jobs let you schedule agent actions to run automatically on a time-based schedule — no inbound message required. The **Scheduler** card shows **ENABLED**, **JOBS**, and **NEXT WAKE**. Use **New Job** to create a scheduled wakeup or agent run.
+
+**Example use cases:**
+- Daily 9 AM briefing sent to your Telegram
+- Hourly GitHub PR summary posted to Slack
+- Weekly cost report pulled from the Usage tab
+
+### Adding a Cron Job via Dashboard
+
+1. Go to **Control → Cron Jobs** → **New Job**.
+2. Set the **schedule** using standard cron syntax (or natural language in newer versions).
+3. Set the **message** the agent should receive (as if you sent it).
+4. Set the **session key** — which agent/channel session to run this in.
+5. Save. The job appears in the list with Last Run and Next Run timestamps.
+
+Each job runs in an isolated auth context under its assigned agent. If a job errors, it won't crash other jobs — failures are isolated.
+
+
+
+## Settings → Debug and Logs
+
+**Debug** streams live Gateway logs in the browser — equivalent to `openclaw gateway --verbose` in the terminal. Use this when:
+- A channel shows Connected = No but you don't know why
+- A cron job ran but didn't produce the expected output
+- You're testing a new skill and want to see tool call traces
+
+**Logs** shows persisted historical run logs, organized by session and cron job. Each cron job run logs the model and token usage, making it easy to audit costs per job.
+
+## Next Steps
+
+If you're interested in setting up OpenClaw in one click, head to [Zeabur](https://zeabur.com) and use the [OpenClaw template](https://zeabur.com/templates/VTZ4FX) to deploy it.
