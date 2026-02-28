@@ -1,0 +1,402 @@
+# Subtext: Shadow Testing Your AI Agent Stack
+
+Subtext is a shadow testing tool for AI agents. It lets you test any change to your AI stack — new models, prompts, or providers — before your users see the impact. You get a CLI that works standalone plus an optional web dashboard for visualizing results with your team.
+
+**Key capabilities:**
+- Zero-config model benchmarking (no API keys needed to start)
+- Production trace diffing — always free, no account required
+- Pinned eval sets for regression detection
+- Shadow testing with your own API keys
+- CI/CD integration for automated quality gates
+- Auto-capture of LLM calls with a single import
+
+**Requirements:** Python 3.9+
+
+
+
+## Project Structure
+
+This tutorial builds a complete shadow testing setup for a customer support agent. Here's where every file lives:
+
+```
+my-agent/
+├── .subtext/                    # Auto-created by Subtext CLI
+│   ├── config.yaml
+│   ├── providers.yaml
+│   ├── prompts/
+│   ├── traces/
+│   ├── evals/
+│   ├── eval_runs/
+│   ├── shadows/
+│   └── results/
+├── agents/
+│   └── support.py               # Your agent with auto-capture
+├── data/
+│   ├── prompts.json             # Test input cases
+│   ├── traces.json              # Production trace exports
+│   └── evals.jsonl              # Eval set cases
+├── .github/
+│   └── workflows/
+│       └── shadow-test.yml      # CI/CD gate
+└── requirements.txt
+```
+
+
+
+## Step 1: Install and First Run
+
+```bash
+pip install subtexts
+```
+
+Run your first benchmark — no API keys, no config:
+
+```bash
+subtext run
+```
+
+Paste a system prompt when prompted. Subtext auto-detects it, generates 5 test inputs, and tests across 5 models in under 90 seconds. You get a cost comparison table immediately. **First 5 runs per month are free.**
+
+You can also point it directly at a file:
+
+```bash
+# Works with plain text, markdown, Python, YAML, JSON, or directories
+subtext run ./agents/support.py
+subtext run ./agents/
+```
+
+
+
+## Step 2: Add Auto-Capture to Your Agent
+
+**Place this file at:** `agents/support.py`
+
+```python
+import subtexts  # One import captures every LLM call automatically
+
+from openai import OpenAI
+from anthropic import Anthropic
+
+openai_client = OpenAI()
+anthropic_client = Anthropic()
+
+SYSTEM_PROMPT = """You are a customer support agent for Acme Corp.
+Help customers with billing questions, order status, and returns.
+Always be polite and escalate to a human when unsure."""
+
+
+def handle_customer_query(user_message: str) -> str:
+    """Handle a customer support query using GPT-4o."""
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+    )
+    return response.choices[0].message.content
+
+
+def classify_ticket(ticket_text: str) -> str:
+    """Classify a support ticket using Claude."""
+    response = anthropic_client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=100,
+        messages=[
+            {
+                "role": "user",
+                "content": f"Classify this support ticket into one category "
+                           f"(billing, shipping, returns, technical, other):\n\n{ticket_text}",
+            }
+        ],
+    )
+    return response.content[0].text
+
+
+if __name__ == "__main__":
+    print(handle_customer_query("Where is my order ORD-4521?"))
+    print(classify_ticket("I was charged twice for my subscription this month"))
+```
+
+Traces are stored locally in `.subtext/traces/` — nothing is sent anywhere unless you explicitly push.
+
+**Environment controls:**
+
+```bash
+# Disable capture without removing the import
+SUBTEXT_CAPTURE_ENABLED=0 python agents/support.py
+
+# Sample only 10% of calls (useful in high-traffic prod)
+SUBTEXT_SAMPLE_RATE=0.1 python agents/support.py
+
+# Custom trace directory
+SUBTEXT_TRACE_DIR=/var/log/subtext/traces python agents/support.py
+```
+
+
+
+## Step 3: Import Test Data
+
+**Place this file at:** `data/prompts.json`
+
+```json
+[
+  "Where is my order ORD-4521?",
+  "I need to return my damaged item",
+  "I was charged twice for my subscription",
+  "How long does standard shipping take?",
+  "Can I cancel my order before it ships?"
+]
+```
+
+**Place this file at:** `data/traces.json`
+
+```json
+[
+  {
+    "query": "Where is my order ORD-4521?",
+    "messages": [
+      {"role": "system", "content": "You are a customer support agent for Acme Corp..."},
+      {"role": "user", "content": "Where is my order ORD-4521?"}
+    ],
+    "response": {
+      "output": "Your order ORD-4521 is currently in transit and expected to arrive by Friday."
+    },
+    "model": "gpt-4o"
+  },
+  {
+    "query": "I need to return my damaged item",
+    "messages": [
+      {"role": "system", "content": "You are a customer support agent for Acme Corp..."},
+      {"role": "user", "content": "I need to return my damaged item"}
+    ],
+    "response": {
+      "tool_calls": [{"function": "initiate_return", "args": {"reason": "damaged"}}],
+      "output": "I've initiated a return request for your damaged item. You'll receive a prepaid label within 24 hours."
+    },
+    "model": "gpt-4o"
+  }
+]
+```
+
+Import them:
+
+```bash
+subtext prompt import --from data/prompts.json --name support-prompts
+subtext trace import --from data/traces.json --name jan-prod
+```
+
+
+
+## Step 4: Diff Traces to Spot Regressions
+
+Compare two production trace snapshots side by side — this is always free, no account needed:
+
+```bash
+subtext trace import --from data/jan-traces.json --name jan-prod
+subtext trace import --from data/feb-traces.json --name feb-prod
+subtext trace diff jan-prod feb-prod
+```
+
+You'll see a comparison table with cost, latency, tokens, and tool calls. Any unexpected changes (like missing tool calls) are flagged with `⚠`.
+
+
+
+## Step 5: Build an Eval Set
+
+**Place this file at:** `data/evals.jsonl`
+
+```jsonl
+{"input": "Customer says they were charged twice this month", "expected": "Should identify billing dispute and offer refund process"}
+{"input": "Package arrived damaged, customer wants replacement", "expected": "Should initiate return and offer replacement or refund"}
+{"input": "Customer asks about cryptocurrency refunds", "expected": "Should explain crypto refunds are not supported"}
+{"input": "Angry customer threatening to leave", "expected": "Should de-escalate and offer supervisor transfer"}
+{"input": "Enterprise customer asking about bulk discount", "expected": "Should route to sales team, not attempt to quote"}
+```
+
+```bash
+# Create the eval set from your JSONL
+subtext eval create support-evals --from data/evals.jsonl
+
+# Or generate test cases automatically from your prompt
+subtext eval create support-evals --generate --prompt agents/support.py
+
+# Add a case from a real production trace that caused a bug
+subtext eval add support-evals --from-trace tr_8f2a9c3d
+
+# Add a manual case
+subtext eval add support-evals \
+  --input "Customer wants to change delivery address after shipment" \
+  --expected "Should explain address change not possible post-shipment"
+```
+
+Run the eval set against multiple models:
+
+```bash
+subtext eval run support-evals
+```
+
+Test a prompt change without touching production:
+
+```bash
+subtext eval run support-evals --prompt ./agents/support_v2.py
+```
+
+
+
+## Step 6: Shadow Test with Your Own Keys
+
+Register your API keys (stored locally in `.subtext/providers.yaml`):
+
+```bash
+subtext provider add openai --key sk-xxx
+subtext provider add anthropic --key sk-ant-xxx
+subtext provider add groq --key gsk-xxx
+subtext provider add fireworks --key fw-xxx
+```
+
+Compare models on your actual prompts:
+
+```bash
+subtext shadow models \
+  --prompts support-prompts \
+  --candidate openai/gpt-4o \
+  --candidate anthropic/claude-sonnet-4-20250514 \
+  --candidate google/gemini-2.0-flash \
+  --candidate groq/llama-3.1-70b-versatile
+```
+
+Compare inference providers (same model, different infrastructure):
+
+```bash
+subtext shadow providers \
+  --baseline fireworks \
+  --candidate groq \
+  --candidate together
+```
+
+Find the best result from a shadow run:
+
+```bash
+subtext shadow report --best           # highest fidelity
+subtext shadow report --cheapest       # lowest cost/1K
+subtext shadow report --top 3 --sort cost
+```
+
+Test a local model (vLLM, Ollama, llama.cpp):
+
+```bash
+subtext provider add local \
+  --base-url http://localhost:8000/v1 \
+  --model my-fine-tuned-model
+
+subtext shadow models --candidate local/my-fine-tuned-model
+```
+
+
+
+## Step 7: Connect to the Web Dashboard
+
+The dashboard (subtexts.io) gives you readiness scores, Jules AI findings, change requests, model leaderboards, and Prompt Lab — all optional on top of the CLI.
+
+```bash
+# Log in with your API key from Settings > API Keys
+subtext login --url https://subtexts.io --key stx_xxxxxxxx
+
+# Push your latest results
+subtext push
+
+# Push last 3 shadow runs
+subtext push --last 3
+```
+
+Shadow runs auto-sync after completion once you're logged in. The dashboard's **Jules** agent continuously monitors your stack and surfaces change requests like "switch tool-call routing to claude-sonnet-4 — saves 61% cost, +2 quality points."
+
+
+
+## Step 8: CI/CD Quality Gate
+
+**Place this file at:** `.github/workflows/shadow-test.yml`
+
+```yaml
+name: Shadow Test Gate
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shadow-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Subtext
+        run: pip install subtexts
+
+      - name: Register providers
+        run: |
+          subtext provider add openai --key ${{ secrets.OPENAI_API_KEY }}
+          subtext provider add anthropic --key ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Run shadow test
+        run: |
+          subtext shadow models \
+            --prompts support-prompts \
+            --candidate openai/gpt-4o-mini \
+            --candidate anthropic/claude-haiku-4-5
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Eval gate — fail if quality regresses
+        run: |
+          subtext eval run support-evals
+          subtext ci --threshold 0.80 --fail-on-regression
+        env:
+          SUBTEXT_API_KEY: ${{ secrets.SUBTEXT_API_KEY }}
+```
+
+`--threshold 0.80` requires 80% fidelity. `--fail-on-regression` fails the build if quality dropped vs the previous run. The build exits non-zero if either condition triggers, blocking the merge.
+
+
+
+## Step 9: `requirements.txt`
+
+**Place this file at:** `requirements.txt`
+
+```
+subtexts>=0.1.0
+openai>=1.0.0
+anthropic>=0.25.0
+```
+
+
+
+## Key Concepts Summary
+
+- **`subtext run`** — Zero-config benchmark across 5 models, managed keys, free tier
+- **Auto-capture** — `import subtexts` traces every LLM call locally
+- **Trace diff** — Side-by-side comparison of two production snapshots
+- **Eval sets** — Pinned regression tests that run on every change
+- **Shadow testing** — Your own API keys, full control over candidates
+- **Jules** — AI agent in the dashboard that monitors and proposes changes
+- **Change Requests** — Jules-generated PRs for model/prompt improvements
+- **Prompt Lab** — Branch and score prompt variants across multiple models
+
+
+
+## Next Steps
+
+- Run `subtext run ./agents/support.py` to get your first benchmark
+- Add `import subtexts` to start accumulating production traces
+- Build your eval set from real bugs: `subtext eval add --from-trace <id>`
+- Enable the CI gate to block regressions automatically
+- Connect to the dashboard to see Jules's recommendations across your full stack
