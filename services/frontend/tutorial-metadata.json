@@ -200,9 +200,13 @@
       "authorId": "devon-sun",
       "lastUpdated": "2026-02-22"
     },
-    "Observarbility/subtext.mdx": {
+    "Audio/fish_audio_tutorial.ipynb": {
       "authorId": "devon-sun",
-      "lastUpdated": "2026-02-23"
+      "lastUpdated": "2026-03-03"
+    },
+    "Model Providers/wavespeed.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2026-03-03"
     }
   },
   "folderOrder": [
