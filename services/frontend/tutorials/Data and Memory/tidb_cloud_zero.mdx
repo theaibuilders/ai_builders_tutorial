@@ -1,0 +1,373 @@
+# TiDB Cloud Zero: Build AI Agents with Persistent Memory
+
+TiDB Cloud Zero is a zero-signup, zero-config, disposable MySQL-compatible database designed for AI agents. With a single API call, your AI agent can provision a fully functional MySQL-compatible database — no credentials, no billing, no setup required.
+
+This tutorial walks you through building a task-tracking agent that provisions its own database and persists state in SQL.
+![tidb cloud zero](/products/tidb/tidb_cloud_zero_1.jpg)
+
+
+## What You'll Build
+
+A Qoder-powered AI agent that:
+- Auto-provisions a TiDB Cloud Zero database via a single API call
+- Creates and queries tables using natural language in Qoder Agent Mode
+- Persists agent memory across sessions in structured SQL
+
+
+
+## Prerequisites
+
+- [Qoder IDE](https://qoder.com) installed (free 2-week Pro Trial available)
+- Python 3.10+ installed
+- `curl` or any HTTP client
+
+
+
+## Project Structure
+
+```
+tidb-agent-project/
+├── .qoder/
+│   └── rules/
+│       └── database.md          # Qoder project rules for DB conventions
+├── src/
+│   ├── agent.py                 # Main agent logic
+│   ├── db.py                    # Direct PyTiDB client helper
+│   └── models.py                # Table schemas
+├── .env                         # DB credentials (after provisioning)
+├── requirements.txt
+└── README.md
+```
+
+
+
+## Step 1: Provision a TiDB Cloud Zero Database
+
+TiDB Cloud Zero provides a free, ephemeral MySQL-compatible database via a single unauthenticated API call.
+
+### For AI Agents
+
+Paste this command in Qoder Agent Mode:
+
+```
+Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero.
+```
+
+The agent will call the API and set up your database automatically.
+
+### For Humans (Manual Setup)
+
+```bash
+curl -X POST https://zero.tidbapi.com/v1alpha1/instances \
+  -H "Content-Type: application/json" \
+  -d '{"tag": "qoder-tutorial"}'
+```
+
+Response:
+
+```json
+{
+  "instance": {
+    "id": "abc123",
+    "connection": {
+      "host": "gateway01.us-west-2.prod.aws.tidbcloud.com",
+      "port": 4000,
+      "username": "randomuser",
+      "password": "randompass"
+    },
+    "connectionString": "mysql://randomuser:randompass@gateway01...:4000/test?ssl=true",
+    "claimInfo": {
+      "claimUrl": "https://tidbcloud.com/tidbs/claim/..."
+    },
+    "expiresAt": "2025-04-07T00:00:00Z"
+  }
+}
+```
+
+Save the credentials from the response to your `.env` file (see Step 5).
+
+### Important Notes
+
+- **No authentication required** — the API is free and open
+- **Instances auto-expire in 30 days** unless claimed
+- **Always use TLS** when connecting (`ssl=true` or `--ssl-mode=REQUIRED`)
+- **Claim your instance** before expiration to make it permanent (see "Claiming Your Database" section)
+
+
+
+## Step 2: Add Qoder Project Rules
+
+Create `.qoder/rules/database.md` to teach Qoder your project conventions:
+
+```markdown
+# Database Rules
+
+- Always use snake_case for table and column names
+- Every table must include a `created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP` column
+- Prefer `VARCHAR(255)` for short text fields
+- Use `TEXT` for long content (notes, descriptions)
+- Always check if a table exists before creating it (use `IF NOT EXISTS`)
+- When inserting data, always return the inserted row for confirmation
+```
+
+
+
+## Step 3: Install Python Dependencies
+
+```bash
+# In tidb-agent-project/
+cat > requirements.txt << EOF
+pytidb==0.0.14
+python-dotenv
+mysql-connector-python
+EOF
+
+pip install -r requirements.txt
+```
+
+
+
+## Step 4: Create the Database Models
+
+**`src/models.py`** — Define your table schemas using PyTiDB:
+
+```python
+from pytidb.schema import TableModel, Field
+from typing import Optional
+from datetime import datetime
+
+
+class Task(TableModel):
+    """Tracks agent-created tasks with status and priority."""
+    __tablename__ = "tasks"
+
+    id: int = Field(primary_key=True, default=None)
+    title: str = Field()
+    description: Optional[str] = Field(default=None)
+    status: str = Field(default="pending")   # pending | in_progress | done
+    priority: str = Field(default="medium")  # low | medium | high
+    created_at: Optional[datetime] = Field(default=None)
+
+
+class AgentMemory(TableModel):
+    """Stores key-value memory entries for the agent between sessions."""
+    __tablename__ = "agent_memory"
+
+    id: int = Field(primary_key=True, default=None)
+    key: str = Field()
+    value: str = Field()
+    context: Optional[str] = Field(default=None)
+    created_at: Optional[datetime] = Field(default=None)
+```
+
+
+
+## Step 5: Create the Database Client Helper
+
+**`src/db.py`** — Connect using environment variables from your provisioned TiDB Zero instance:
+
+```python
+import os
+from pytidb import TiDBClient
+from dotenv import load_dotenv
+from src.models import Task, AgentMemory
+
+load_dotenv()
+
+
+def get_client() -> TiDBClient:
+    """Returns a connected TiDB client using env credentials."""
+    return TiDBClient.connect(
+        host=os.getenv("TIDB_HOST"),
+        port=int(os.getenv("TIDB_PORT", "4000")),
+        username=os.getenv("TIDB_USERNAME"),
+        password=os.getenv("TIDB_PASSWORD"),
+        database=os.getenv("TIDB_DATABASE", "test"),
+        ensure_db=True,
+    )
+
+
+def init_tables(client: TiDBClient):
+    """Create tables if they don't already exist."""
+    client.create_table(schema=Task, if_exists="skip")
+    client.create_table(schema=AgentMemory, if_exists="skip")
+    print("✅ Tables ready: tasks, agent_memory")
+
+
+def add_task(client: TiDBClient, title: str, description: str = "", priority: str = "medium") -> Task:
+    table = client.get_table("tasks", schema=Task)
+    task = Task(title=title, description=description, priority=priority)
+    table.insert(task)
+    return task
+
+
+def get_tasks(client: TiDBClient, status: str = None) -> list[Task]:
+    table = client.get_table("tasks", schema=Task)
+    rows = table.query()
+    if status:
+        rows = [r for r in rows if r.status == status]
+    return rows
+
+
+def update_task_status(client: TiDBClient, task_id: int, new_status: str):
+    client.execute(
+        f"UPDATE tasks SET status = '{new_status}' WHERE id = {task_id}"
+    )
+
+
+def save_memory(client: TiDBClient, key: str, value: str, context: str = ""):
+    """Persist a memory entry for the agent."""
+    table = client.get_table("agent_memory", schema=AgentMemory)
+    # Upsert: delete existing key then insert
+    client.execute(f"DELETE FROM agent_memory WHERE `key` = '{key}'")
+    table.insert(AgentMemory(key=key, value=value, context=context))
+
+
+def recall_memory(client: TiDBClient, key: str) -> str | None:
+    result = client.execute(
+        f"SELECT value FROM agent_memory WHERE `key` = '{key}' LIMIT 1"
+    )
+    rows = result.fetchall()
+    return rows[0][0] if rows else None
+```
+
+
+
+## Step 6: Create the Agent Entry Point
+
+**`src/agent.py`** — A simple agent loop that uses TiDB for state:
+
+```python
+from src.db import get_client, init_tables, add_task, get_tasks, save_memory, recall_memory
+
+
+def run_agent():
+    print("🤖 TiDB Agent starting...")
+    client = get_client()
+    init_tables(client)
+
+    # Recall last session context
+    last_session = recall_memory(client, "last_session_note")
+    if last_session:
+        print(f"📝 Memory from last session: {last_session}")
+
+    # Add some sample tasks (agent would generate these dynamically)
+    add_task(client, "Analyze Q1 sales data", "Run SQL queries on monthly totals", "high")
+    add_task(client, "Write documentation", "Document the new API endpoints", "medium")
+    add_task(client, "Fix login bug", "Users report session timeout after 5 min", "high")
+
+    # Query pending tasks
+    pending = get_tasks(client, status="pending")
+    print(f"\n📋 Pending tasks ({len(pending)}):")
+    for task in pending:
+        print(f"  [{task.priority.upper()}] {task.title}")
+
+    # Save session note for next run
+    save_memory(
+        client,
+        key="last_session_note",
+        value=f"Session processed {len(pending)} pending tasks",
+        context="agent_loop"
+    )
+    print("\n✅ Agent session complete. State saved to TiDB.")
+
+
+if __name__ == "__main__":
+    run_agent()
+```
+
+
+
+## Step 7: Populate Your `.env` File
+
+After provisioning your TiDB Cloud Zero instance (Step 1), create your `.env` file with the credentials from the API response:
+
+```bash
+# .env
+TIDB_HOST=gateway01.us-west-2.prod.aws.tidbcloud.com
+TIDB_PORT=4000
+TIDB_USERNAME=<username from API response>
+TIDB_PASSWORD=<password from API response>
+TIDB_DATABASE=test
+```
+
+> **Tip:** Use environment variables instead of hardcoding credentials to avoid leaking passwords in shell history.
+
+
+
+## Step 8: Use Qoder Agent Mode with TiDB
+
+Open **Qoder AI Chat → Agent Mode** and try these natural language prompts:
+
+**Provision a database (if not done already):**
+```
+Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero.
+```
+
+**Create the schema:**
+```
+Create a `tasks` table with columns:
+id (INT primary key auto_increment), title (VARCHAR 255),
+status (VARCHAR 50 default 'pending'), priority (VARCHAR 50),
+created_at (TIMESTAMP default CURRENT_TIMESTAMP).
+```
+
+**Query and report:**
+```
+Query all rows in the tasks table where status = 'pending',
+then generate a markdown report grouped by priority level.
+```
+
+**Memory recall:**
+```
+Check the agent_memory table for the key 'last_session_note'
+and summarize what the agent did last session.
+```
+
+Qoder will provision the database, execute SQL commands, and display results inline — all through natural language.
+
+
+
+## How It Works
+
+```
+Qoder Agent Mode
+      │
+      │  HTTP POST (provision)
+      ▼
+https://zero.tidbapi.com/v1alpha1/instances
+      │
+      │  Returns credentials
+      ▼
+TiDB Cloud Zero
+(ephemeral MySQL-compatible database)
+      │
+      │  MySQL protocol (TLS)
+      ▼
+Your Application / PyTiDB
+```
+
+- **TiDB Cloud Zero API** provisions a free, ephemeral MySQL instance with a single unauthenticated POST request
+- **Qoder Agent Mode** can call the API directly and use the credentials to execute SQL
+- **PyTiDB** (`src/db.py`) provides a direct Python SDK path for programmatic access
+- **Vector & Full-Text Search** — TiDB supports `VECTOR` type, vector indexes, and full-text search out of the box
+
+
+
+## Claiming Your Database (Persistence)
+
+TiDB Cloud Zero sessions are ephemeral by default. To keep your data permanently:
+
+1. Visit [zero.tidbcloud.com](https://zero.tidbcloud.com) and open the one-time Claim link from your session
+2. Sign up or log into TiDB Cloud
+3. Your session migrates into your account with persistent access
+4. Update your `.env` with the new permanent credentials
+
+
+
+## Next Steps
+
+- Add **vector search** to `agent_memory` using PyTiDB's `EmbeddingFunction` for semantic recall
+- Use **Qoder Quest Mode** to delegate a full feature spec that auto-generates and runs migrations
+- Add a `branches` table and use TiDB's branching features for multi-agent parallel workflows
+- Integrate with OpenAI or Anthropic SDK to drive agent decisions from query results
