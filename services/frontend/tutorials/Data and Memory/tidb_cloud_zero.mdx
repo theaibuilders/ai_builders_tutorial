@@ -236,6 +236,19 @@ Your database expires in 30 days. To keep it permanently:
 
 
 
+## Checking Your Database in the TiDB Dashboard
+
+After claiming your instance, you can inspect your data directly in the TiDB Cloud dashboard:
+
+1. Log into [TiDB Cloud](https://tidbcloud.com) and open your claimed cluster
+2. In the left sidebar, open **SQL Editor**
+3. Use the **Schemas** pane to browse your databases and tables—you'll see the `feedback` table with columns: `id`, `name`, `message`, `sentiment`, `embedding`, and `created_at`
+4. Run queries or browse the data in the Result view to verify your Pulse app's feedback entries
+
+![TiDB Cloud SQL Editor showing feedback table](/products/tidb/tidb_cloud_zero_3.jpg)
+
+
+
 ## Next Steps
 
 - **Deploy to Streamlit Cloud** — free hosting for your Pulse app
