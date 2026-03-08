@@ -1302,6 +1302,37 @@ async function renderEnhancedMarkdown(markdown: string): Promise<string> {
       processedLines.push(trimmedLine);
       continue;
     }
+
+    // Parse markdown tables (| col | col |)
+    if (/^\|.+\|$/.test(trimmedLine)) {
+      if (inList) {
+        while (listStack.length > 0) {
+          const lastList = listStack.pop();
+          processedLines.push(`</${lastList.isNumbered ? 'ol' : 'ul'}>`);
+        }
+        inList = false;
+      }
+      const tableRows: string[] = [];
+      while (i < lines.length && /^\|.+\|$/.test(lines[i].trim())) {
+        tableRows.push(lines[i].trim());
+        i++;
+      }
+      i--; // adjust since outer loop will increment
+      const parseCells = (row: string) => row.split('|').map((c) => c.trim()).filter(Boolean);
+      const headerCells = parseCells(tableRows[0]);
+      const dataRows = tableRows.slice(2).map(parseCells); // skip header and separator
+      let tableHtml = '<div class="overflow-x-auto my-6 rounded-lg border border-gray-600"><table class="markdown-table w-full border-collapse text-sm"><thead><tr>';
+      headerCells.forEach((c) => { tableHtml += `<th class="border border-gray-600 bg-gray-700/50 px-4 py-3 text-left font-semibold text-white">${c}</th>`; });
+      tableHtml += '</tr></thead><tbody>';
+      dataRows.forEach((row, ri) => {
+        tableHtml += `<tr class="${ri % 2 === 0 ? 'bg-gray-800/30' : ''}">`;
+        row.forEach((c) => { tableHtml += `<td class="border border-gray-600 px-4 py-3 text-gray-300">${c}</td>`; });
+        tableHtml += '</tr>';
+      });
+      tableHtml += '</tbody></table></div>';
+      processedLines.push(tableHtml);
+      continue;
+    }
     
     // Check for list items
     const bulletMatch = line.match(/^(\s*)([-*+])\s+(.+)$/);
@@ -1493,13 +1524,15 @@ function getNbviewerUrl(filePath: string): string {
           background: #252830 !important;
         }
 
-        /* Enable wrapping specifically for bash/shell code blocks */
+        /* Enable wrapping specifically for bash/shell/text code blocks */
         .tutorial-content .code-block[data-lang="bash"] pre,
         .tutorial-content .code-block[data-lang="bash"] code,
         .tutorial-content .code-block[data-lang="shell"] pre,
         .tutorial-content .code-block[data-lang="shell"] code,
         .tutorial-content .code-block[data-lang="sh"] pre,
-        .tutorial-content .code-block[data-lang="sh"] code {
+        .tutorial-content .code-block[data-lang="sh"] code,
+        .tutorial-content .code-block[data-lang="text"] pre,
+        .tutorial-content .code-block[data-lang="text"] code {
           white-space: pre-wrap !important;
           word-break: break-word !important;
           overflow-x: hidden !important;
@@ -1802,13 +1835,15 @@ function getNbviewerUrl(filePath: string): string {
           background: #252830 !important;
         }
 
-        /* Enable wrapping specifically for bash/shell code blocks */
+        /* Enable wrapping specifically for bash/shell/text code blocks */
         .tutorial-content .code-block[data-lang="bash"] pre,
         .tutorial-content .code-block[data-lang="bash"] code,
         .tutorial-content .code-block[data-lang="shell"] pre,
         .tutorial-content .code-block[data-lang="shell"] code,
         .tutorial-content .code-block[data-lang="sh"] pre,
-        .tutorial-content .code-block[data-lang="sh"] code {
+        .tutorial-content .code-block[data-lang="sh"] code,
+        .tutorial-content .code-block[data-lang="text"] pre,
+        .tutorial-content .code-block[data-lang="text"] code {
           white-space: pre-wrap !important;
           word-break: break-word !important;
           overflow-x: hidden !important;
