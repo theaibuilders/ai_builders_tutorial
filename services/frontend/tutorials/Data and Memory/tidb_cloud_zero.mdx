@@ -1,38 +1,14 @@
 # TiDB Cloud Zero: Build "Pulse" — Real-time Feedback Wall with AI Search
 
-TiDB Cloud Zero is a zero-signup, zero-config, disposable MySQL-compatible database with built-in vector search. With a single API call, you get a fully functional database — no credentials, no billing, no setup required.
+[TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders) is a zero-signup, zero-config, disposable MySQL-compatible database with built-in vector search. With a single API call, you get a fully functional database — no credentials, no billing, no setup required.
 
 In this tutorial, you'll build **Pulse** — a real-time feedback wall with AI-powered semantic search and live analytics. The app showcases TiDB's unique capabilities: vector search, HTAP (real-time analytics), and high-concurrency writes. Build it entirely with AI prompts — no manual coding required.
 
-
+![tidb cloud zero](/products/tidb/tidb_cloud_zero_1.jpg)
 
 ## What You'll Build
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  PULSE — Real-time Feedback Wall                                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌─ Post Feedback ─────────────────────────────────────────┐   │
-│  │  Name: [________]  Message: [____________________] [Post]│   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│  ┌─ AI Search ──────────────────────────────────────────────┐   │
-│  │  🔍 "issues with performance" → finds "the app is slow"  │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│  ┌─ Live Analytics ────────────────────────────────────────┐   │
-│  │  📊 Total: 1,247  │  📈 Last hour: 89  │  🔥 Peak: 2pm  │   │
-│  │  ████████████ Positive 45%  ██████ Neutral 28%          │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│  ┌─ Live Feed ──────────────────────────────────────────────┐   │
-│  │  • Alice: "Love the new dashboard!" 😊 (2s ago)          │   │
-│  │  • Bob: "Search could be faster" 😐 (5s ago)             │   │
-│  │  • Carol: "Great customer support!" 😊 (12s ago)         │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-```
+![pulse app](/products/tidb/tidb_cloud_zero_2.jpg)
 
 
 
@@ -50,7 +26,6 @@ In this tutorial, you'll build **Pulse** — a real-time feedback wall with AI-p
 
 ## Prerequisites
 
-- [Qoder IDE](https://qoder.com) installed (free 2-week Pro Trial available)
 - Python 3.10+ installed
 - OpenAI API key (for embeddings)
 
@@ -58,20 +33,20 @@ In this tutorial, you'll build **Pulse** — a real-time feedback wall with AI-p
 
 ## Getting Started
 
-Create a new folder and open it with Qoder:
+Create a new folder and open it in your preferred editor or IDE:
 
 ```bash
 mkdir pulse-app
 cd pulse-app
 ```
 
-Open the folder in Qoder, then switch to **Agent Mode** in the AI Chat panel.
+Open the folder in your editor, then switch to **agent mode** (or your AI assistant's equivalent) to send prompts.
 
 
 
 ## Step 1: Provision Your Database
 
-Send this prompt in Agent Mode:
+Send this prompt in your AI chat:
 
 ```
 Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero.
@@ -233,7 +208,7 @@ This demonstrates TiDB handling larger datasets while keeping analytics fast.
 
 ## Why TiDB vs. Alternatives?
 
-| Requirement | PostgreSQL + pgvector | Pinecone + PostgreSQL | TiDB Cloud Zero |
+| Requirement | PostgreSQL + pgvector | Pinecone + PostgreSQL | [TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders) |
 |-------------|----------------------|----------------------|------------------|
 | Vector search | ✅ Extension needed | ✅ Separate service | ✅ Built-in |
 | Real-time analytics | ⚠️ Slows with scale | ❌ Separate DB | ✅ Native HTAP |
@@ -244,7 +219,7 @@ This demonstrates TiDB handling larger datasets while keeping analytics fast.
 
 ## Important Notes
 
-- **No authentication required** — TiDB Cloud Zero API is free and open
+- **No authentication required** — [TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders) API is free and open
 - **Instances auto-expire in 30 days** — claim yours to keep it permanently
 - **Always use TLS** when connecting
 - **OpenAI costs** — embeddings use the affordable `text-embedding-3-small` model
