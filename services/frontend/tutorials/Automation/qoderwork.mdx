@@ -1,0 +1,302 @@
+# QoderWork: Building and Using Custom Skills
+
+QoderWork is a desktop AI agent that autonomously executes multi-step tasks on your Mac — file organization, data analysis, document creation, and more. **Skills** are the extensibility layer that lets you supercharge it with reusable automation modules, both from the community marketplace and ones you build yourself.
+
+This tutorial covers everything: navigating the Skills Marketplace, installing and managing Skills, and authoring your own custom Skill from scratch with a proper file structure.
+
+## Prerequisites
+
+- QoderWork desktop app installed on your local machine 
+- An active Qoder account (free tier works)
+- Basic familiarity with JSON/YAML and Markdown
+
+## Project Structure
+
+Before diving in, here's the file layout for a custom Skill you'll build in this tutorial:
+
+```
+my-skill/
+├── SKILL.md          # Required — skill metadata (YAML frontmatter + description)
+├── prompt.md         # The task template with variables
+├── config.json       # Optional — default parameters and settings
+└── README.md         # Optional — human-readable docs
+```
+
+When you install a custom Skill, you zip this folder and drag it into QoderWork. The only **required** file is `SKILL.md` at the root of the zip.
+
+
+
+## Step 1: Explore the Skills Marketplace
+
+1. Open QoderWork and click **Skills** in the left sidebar.
+2. You'll land on the **Skills Marketplace** tab — browse Official Selection and Other Skills.
+3. Use the **Filter** dropdown to narrow by category (for example: **Content Creation**, **Data & AI**, **Design & UI**, **DevOps & Deployment**, **Docs & Writing**, **Productivity**, **Research & Analysis**).
+
+Notable built-in marketplace Skills include `deep-research`, `cloudflare-deploy`, `notion-infographic`, `file-organizer`, and `frontend-design`.
+
+4. Switch to the **Built-in** tab to see Skills that ship with QoderWork: `agent-browser`, `docx`, `pdf`, `pptx`, `xlsx`, `find-skills`, and `install-skill-dependency`.
+5. Switch to **User-installed** to manage Skills you've added — both from the market and locally installed ones.
+
+
+
+## Step 2: Install a Marketplace Skill
+
+Installing from the marketplace takes one click:
+
+1. In the **Skills Marketplace** tab, click any skill card (e.g., `deep-research`).
+2. Click **Install**.
+3. The skill appears in your **User-installed** tab with a toggle to enable/disable it.
+4. When an update is available, an **Update** badge appears — click it to pull the latest version.
+
+To install a **custom or third-party Skill** as a `.zip` file:
+
+1. Click **+ Install skill** (top-right corner).
+2. In the dialog, drag and drop your `.zip` file or click to browse.
+3. The zip must contain `SKILL.md` at the root — see file requirements below.
+4. Click **Install**.
+
+
+
+## Step 3: Create Your First Custom Skill
+
+We'll build a `weekly-report` Skill that scans a project folder and generates a Markdown summary of the week's changes.
+
+### 3a. Create the folder structure
+
+```bash
+mkdir -p ~/skills/weekly-report
+cd ~/skills/weekly-report
+```
+
+### 3b. Create `SKILL.md`
+
+This is the only required file. The YAML frontmatter defines metadata; the body is the trigger description QoderWork uses to decide when to invoke the Skill.
+
+```markdown
+
+name: weekly-report
+version: 1.0.0
+description: >
+  Scans a specified project folder for files modified in the past 7 days
+  and generates a weekly-report-{date}.md summary with changes, action
+  items, and a file diff overview. Trigger when the user asks for a
+  weekly summary, weekly report, or week-in-review for a folder.
+category: Productivity
+author: your-name
+
+
+## Weekly Report Skill
+
+Generates a structured weekly report from any local project folder.
+Useful for standups, client updates, and personal progress tracking.
+
+### When to trigger
+- User says "create a weekly report for [folder]"
+- User says "summarize this week's changes in [folder]"
+- User asks for a "week in review" of a directory
+
+### Variables
+- `{{folder}}` — absolute or relative path to the project folder
+- `{{date}}` — auto-filled with today's date (YYYY-MM-DD)
+- `{{format}}` — output format, default is `markdown`
+```
+
+### 3c. Create `prompt.md`
+
+This is the task template sent to the AI when the Skill is triggered.
+
+```markdown
+# Task: Weekly Report for {{folder}}
+
+Scan the folder at `{{folder}}` and perform the following steps:
+
+1. **List modified files** — find all files modified in the last 7 days.
+   Include file name, path, size, and last-modified timestamp.
+
+2. **Categorize changes** — group files by type:
+   - New files (created this week)
+   - Modified files (changed but not new)
+   - Deleted files (if detectable via git or trash)
+
+3. **Extract action items** — scan `.md`, `.txt`, and `.docx` files for
+   lines containing TODO, ACTION, FIXME, or [ ] checkbox syntax.
+
+4. **Generate report** — write the output to:
+   `{{folder}}/weekly-report-{{date}}.md`
+
+   Use this structure:
+   ```
+   # Weekly Report — {{date}}
+
+   ## Summary
+   - X files modified, Y files created, Z action items found
+
+   ## Modified Files
+   | File | Type | Last Modified |
+   ||||
+   | ...  | ...  | ...           |
+
+   ## Action Items
+   - [ ] Item from file.md
+   - [ ] Another item
+
+   ## Notes
+   _Auto-generated by QoderWork weekly-report Skill_
+   ```
+
+5. **Confirm completion** — respond with the path to the generated report.
+```
+
+### 3d. Create `config.json`
+
+Optional defaults that pre-fill Skill variables:
+
+```json
+{
+  "defaults": {
+    "format": "markdown",
+    "lookback_days": 7,
+    "include_hidden": false,
+    "action_item_keywords": ["TODO", "ACTION", "FIXME", "[ ]"]
+  },
+  "permissions": {
+    "file_access": "read-write",
+    "scope": "specified_folder_only"
+  }
+}
+```
+
+### 3e. Create `README.md`
+
+```markdown
+# weekly-report Skill
+
+Generates a Markdown weekly report from any local project folder.
+
+## Usage
+
+In QoderWork chat, type:
+
+```
+Create a weekly report for ~/Projects/my-app
+```
+
+Or invoke directly with:
+
+```
+@weekly-report folder=~/Projects/my-app
+```
+
+## Output
+
+Creates `weekly-report-YYYY-MM-DD.md` in the target folder.
+
+## Permissions Required
+
+Read-write access to the target folder.
+```
+
+
+
+## Step 4: Package and Install Your Skill
+
+```bash
+cd ~/skills
+zip -r weekly-report.zip weekly-report/
+```
+
+Your zip should look like:
+
+```
+weekly-report.zip
+└── weekly-report/
+    ├── SKILL.md        ← required, must be at root of the folder
+    ├── prompt.md
+    ├── config.json
+    └── README.md
+```
+
+Now install it:
+
+1. In QoderWork → **Skills** → click **+ Install skill**
+2. Drag `weekly-report.zip` into the dialog
+3. Click **Install**
+4. It appears in **User-installed → Local install**
+
+
+
+## Step 5: Use Your Skill
+
+With the Skill installed, trigger it in two ways:
+
+**Natural language:**
+```
+Create a weekly report for ~/Projects/my-saas-app
+```
+
+**Direct invocation with `@`:**
+```
+@weekly-report folder=~/Projects/my-saas-app
+```
+
+QoderWork will show the execution plan before running. Review it, then click **Execute**.
+
+
+
+## Step 6: Use the Built-in `create-skill` Helper
+
+QoderWork has a built-in `create-skill` Skill that guides you interactively. In the chat, type:
+
+```
+Help me create a skill using create-skill. Please detect the current
+environment first and save the skill to the correct path: in a VM
+environment, save to /root/.qoderwork/skills/; otherwise save to
+~/.qoderwork/skills/. First, ask me what the skill should do.
+```
+
+QoderWork will interview you about the Skill's purpose and generate the `SKILL.md` automatically, saving it to the correct local path.
+
+**Skills are saved to:**
+
+| Environment | Path |
+|-||
+| Local Mac | `~/.qoderwork/skills/` |
+| VM / Docker | `/root/.qoderwork/skills/` |
+
+
+
+## Step 7: MCP Integration in Skills
+
+Skills can invoke MCP (Model Context Protocol) servers for external integrations. Reference an MCP tool in `prompt.md` like this:
+
+```markdown
+# Task: Deploy to Cloudflare
+
+Use the `cloudflare-deploy` MCP tool to:
+1. Build the project at `{{project_path}}`
+2. Deploy to Cloudflare Workers
+3. Return the live URL
+```
+
+Configure MCP servers under **Settings → Integrations → MCP** before using them in Skills.
+
+
+
+## Troubleshooting
+
+**Skill not appearing after install** — confirm `SKILL.md` is at the root of the zip (not nested inside an extra folder).
+
+**Skill triggers on wrong prompts** — tighten the `description` field in `SKILL.md` with more specific trigger phrases.
+
+**Permission errors during execution** — go to **Settings → File Access** and add the target folder with read-write permission.
+
+**Dependency missing** — the built-in `install-skill-dependency` Skill can diagnose and fix missing runtime dependencies automatically.
+
+
+
+## Next Steps
+
+- Browse the Skills Marketplace for community Skills like `notion-infographic`, `frontend-design`, and `analytics-data-analysis`
+- Chain multiple Skills in a single task prompt for complex multi-stage workflows
+- Share your Skills with the community by publishing to the QoderWork marketplace via **Create with QoderWork** in the Skills interface
+- Explore MCP server integrations at **Settings → Integrations → MCP** to connect external APIs and services
