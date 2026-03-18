@@ -6,7 +6,7 @@ OpenClaw is one of the most popular AI agent tools around — but it has a frust
 
 The best part: you install it by sending three messages in the OpenClaw chat. No terminal, no config files, no coding required.
 
-
+![mem9 overview](/products/mem9/mem9-0.jpg)
 
 ## What mem9 Does
 
@@ -49,13 +49,9 @@ After a moment, your agent will ask you a question:
 > 1. Create a new mem9 API key
 > 2. Reconnect an existing mem9 API key
 
-**If this is your first time using mem9**, reply:
+- **If this is your first time using mem9**, reply: `1`
 
-```
-1
-```
-
-**If you have used mem9 before** and want to reconnect your previous memories, reply `2` and paste your old API key when asked.
+- **If you have used mem9 before** and want to reconnect your previous memories, reply `2` and paste your old API key when asked.
 
 Your agent will then create a private memory space for you in the cloud and connect itself to it.
 
@@ -111,7 +107,51 @@ To open your memory dashboard:
 2. Enter your API key (the one you saved in Step 3)
 3. Browse your full memory history
 
+![mem9 memory dashboard](/products/mem9/mem9-2.jpg)
+
 This is useful for checking what your agent knows, spotting anything you'd like to remove, and understanding what context it will bring into your next conversation.
+
+
+
+## Understanding Your Memory Dashboard
+
+The mem9 dashboard gives you rich insights into how your agent's memory is organized and evolving over time.
+
+![mem9 memory analysis](/products/mem9/mem9-3.jpg)
+
+The **Memory Pulse** section provides a high-level overview:
+
+- **Memory count**: See at a glance how many memories are stored (e.g., 181 total memories)
+- **Saved vs. Learned**: Distinguish between things you explicitly asked to remember versus insights auto-extracted from your chats
+- **Activity rhythm**: Track memory creation over time with a visual timeline
+- **Composition breakdown**: A circular chart showing how your memories are categorized (Identity, Preference, Activity)
+- **Signal stack**: Recurring tags that surface frequently, like `#news`, `#ai`, `#wants`, `#builders`, and `#updates`
+
+The left sidebar shows **Aggregate Cards** that group your memories by type — Identity (who you are), Preference (how you like things), and Activity (what you've done). You can also see **Top Topics** and **Top Tags** to understand what themes dominate your conversations.
+
+
+
+## Export and Import Your Memories
+
+Your memories are yours. mem9 lets you export everything to a JSON file for backup, migration, or analysis — and import them back whenever needed.
+
+**To export your memories:**
+
+Click the **Export** button in your dashboard. You'll see a confirmation showing how many memories will be exported (both saved by you and learned from chats). The export preserves all original timestamps and includes everything regardless of any filters you've applied.
+
+![mem9 export memories](/products/mem9/mem9-4.jpg)
+
+**To import memories:**
+
+Click the **Import** button and select a previously exported JSON file. This is useful when:
+
+- Migrating memories to a new API key
+- Restoring from a backup
+- Consolidating memories from multiple sources
+
+![mem9 import memories](/products/mem9/mem9-5.jpg)
+
+Imported memories are processed in the background. You can track the import history to see what was added.
 
 
 
