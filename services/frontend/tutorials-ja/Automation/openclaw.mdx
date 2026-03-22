@@ -1,0 +1,432 @@
+# OpenClaw：パーソナルAIアシスタントを構築しよう
+
+## 構築するもの
+
+このチュートリアルでは、本番環境対応の **OpenClaw** AIアシスタントをデプロイします。完成すると、アシスタントはリアルタイムでウェブを検索・スクレイピングし（Bright Data）、セッションを跨いで会話を記憶し（Mem9 + TiDB Cloud Zero）、東南アジア向けに最適化されたLLM（Agnes AI）で推論し、Telegram でチャットできるようになります。すべてが単一の Zeabur Dedicated Server 上で動作します。
+
+![openclaw banner](/products/agentforge_openclaw/agentforge_openclaw_0.jpg)
+### 前提条件
+
+- [Zeabur](https://zeabur.com) アカウント（Dedicated Server プラン — 最低 2 vCPU / 4 GB RAM）
+- [Telegram](https://telegram.org) アカウントと Telegram アプリがインストールされたスマートフォン
+- [Bright Data](https://brightdata.com) アカウントと API キー
+- [Mem9](https://mem9.ai) アカウント（永続メモリ用）
+- [TiDB Cloud Zero](https://zero.tidbcloud.com) データベース（サインアップ不要）
+- [ZenMux](https://zenmux.ai) アカウント（[Agnes AI](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) モデルアクセス用）
+- 環境変数と JSON ファイルの基本的な知識
+
+### アーキテクチャ概要
+
+```
+┌────────────┐     ┌──────────────────────────────────────────────┐
+│  Telegram   │◄───►│            OpenClaw (Zeabur)                 │
+│  User Chat  │     │  ┌────────────┐  ┌────────────────────────┐ │
+└────────────┘     │  │ LLM Router │  │  Skills                │ │
+                    │  │ Agnes AI   │  │  ├─ Bright Data (Web)  │ │
+                    │  │ GLM-4.7    │  │  ├─ Mem9 (Memory)      │ │
+                    │  │ Grok 4     │  │  └─ TiDB (Database)    │ │
+                    │  └────────────┘  └────────────────────────┘ │
+                    └──────────────────────────────────────────────┘
+```
+
+## ステップ 1 — Zeabur に OpenClaw をデプロイ
+
+ワンクリックテンプレートを開いて **Deploy** をクリック：
+
+👉 [https://zeabur.com/templates/VTZ4FX](https://zeabur.com/templates/VTZ4FX?utm_source=luma)
+
+3つのフィールドがあるデプロイフォームが表示されます：
+
+| フィールド | 入力内容 |
+|||
+| **Domain** | ユニークなサブドメインを選択（例：`yourname-openclaw`）。UIは `yourname-openclaw.zeabur.app` でアクセス可能 |
+| **Enable Control UI** | `true` に設定してブラウザからモデルとスキルを管理可能に |
+| **Zeabur AI Hub API Key** | **Generate** をクリックして自動生成 — 追加費用なしでバンドルモデルにアクセス可能 |
+
+サーバータイプとして **Dedicated Server** を選択し、**OpenClaw** を宛先に選んで **Confirm** をクリック。
+
+![zeabur deploy form](/products/agentforge_openclaw/agentforge_openclaw_1.jpg)
+
+デプロイには約60〜90秒かかります。ステータスが緑色になったら、ブラウザでドメインURLを開き、Zeabur の **Instructions** タブに表示されている `OPENCLAW_GATEWAY_TOKEN` でログインします。
+
+
+
+## ステップ 2 — Telegram Bot を接続
+
+アシスタントには通信チャンネルが必要です。Telegram を使用します。
+
+**Bot を作成：**
+
+1. Telegram を開いて [@BotFather](https://t.me/BotFather) にメッセージを送信
+2. `/newbot` を送信
+3. 表示名を選択（例：*Agent Forge Bot*）
+4. `bot` で終わるユーザー名を選択（例：`agentforge_hackathon_bot`）
+5. BotFather から提供されるトークンをコピー（`123456789:ABCdef...` のような形式）
+
+**トークンを Zeabur に追加：**
+
+Zeabur で OpenClaw サービス → **Variable** タブ → 追加：
+
+```bash
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+```
+
+サービスを再起動。その後 OpenClaw ダッシュボード → **Channels** パネル → **Connect Telegram Bot** をクリック。
+
+Telegram で Bot にメッセージを送信すると、応答が返ってくるはずです。
+
+![telegram bot chat](/products/agentforge_openclaw/agentforge_openclaw_3.jpg)
+
+
+
+## ステップ 3 — AI モデルと Agnes AI を設定
+
+デプロイ後、OpenClaw ダッシュボードには Zeabur AI Hub 経由で複数のモデルが含まれています：
+
+| モデル | 役割 | コンテキスト |
+||||
+| GLM-4.7 Flash | デフォルト | 204.8K |
+| Grok 4 Fast | フォールバック #1 | 2M |
+| MiniMax M2.5 | フォールバック #2 | 196.6K |
+| Kimi K2.5 | フォールバック #3 | 131.1K |
+| Qwen 3 235B | フォールバック #4 | 32.8K |
+| GPT-5 Mini | フォールバック #5 | 400K |
+
+![openclaw models dashboard](/products/agentforge_openclaw/agentforge_openclaw_2.jpg)
+
+### ZenMux 経由で Agnes AI を追加
+
+[Agnes 1.5 Pro](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) は OpenClaw 向けに最適化されたモデルです。ZenMux の OpenAI 互換ゲートウェイ経由でアクセスします。
+
+1. [zenmux.ai](https://zenmux.ai) でサインアップして API キーを作成
+2. Zeabur → **Variable** タブで追加：
+
+```bash
+ZENMUX_API_KEY=your_zenmux_api_key_here
+```
+
+3. Zeabur の **File Management** タブを開き、`/home/node/.openclaw/openclaw.json` を編集。以下の完全な設定で内容を置き換え：
+
+```json
+{
+  "models": {
+    "providers": {
+      "zenmux": {
+        "baseUrl": "https://zenmux.ai/api/v1",
+        "apiKey": "${ZENMUX_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "sapiens-ai/agnes-1.5-pro",
+            "name": "Agnes 1.5 Pro (ZenMux)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {
+              "input": 1.0,
+              "output": 4.0,
+              "cacheRead": 0.1,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "zeabur-ai": {
+        "baseUrl": "https://hnd1.aihub.zeabur.ai/v1",
+        "apiKey": "${ZEABUR_AI_HUB_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "minimax-m2.5",
+            "name": "MiniMax M2.5 (Zeabur AI Hub)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {
+              "input": 0.27,
+              "output": 0.95,
+              "cacheRead": 0.03,
+              "cacheWrite": 0
+            },
+            "contextWindow": 196608,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "zenmux/sapiens-ai/agnes-1.5-pro",
+        "fallbacks": ["zeabur-ai/minimax-m2.5"]
+      },
+      "models": {
+        "zenmux/sapiens-ai/agnes-1.5-pro": {}
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      },
+      "groupPolicy": "allowlist",
+      "streaming": "partial"
+    }
+  },
+  "gateway": {
+    "controlUi": {
+      "dangerouslyAllowHostHeaderOriginFallback": true,
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token"
+    },
+    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12"]
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.3.13",
+    "lastTouchedAt": "2026-03-22T06:27:58.962Z"
+  }
+}
+```
+
+サービスを再起動。Agnes 1.5 Pro がモデルリストに表示されます — Telegram で `/model` コマンドで切り替え可能です。
+
+
+## ステップ 4 — Bright Data スキルをインストール（ウェブ検索＆スクレイピング）
+
+[Bright Data](https://brightdata.com) により、エージェントはリアルタイムでウェブを検索し、あらゆるページからコンテンツを抽出できます。
+
+### Bright Data の認証情報を取得
+
+1. [brightdata.com](https://brightdata.com) にログインして **Web Access** → **SERP API** に移動
+2. 新しいゾーンを作成（またはデフォルトを使用）して **Zone name** をコピー
+3. **Account Settings** → **API Tokens** に移動して **API key** をコピー
+![bright data dashboard](/products/agentforge_openclaw/agentforge_openclaw_4.jpg)
+
+### スキルをインストール
+
+Telegram Bot に自然言語で Bright Data スキルのインストールをメッセージ：
+
+> *「Install the Bright Data skill for web search.」*
+
+OpenClaw が自動的に ClawHub からスキルを取得してインストールします。
+
+### 環境変数を設定
+
+Zeabur → **Variable** タブで追加：
+
+```bash
+BRIGHTDATA_API_KEY=your_bright_data_api_key
+BRIGHTDATA_SERP_ZONE=your_zone_name
+```
+
+Telegram Bot にメッセージしてゲートウェイを再起動：
+
+> */restart*
+
+### 試してみる
+
+Telegram Bot にメッセージ：
+
+> *「シンガポールの最新AIハッカソンニュースを検索して、上位3件を要約してください。」*
+
+エージェントは Bright Data の SERP API を使用して検索し、記事を要約します。
+
+
+## ステップ 5 — Mem9 で永続メモリを追加
+
+[Mem9](https://mem9.ai) は OpenClaw の組み込みファイルベースメモリを、適切なベクトル検索対応メモリシステムに置き換えます。エージェントはセッションを跨いでユーザーの好みや過去の会話を記憶します。
+
+![mem9 dashboard](/products/agentforge_openclaw/agentforge_openclaw_5.jpg)
+### Mem9 スキルをインストール
+
+Telegram Bot に自然言語で Mem9 スキルのインストールをメッセージ：
+
+> *「Read https://mem9.ai/SKILL.md and follow the instructions to install and configure mem9 for OpenClaw」*
+
+OpenClaw が自動的にスキルの指示を取得し、セットアップをガイドします。
+
+### Mem9 を設定
+
+インストール後、OpenClaw から **MEM9 Space ID** が提供されます。Zeabur → **Variable** タブに保存：
+
+```bash
+MEM9_SPACE_ID=your_mem9_space_id
+```
+
+スキルは自動的にメモリプラグインとして登録され、OpenClaw のデフォルト `memory-core` スロットを置き換えます。Telegram Bot に `/restart` を送信して有効化。
+
+### メモリの動作を確認
+
+Bot にいくつかメッセージを送信：
+
+> *「私のお気に入りのプログラミング言語は Python で、エージェント AI に興味があることを覚えておいて。」*
+
+その後、新しいセッションで質問：
+
+> *「私について何を知っていますか？」*
+
+エージェントは Mem9 ストアからあなたの好みを思い出すはずです。
+
+## ステップ 6 — TiDB Cloud Zero（データベース）を接続
+
+[TiDB Cloud Zero](https://zero.tidbcloud.com) は、ベクトル検索内蔵の使い捨て MySQL 互換データベースを提供します — サインアップ不要、設定不要、ミリ秒でプロビジョニング。
+
+![tidb zero dashboard](/products/agentforge_openclaw/agentforge_openclaw_6.jpg)
+
+### データベースをプロビジョニング
+
+Telegram Bot に自然言語で TiDB Cloud Zero のセットアップをメッセージ：
+
+> *「Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero.」*
+
+OpenClaw がデータベースをプロビジョニングし、接続文字列を返します。
+
+### 環境変数を設定
+
+エージェントの応答から `connectionString` をコピー。Zeabur → **Variable** タブで追加：
+
+```bash
+TIDB_CONNECTION_STRING=mysql://user:pass@gateway01.prod.aws.tidbcloud.com:4000/test
+```
+
+（実際の接続文字列に置き換えてください。）
+
+Telegram Bot に `/restart` を送信して変更を適用。
+
+### エージェントから使用
+
+エージェントは SQL を使用してデータを保存・クエリできます。例えば Bot に質問：
+
+> *「今日見たハッカソンプロジェクトを追跡するテーブルを作成して。プロジェクト名、チーム、簡単な説明のカラムを含めて。」*
+
+TiDB Zero データベースは30日間有効で、無料枠と $1 のハード上限が含まれています — ハッカソンデモには十分です。その後もデータベースを保持したい場合は、[TiDB Cloud](https://tidbcloud.com) でクレームできます。
+
+
+
+## ステップ 7 — エージェントを構築＆カスタマイズ
+
+ここからが本当の楽しみの始まりです。5つの統合がすべて稼働し、OpenClaw アシスタントはリアルタイムでウェブデータを検索・スクレイピングし（Bright Data）、セッション間でコンテキストを記憶し（Mem9）、構造化データを保存・クエリし（TiDB Cloud Zero）、地域最適化された LLM で推論し（Agnes AI via ZenMux）、Telegram で通信できます。
+
+エージェントを **パーソナル・チーフ・オブ・スタッフ** と考えてください — 常にオンラインで、常に学習し、どんなタスクにも対応できます。
+
+![openclaw team](/products/agentforge_openclaw/agentforge_openclaw_8.jpg)
+### 何を構築しますか？
+
+想像力を刺激するアイデアをいくつか：
+
+- **リサーチアシスタント** — *「シンガポールのAIスタートアップトップ10を検索し、各社を要約して、後で確認できるようデータベースに保存して。」*
+- **会議準備Bot** — *「明日Acme社のJohnと会議があることを覚えておいて。Acmeに関する最近のニュースを検索して、3つの話題を準備して。」*
+- **競合トラッカー** — *「毎日[競合名]についてのニュースを検索し、データベースに要約を保存して。重大なことがあれば通知して。」*
+- **学習ジャーナル** — *「機械学習について私が話すことをすべて覚えておいて。クイズを求めたら、学んだことをテストして。」*
+- **イベントスカウト** — *「アジアで開催予定のAIハッカソンを検索し、私の空いている日程でフィルターして、最良のものを保存して。」*
+
+ウェブ検索、永続メモリ、データベースの組み合わせにより、エージェントは単一の会話だけでなく、数日から数週間にわたるマルチステップワークフローを処理できます。
+
+設定済みの環境変数のクイックリファレンス：
+
+```bash
+# Zeabur & OpenClaw
+TELEGRAM_BOT_TOKEN=...
+ZEABUR_AI_HUB_API_KEY=...        # デプロイ時に自動生成
+
+# Agnes AI (via ZenMux)
+ZENMUX_API_KEY=...
+
+# Bright Data
+BRIGHTDATA_API_KEY=...
+BRIGHTDATA_SERP_ZONE=...
+
+# Mem9
+MEM9_SPACE_ID=...
+
+# TiDB Cloud Zero
+TIDB_CONNECTION_STRING=...
+```
+
+### 便利な OpenClaw コマンド
+
+| コマンド | 機能 |
+|||
+| `/model` | AI モデルを切り替え |
+| `/session` | 会話セッションを表示またはリセット |
+| `/skill` | インストール済みスキルを一覧表示 |
+| `/restart` | OpenClaw ゲートウェイを再起動 |
+| `/help` | 利用可能なコマンドをすべて表示 |
+
+## ステップ 8 — QoderWork でプロジェクトを提出
+
+発表の準備ができたら、作業をまとめて **QoderWork** に自動で提出デッキを作成させましょう。
+
+![qoderwork](/products/agentforge_openclaw/agentforge_openclaw_7.jpg)
+
+### 準備するもの
+
+1. **スクリーンショット** — 重要な瞬間をキャプチャ：Telegram での会話、設定済みモデルの OpenClaw ダッシュボード、Bright Data 検索結果、Mem9 メモリ呼び出し、構築したクリエイティブな機能
+2. **短い要約** — エージェントの機能と使用したスポンサーツールを説明する3〜5文
+
+### スライドデッキを生成
+
+[QoderWork](https://qoder.com/qoderwork) を開いて、次のようなメッセージを送信：
+
+> *「Agent Forge Hackathon のハッカソン提出プレゼンテーションを作成してください。要約はこちら：[要約を貼り付け]。スクリーンショットはこちら：[スクリーンショットを添付]。」*
+
+QoderWork は、プロジェクト概要、アーキテクチャ、スクリーンショット付きの機能デモ、スポンサー謝辞を含む、洗練された `.pptx` スライドデッキを生成します。
+
+## トラブルシューティング
+
+- **OpenClaw が Zeabur で起動しない** — **Dedicated Server**（Shared ではなく）を選択したことを確認。OpenClaw には最低 2 vCPU と 4 GB RAM が必要です。
+
+- **Telegram Bot が応答しない** — Variable タブの `TELEGRAM_BOT_TOKEN` を再確認。追加または変更後、サービスを再起動。その後ダッシュボードで「Connect Telegram Bot」をクリック。
+
+- **Bright Data スキルが動作しない** — `BRIGHTDATA_API_KEY` と `BRIGHTDATA_SERP_ZONE` の両方が設定されていることを確認。追加後、Telegram Bot に `/restart` を送信。
+
+- **Agnes AI モデルが表示されない** — `openclaw.json` ファイルが有効な JSON 構文で正しく保存されていることを確認。設定を検証してサービスを再起動。
+
+- **Mem9 がセッション間で記憶しない** — `MEM9_SPACE_ID` が正しく設定されていることを確認。mem9 スキルが自然言語で正常にインストールされ、Bot に `/restart` を送信したことを確認。
+
+- **TiDB Cloud Zero 接続に失敗** — 接続文字列の形式が正しいことを確認（`mysql://user:pass@host:4000/dbname`）。Zero インスタンスは30日で期限切れになります — 期限が切れた場合はエージェントに新しいインスタンスのプロビジョニングを依頼。
+
+
+
+## クイックリンク
+
+| リソース | URL |
+|||
+| OpenClaw テンプレート | [zeabur.com/templates/VTZ4FX](https://zeabur.com/templates/VTZ4FX?utm_source=luma) |
+| Agnes 1.5 Pro | [zenmux.ai/sapiens-ai/agnes-1.5-pro](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) |
+| Bright Data + OpenClaw ガイド | [brightdata.com/blog/ai/openclaw-with-bright-data](https://brightdata.com/blog/ai/openclaw-with-bright-data?utm_source=luma) |
+| TiDB Cloud Zero | [zero.tidbcloud.com](https://zero.tidbcloud.com/?utm_source=luma) |
+| Mem9 | [mem9.ai](https://mem9.ai/?utm_source=luma) |
+| QoderWork | [qoder.com/qoderwork](https://qoder.com/qoderwork) |
+
+
+
+## まとめ
+
+本番環境対応の AI アシスタントを構築しました：
+
+- **ウェブ検索** — Bright Data の SERP API でリアルタイム検索
+- **すべてを記憶** — Mem9 の永続メモリでセッション間も保持
+- **データを保存・クエリ** — TiDB Cloud Zero の MySQL 互換データベース
+- **インテリジェントに推論** — Agnes AI やその他の強力なモデル
+- **どこでもチャット** — Telegram 経由
+
+これは単なるデモではありません — これは基盤です。リサーチアシスタント、パーソナル・チーフ・オブ・スタッフ、あるいはまったく新しいものを構築するにしても、OpenClaw は実際に仕事をこなすエージェントを作るためのビルディングブロックを提供します。
+
+あなたが何を構築するか、楽しみにしています。Happy hacking!
