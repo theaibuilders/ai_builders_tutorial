@@ -1,0 +1,432 @@
+# OpenClaw: Build Your Personal AI Assistant
+
+## What You're Building
+
+In this tutorial, you'll deploy a production-ready **OpenClaw** AI assistant. By the end, your assistant will be able to search and scrape the live web (Bright Data), remember conversations across sessions (Mem9 + TiDB Cloud Zero), reason with a Southeast-Asia-tuned LLM (Agnes AI), and chat with you on Telegram — all running on a single Zeabur Dedicated Server.
+
+![openclaw banner](/products/agentforge_openclaw/agentforge_openclaw_0.jpg)
+### Prerequisites
+
+- A [Zeabur](https://zeabur.com) account (Dedicated Server plan — minimum 2 vCPU / 4 GB RAM)
+- A [Telegram](https://telegram.org) account and a phone with the Telegram app installed
+- A [Bright Data](https://brightdata.com) account with an API key
+- A [Mem9](https://mem9.ai) account for persistent memory
+- A [TiDB Cloud Zero](https://zero.tidbcloud.com) database (no sign-up required)
+- A [ZenMux](https://zenmux.ai) account for [Agnes AI](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) model access
+- Basic comfort with environment variables and JSON files
+
+### Architecture Overview
+
+```
+┌────────────┐     ┌──────────────────────────────────────────────┐
+│  Telegram   │◄───►│            OpenClaw (Zeabur)                 │
+│  User Chat  │     │  ┌────────────┐  ┌────────────────────────┐ │
+└────────────┘     │  │ LLM Router │  │  Skills                │ │
+                    │  │ Agnes AI   │  │  ├─ Bright Data (Web)  │ │
+                    │  │ GLM-4.7    │  │  ├─ Mem9 (Memory)      │ │
+                    │  │ Grok 4     │  │  └─ TiDB (Database)    │ │
+                    │  └────────────┘  └────────────────────────┘ │
+                    └──────────────────────────────────────────────┘
+```
+
+## Step 1 — Deploy OpenClaw on Zeabur
+
+Open the one-click template and hit **Deploy**:
+
+👉 [https://zeabur.com/templates/VTZ4FX](https://zeabur.com/templates/VTZ4FX?utm_source=luma)
+
+You'll see a deployment form with three fields:
+
+| Field | What to enter |
+|||
+| **Domain** | Pick a unique subdomain, e.g. `yourname-openclaw`. Your UI will be at `yourname-openclaw.zeabur.app` |
+| **Enable Control UI** | Set to `true` so you can manage models and skills from the browser |
+| **Zeabur AI Hub API Key** | Click **Generate** to create one automatically — this gives you access to bundled models at no extra cost |
+
+Choose **Dedicated Server** as the server type, select the **OpenClaw** destination, and click **Confirm**.
+
+![zeabur deploy form](/products/agentforge_openclaw/agentforge_openclaw_1.jpg)
+
+Deployment takes roughly 60–90 seconds. Once the status turns green, open your domain URL in a browser and log in with the `OPENCLAW_GATEWAY_TOKEN` shown in the Zeabur **Instructions** tab.
+
+
+
+## Step 2 — Connect a Telegram Bot
+
+Your assistant needs a channel to talk through. We'll use Telegram.
+
+**Create the bot:**
+
+1. Open Telegram and message [@BotFather](https://t.me/BotFather)
+2. Send `/newbot`
+3. Pick a display name (e.g. *Agent Forge Bot*)
+4. Pick a username ending in `bot` (e.g. `agentforge_hackathon_bot`)
+5. Copy the token BotFather gives you (looks like `123456789:ABCdef...`)
+
+**Add the token to Zeabur:**
+
+Go to your OpenClaw service in Zeabur → **Variable** tab → add:
+
+```bash
+TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+```
+
+Restart the service. Then open the OpenClaw dashboard → **Channels** panel → click **Connect Telegram Bot**.
+
+Now message your bot on Telegram. You should see it respond.
+
+![telegram bot chat](/products/agentforge_openclaw/agentforge_openclaw_3.jpg)
+
+
+
+## Step 3 — Configure AI Models & Agnes AI
+
+After deployment, your OpenClaw dashboard already includes several models via the Zeabur AI Hub:
+
+| Model | Role | Context |
+||||
+| GLM-4.7 Flash | Default | 204.8K |
+| Grok 4 Fast | Fallback #1 | 2M |
+| MiniMax M2.5 | Fallback #2 | 196.6K |
+| Kimi K2.5 | Fallback #3 | 131.1K |
+| Qwen 3 235B | Fallback #4 | 32.8K |
+| GPT-5 Mini | Fallback #5 | 400K |
+
+![openclaw models dashboard](/products/agentforge_openclaw/agentforge_openclaw_2.jpg)
+
+### Add Agnes AI via ZenMux
+
+[Agnes 1.5 Pro](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) is a model optimised for OpenClaw. Access it through ZenMux's OpenAI-compatible gateway.
+
+1. Sign up at [zenmux.ai](https://zenmux.ai) and create an API key
+2. In Zeabur → **Variable** tab, add:
+
+```bash
+ZENMUX_API_KEY=your_zenmux_api_key_here
+```
+
+3. Open the Zeabur **File Management** tab and edit `/home/node/.openclaw/openclaw.json`. Replace the contents with this complete configuration:
+
+```json
+{
+  "models": {
+    "providers": {
+      "zenmux": {
+        "baseUrl": "https://zenmux.ai/api/v1",
+        "apiKey": "${ZENMUX_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "sapiens-ai/agnes-1.5-pro",
+            "name": "Agnes 1.5 Pro (ZenMux)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {
+              "input": 1.0,
+              "output": 4.0,
+              "cacheRead": 0.1,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "zeabur-ai": {
+        "baseUrl": "https://hnd1.aihub.zeabur.ai/v1",
+        "apiKey": "${ZEABUR_AI_HUB_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "minimax-m2.5",
+            "name": "MiniMax M2.5 (Zeabur AI Hub)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {
+              "input": 0.27,
+              "output": 0.95,
+              "cacheRead": 0.03,
+              "cacheWrite": 0
+            },
+            "contextWindow": 196608,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "zenmux/sapiens-ai/agnes-1.5-pro",
+        "fallbacks": ["zeabur-ai/minimax-m2.5"]
+      },
+      "models": {
+        "zenmux/sapiens-ai/agnes-1.5-pro": {}
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "groups": {
+        "*": {
+          "requireMention": true
+        }
+      },
+      "groupPolicy": "allowlist",
+      "streaming": "partial"
+    }
+  },
+  "gateway": {
+    "controlUi": {
+      "dangerouslyAllowHostHeaderOriginFallback": true,
+      "allowInsecureAuth": true,
+      "dangerouslyDisableDeviceAuth": true
+    },
+    "auth": {
+      "mode": "token"
+    },
+    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12"]
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.3.13",
+    "lastTouchedAt": "2026-03-22T06:27:58.962Z"
+  }
+}
+```
+
+Restart the service. Agnes 1.5 Pro now appears in your model list — switch to it with the `/model` command in Telegram.
+
+
+## Step 4 — Install Bright Data Skills (Web Search & Scraping)
+
+[Bright Data](https://brightdata.com) gives your agent the ability to search the web in real time and extract content from any page.
+
+### Get Your Bright Data Credentials
+
+1. Log in to [brightdata.com](https://brightdata.com) and go to **Web Access** → **SERP API**
+2. Create a new zone (or use the default one) and copy the **Zone name**
+3. Go to **Account Settings** → **API Tokens** and copy your **API key**
+![bright data dashboard](/products/agentforge_openclaw/agentforge_openclaw_4.jpg)
+
+### Install the Skill
+
+Message your Telegram bot to install the Bright Data skill using natural language:
+
+> *"Install the Bright Data skill for web search."*
+
+OpenClaw will automatically fetch and install the skill from ClawHub.
+
+### Set Environment Variables
+
+In Zeabur → **Variable** tab, add:
+
+```bash
+BRIGHTDATA_API_KEY=your_bright_data_api_key
+BRIGHTDATA_SERP_ZONE=your_zone_name
+```
+
+Restart the gateway by messaging your Telegram bot:
+
+> */restart*
+
+### Try It Out
+
+Message your Telegram bot:
+
+> *"Search for the latest AI hackathon news in Singapore and summarise the top 3 results."*
+
+The agent will use Bright Data's SERP API to search and summarise the articles.
+
+
+## Step 5 — Add Persistent Memory with Mem9
+
+[Mem9](https://mem9.ai) replaces OpenClaw's built-in file-based memory with a proper vector-search-backed memory system. Your agent will remember user preferences and past conversations across sessions.
+
+![mem9 dashboard](/products/agentforge_openclaw/agentforge_openclaw_5.jpg)
+### Install the Mem9 Skill
+
+Message your Telegram bot to install the Mem9 skill using natural language:
+
+> *"Read https://mem9.ai/SKILL.md and follow the instructions to install and configure mem9 for OpenClaw"*
+
+OpenClaw will automatically fetch the skill instructions and guide you through the setup.
+
+### Configure Mem9
+
+After installation, OpenClaw will provide you with a **MEM9 Space ID**. Save it to Zeabur → **Variable** tab:
+
+```bash
+MEM9_SPACE_ID=your_mem9_space_id
+```
+
+The skill automatically registers itself as a memory plugin, replacing OpenClaw's default `memory-core` slot. Send `/restart` to your Telegram bot to activate.
+
+### Verify Memory Is Working
+
+Send a few messages to your bot:
+
+> *"Remember that my favourite programming language is Python and I'm interested in agentic AI."*
+
+Then in a new session, ask:
+
+> *"What do you know about me?"*
+
+The agent should recall your preferences from the Mem9 store.
+
+## Step 6 — Connect TiDB Cloud Zero (Database)
+
+[TiDB Cloud Zero](https://zero.tidbcloud.com) gives your agent a disposable, MySQL-compatible database with built-in vector search — no sign-up, no config, provisions in milliseconds.
+
+![tidb zero dashboard](/products/agentforge_openclaw/agentforge_openclaw_6.jpg)
+
+### Provision a Database
+
+Message your Telegram bot to set up TiDB Cloud Zero using natural language:
+
+> *"Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero."*
+
+OpenClaw will provision a database and return the connection string.
+
+### Set the Environment Variable
+
+Copy the `connectionString` from the agent's response. In Zeabur → **Variable** tab, add:
+
+```bash
+TIDB_CONNECTION_STRING=mysql://user:pass@gateway01.prod.aws.tidbcloud.com:4000/test
+```
+
+(Replace with your actual connection string.)
+
+Send `/restart` to your Telegram bot to apply the changes.
+
+### Use It From Your Agent
+
+Your agent can now use SQL to store and query data. For example, ask your bot:
+
+> *"Create a table to track the hackathon projects I've seen today, with columns for project name, team, and a short description."*
+
+TiDB Zero databases last 30 days and include a free quota plus a hard $1 spending limit — plenty for a hackathon demo. If you want to keep the database afterwards, you can claim it in [TiDB Cloud](https://tidbcloud.com).
+
+
+
+## Step 7 — Build & Customise Your Agent
+
+This is where the real fun begins. With all five integrations live, your OpenClaw assistant can now search and scrape live web data (Bright Data), remember context across sessions (Mem9), store and query structured data (TiDB Cloud Zero), reason with a region-tuned LLM (Agnes AI via ZenMux), and communicate over Telegram.
+
+Think of your agent as a **personal chief of staff** — always online, always learning, and ready to handle whatever you throw at it.
+
+![openclaw team](/products/agentforge_openclaw/agentforge_openclaw_8.jpg)
+### What Will You Build?
+
+Here are some ideas to spark your imagination:
+
+- **Research Assistant** — *"Search for the top 10 AI startups in Singapore, summarise each one, and save them to a database so I can review later."*
+- **Meeting Prep Bot** — *"Remember that I'm meeting John from Acme Corp tomorrow. Search for recent news about Acme and prepare 3 talking points."*
+- **Competitor Tracker** — *"Every day, search for news about [competitor name] and store a summary in my database. Alert me if anything major happens."*
+- **Learning Journal** — *"Remember everything I tell you about machine learning. When I ask for a quiz, test me on what I've learned."*
+- **Event Scout** — *"Search for upcoming AI hackathons in Asia, filter by dates I'm available, and save the best ones."*
+
+The combination of web search, persistent memory, and a database means your agent can handle multi-step workflows that span days or weeks — not just single conversations.
+
+Here's a quick-reference of all the environment variables you should have set:
+
+```bash
+# Zeabur & OpenClaw
+TELEGRAM_BOT_TOKEN=...
+ZEABUR_AI_HUB_API_KEY=...        # auto-generated during deploy
+
+# Agnes AI (via ZenMux)
+ZENMUX_API_KEY=...
+
+# Bright Data
+BRIGHTDATA_API_KEY=...
+BRIGHTDATA_SERP_ZONE=...
+
+# Mem9
+MEM9_SPACE_ID=...
+
+# TiDB Cloud Zero
+TIDB_CONNECTION_STRING=...
+```
+
+### Useful OpenClaw Commands
+
+| Command | What it does |
+|||
+| `/model` | Switch between AI models |
+| `/session` | View or reset conversation session |
+| `/skill` | List installed skills |
+| `/restart` | Restart the OpenClaw gateway |
+| `/help` | Show all available commands |
+
+## Step 8 — Submit Your Project with QoderWork
+
+When you're ready to present, gather your work and let **QoderWork** build your submission deck automatically.
+
+![qoderwork](/products/agentforge_openclaw/agentforge_openclaw_7.jpg)
+
+### What to Prepare
+
+1. **Screenshots** — Capture key moments: your Telegram conversations, the OpenClaw dashboard with models configured, Bright Data search results, Mem9 memory recall, and any creative features you built
+2. **A short summary** — 3–5 sentences describing what your agent does and which sponsor tools it uses
+
+### Generate Your Slide Deck
+
+Open [QoderWork](https://qoder.com/qoderwork) and send a message like:
+
+> *"Create a hackathon submission presentation for the Agent Forge Hackathon. Here's my summary: [paste your summary]. And here are my screenshots: [attach your screenshots]."*
+
+QoderWork will generate a polished `.pptx` slide deck you can use directly for your hackathon submission, covering your project overview, architecture, feature demos with your screenshots, and sponsor acknowledgements.
+
+## Troubleshooting
+
+- **OpenClaw won't start on Zeabur** — Ensure you selected **Dedicated Server** (not Shared). OpenClaw requires at least 2 vCPU and 4 GB RAM.
+
+- **Telegram bot isn't responding** — Double-check `TELEGRAM_BOT_TOKEN` in the Variable tab. After adding or changing it, restart the service. Then click "Connect Telegram Bot" in the dashboard.
+
+- **Bright Data skill not working** — Verify both `BRIGHTDATA_API_KEY` and `BRIGHTDATA_SERP_ZONE` are set. Send `/restart` to your Telegram bot after adding them.
+
+- **Agnes AI model not appearing** — Confirm the `openclaw.json` file was saved correctly with valid JSON syntax. Validate the configuration and restart the service.
+
+- **Mem9 not remembering across sessions** — Check that `MEM9_SPACE_ID` is set correctly. Make sure the mem9 skill was installed successfully via natural language and send `/restart` to your bot.
+
+- **TiDB Cloud Zero connection failing** — Verify the connection string format is correct (`mysql://user:pass@host:4000/dbname`). Zero instances expire after 30 days — ask your agent to provision a new one if yours has lapsed.
+
+
+
+## Quick Links
+
+| Resource | URL |
+|||
+| OpenClaw Template | [zeabur.com/templates/VTZ4FX](https://zeabur.com/templates/VTZ4FX?utm_source=luma) |
+| Agnes 1.5 Pro | [zenmux.ai/sapiens-ai/agnes-1.5-pro](https://zenmux.ai/sapiens-ai/agnes-1.5-pro) |
+| Bright Data + OpenClaw Guide | [brightdata.com/blog/ai/openclaw-with-bright-data](https://brightdata.com/blog/ai/openclaw-with-bright-data?utm_source=luma) |
+| TiDB Cloud Zero | [zero.tidbcloud.com](https://zero.tidbcloud.com/?utm_source=luma) |
+| Mem9 | [mem9.ai](https://mem9.ai/?utm_source=luma) |
+| QoderWork | [qoder.com/qoderwork](https://qoder.com/qoderwork) |
+
+
+
+## Summary
+
+You've just built a production-ready AI assistant that can:
+
+- **Search the web** in real time using Bright Data's SERP API
+- **Remember everything** across sessions with Mem9's persistent memory
+- **Store and query data** in a MySQL-compatible database via TiDB Cloud Zero
+- **Reason intelligently** with Agnes AI and other powerful models
+- **Chat anywhere** through Telegram
+
+This is more than a demo — it's a foundation. Whether you're building a research assistant, a personal chief of staff, or something entirely new, OpenClaw gives you the building blocks to create agents that actually get things done.
+
+We can't wait to see what you build. Happy hacking!
