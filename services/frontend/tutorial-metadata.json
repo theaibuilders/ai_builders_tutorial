@@ -227,6 +227,10 @@
     "Automation/openclaw.mdx": {
       "authorId": "devon-sun",
       "lastUpdated": "2026-03-22"
+    },
+    "Model Providers/gmi_cloud.ipynb": {
+      "authorId": "devon-sun",
+      "lastUpdated": "2026-03-23"
     }
   },
   "folderOrder": [
