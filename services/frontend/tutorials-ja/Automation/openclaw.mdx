@@ -151,23 +151,23 @@ ZENMUX_API_KEY=your_zenmux_api_key_here
           }
         ]
       },
-      "zeabur-ai": {
-        "baseUrl": "https://hnd1.aihub.zeabur.ai/v1",
-        "apiKey": "${ZEABUR_AI_HUB_API_KEY}",
+      "nosana": {
+        "baseUrl": "{BASE_URL}",
+        "apiKey": "${NOSANA_API_KEY}",
         "api": "openai-completions",
         "models": [
           {
-            "id": "minimax-m2.5",
-            "name": "MiniMax M2.5 (Zeabur AI Hub)",
+            "id": "{NOSANA_MODEL_ID}",
+            "name": "GLM-4.7 Flash Q4_K_M (Nosana)",
             "reasoning": false,
             "input": ["text"],
             "cost": {
-              "input": 0.27,
-              "output": 0.95,
-              "cacheRead": 0.03,
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
               "cacheWrite": 0
             },
-            "contextWindow": 196608,
+            "contextWindow": 128000,
             "maxTokens": 8192
           }
         ]
@@ -178,7 +178,7 @@ ZENMUX_API_KEY=your_zenmux_api_key_here
     "defaults": {
       "model": {
         "primary": "zenmux/sapiens-ai/agnes-1.5-pro",
-        "fallbacks": ["zeabur-ai/minimax-m2.5"]
+        "fallbacks": ["nosana/{NOSANA_MODEL_ID}"]
       },
       "models": {
         "zenmux/sapiens-ai/agnes-1.5-pro": {}
@@ -394,10 +394,12 @@ QoderWork は、プロジェクト概要、アーキテクチャ、スクリー�
 ```bash
 # Zeabur & OpenClaw
 TELEGRAM_BOT_TOKEN=...
-ZEABUR_AI_HUB_API_KEY=...        # デプロイ時に自動生成
 
 # Agnes AI (via ZenMux)
 ZENMUX_API_KEY=...
+
+# Nosana
+NOSANA_API_KEY=...
 
 # Bright Data
 BRIGHTDATA_API_KEY=...
