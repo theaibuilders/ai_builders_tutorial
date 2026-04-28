@@ -1,7 +1,7 @@
 import { signal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
 
 // Global signal to control modal visibility
 export const showLoginModal = signal(false);
@@ -153,6 +153,10 @@ const LoginModal = () => {
       if (window.google) {
         const googleClientId = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || '695004012662-a3981egieh12pqcbb57sbiug99b48mos.apps.googleusercontent.com';
         
+        // Guard against duplicate initialization across components
+        if ((window as any).__googleSignInInitialized) return;
+        (window as any).__googleSignInInitialized = true;
+
         window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: (response: any) => handleGoogleLogin(response.credential),

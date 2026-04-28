@@ -13,7 +13,7 @@ const user = signal<User | null>(null);
 const isLoading = signal(false);
 const error = signal<string | null>(null);
 
-const API_URL = 'http://localhost:8000';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:8000';
 
 // Check if user is authenticated on load
 const checkAuth = async () => {
@@ -141,6 +141,10 @@ const LoginForm: FunctionalComponent = () => {
         // Use environment variable for Google Client ID, fallback to hardcoded for backward compatibility
         const googleClientId = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID || '695004012662-a3981egieh12pqcbb57sbiug99b48mos.apps.googleusercontent.com';
         
+        // Guard against duplicate initialization across components
+        if ((window as any).__googleSignInInitialized) return;
+        (window as any).__googleSignInInitialized = true;
+
         window.google.accounts.id.initialize({
           client_id: googleClientId,
           callback: (response: any) => handleGoogleLogin(response.credential),
