@@ -1,11 +1,14 @@
-FROM node:22-slim
+FROM node:22-alpine AS builder
 LABEL "language"="nodejs"
 LABEL "framework"="astro"
-LABEL "build-date"="2025-11-30"
-WORKDIR /src
-COPY services/frontend/package*.json ./
+
+WORKDIR /app
+COPY . .
+
+WORKDIR /app/services/frontend
 RUN npm install
-COPY services/frontend/ ./
 RUN npm run build
+
+FROM zeabur/caddy-static:latest
+COPY --from=builder /app/services/frontend/dist /usr/share/caddy
 EXPOSE 8080
-CMD ["npm", "start"]
