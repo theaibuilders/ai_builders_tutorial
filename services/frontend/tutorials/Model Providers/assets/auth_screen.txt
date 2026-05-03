@@ -1,0 +1,6 @@
+[PLACEHOLDER] Authentication Screen
+Description: The authentication prompt seen when accessing the Agent's Gateway URL.
+Shows:
+- Gateway URL in the address bar.
+- The input field for the 'Gateway Token'.
+- The login button.

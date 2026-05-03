@@ -1,0 +1,6 @@
+[PLACEHOLDER] Model Selection Screen
+Description: Screenshot of the Nosana Dashboard's model selection interface.
+It should highlight:
+- The dropdown menu for choosing models (e.g., GLM-4, Llama 3).
+- VRAM requirements for each model.
+- GPU type selection (e.g., RTX 4090).

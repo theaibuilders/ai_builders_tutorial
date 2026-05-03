@@ -1,0 +1,5 @@
+[PLACEHOLDER] Telegram Pairing
+Description: The OpenClaw interface for connecting a Telegram bot.
+Shows:
+- The field for entering the Telegram Bot Token.
+- A confirmation status that the bot is linked to the Nosana deployment.

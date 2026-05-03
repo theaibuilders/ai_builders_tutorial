@@ -1,0 +1,6 @@
+[PLACEHOLDER] Architecture Diagram
+Description: This diagram shows the flow between:
+1. User Interface (Telegram/Web)
+2. OpenClaw Agent running in a Nosana Container
+3. GPU Inference Engine (e.g., vLLM/Ollama) on the Nosana Grid
+4. The Nosana Network connecting consumers to providers.
