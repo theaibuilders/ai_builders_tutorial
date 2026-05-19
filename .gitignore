@@ -25,6 +25,9 @@ services/frontend/.env
 .tmp
 **/.cache
 
+# Repo-local SSH keys
+.repo-ssh/
+
 # Large model files
 tutorials/Fine Tuning/results/
 *.safetensors
