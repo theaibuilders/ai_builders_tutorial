@@ -233,18 +233,6 @@ const hasDrafts = draftSections.length > 0;
             </svg>
           </a>
         </div>
-        <button
-          id="sidebar-auth-button"
-          class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-1.5"
-          aria-label="Sign In / Sign Up"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="sidebar-auth-icon">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-            <polyline points="10 17 15 12 10 7"/>
-            <line x1="15" y1="12" x2="3" y2="12"/>
-          </svg>
-          <span id="sidebar-auth-text">Sign In</span>
-        </button>
       </div>
     </div>
   </div>
@@ -291,63 +279,11 @@ const hasDrafts = draftSections.length > 0;
     }
   }
   
-  // Check authentication status and setup modal trigger
-  function checkAuthStatus() {
-    const token = localStorage.getItem('auth_token');
-    const authButton = document.getElementById('sidebar-auth-button');
-    const authText = document.getElementById('sidebar-auth-text');
-    const authIcon = document.getElementById('sidebar-auth-icon');
-    
-    if (authButton) {
-      if (token && authText && authIcon) {
-        // User is logged in - show account button
-        authButton.setAttribute('aria-label', 'Account');
-        authText.textContent = 'Account';
-        
-        // Change icon to user icon
-        authIcon.innerHTML = `
-          <circle cx="12" cy="12" r="10"/>
-          <circle cx="12" cy="10" r="3"/>
-          <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/>
-        `;
-      } else {
-        // User is logged out - show sign in button
-        authButton.setAttribute('aria-label', 'Sign In / Sign Up');
-        authText.textContent = 'Sign In';
-        
-        // Change icon to sign in icon
-        authIcon.innerHTML = `
-          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-          <polyline points="10 17 15 12 10 7"/>
-          <line x1="15" y1="12" x2="3" y2="12"/>
-        `;
-      }
-    }
-  }
-  
   // Make functions available globally
   (window as any).toggleSection = toggleSection;
   
-  // Initialize section states and check auth
+  // Initialize section states
   document.addEventListener('DOMContentLoaded', () => {
-    // Setup auth button click handler
-    const authButton = document.getElementById('sidebar-auth-button');
-    if (authButton) {
-      authButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Dispatch custom event to open modal
-        window.dispatchEvent(new CustomEvent('openLoginModal'));
-      });
-    }
-    
-    // Check authentication status
-    checkAuthStatus();
-    
-    // Listen for auth status changes
-    window.addEventListener('authStatusChanged', () => {
-      checkAuthStatus();
-    });
-    
     // All sections start collapsed by default
     // Only expand the section containing the current file
   // More robust detection of the active link: look for element with the active background class by attribute selector

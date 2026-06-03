@@ -7,7 +7,6 @@ const TUTORIALS_DIR = path.join(process.cwd(), 'tutorials');
 const DRAFTS_DIR = path.join(process.cwd(), 'tutorials-draft');
 const METADATA_CONFIG_PATH = path.join(process.cwd(), 'tutorial-metadata.json');
 const AUTHOR_METADATA_PATH = path.join(process.cwd(), 'author-metadata.json');
-const VISIBILITY_CONFIG_PATH = path.join(process.cwd(), 'tutorial-visibility.json');
 
 // Get tutorials directory for a specific language
 export function getTutorialsDir(language: string = 'en'): string {
@@ -75,23 +74,8 @@ function loadMetadataOverrides(): Record<string, any> {
   return {};
 }
 
-// Load visibility configuration
-function loadVisibilityConfig(): Record<string, { masked: boolean }> {
-  try {
-    if (fs.existsSync(VISIBILITY_CONFIG_PATH)) {
-      const content = fs.readFileSync(VISIBILITY_CONFIG_PATH, 'utf-8');
-      const config = JSON.parse(content);
-      return config.tutorials || {};
-    }
-  } catch (error) {
-    console.error('Error loading visibility config:', error);
-  }
-  return {};
-}
-
 const authorMetadata = loadAuthorMetadata();
 const metadataOverrides = loadMetadataOverrides();
-const visibilityConfig = loadVisibilityConfig();
 
 // Resolve author information from authorId
 function resolveAuthorInfo(authorId?: string): { author?: string; authorPicture?: string; authorUrl?: string } {
@@ -177,25 +161,13 @@ export function extractMarkdownMetadata(content: string, filePath?: string): any
     // Resolve author information if authorId is provided
     const authorInfo = resolveAuthorInfo(overrides.authorId);
     
-    const finalMetadata = {
+    return {
       ...defaultMetadata,
       ...overrides,
       ...authorInfo // This will override any existing author fields with resolved data
     };
-    
-    // Apply visibility configuration
-    if (visibilityConfig[filePath]) {
-      finalMetadata.masked = visibilityConfig[filePath].masked;
-    }
-    
-    return finalMetadata;
   }
-  
-  // Apply visibility configuration even without metadata overrides
-  if (filePath && visibilityConfig[filePath]) {
-    defaultMetadata.masked = visibilityConfig[filePath].masked;
-  }
-  
+
   return defaultMetadata;
 }
 
@@ -231,25 +203,13 @@ export function extractNotebookMetadata(notebook: any, filePath?: string): any {
     // Resolve author information if authorId is provided
     const authorInfo = resolveAuthorInfo(overrides.authorId);
     
-    const finalMetadata = {
+    return {
       ...defaultMetadata,
       ...overrides,
       ...authorInfo // This will override any existing author fields with resolved data
     };
-    
-    // Apply visibility configuration
-    if (visibilityConfig[filePath]) {
-      finalMetadata.masked = visibilityConfig[filePath].masked;
-    }
-    
-    return finalMetadata;
   }
-  
-  // Apply visibility configuration even without metadata overrides
-  if (filePath && visibilityConfig[filePath]) {
-    defaultMetadata.masked = visibilityConfig[filePath].masked;
-  }
-  
+
   return defaultMetadata;
 }
 
