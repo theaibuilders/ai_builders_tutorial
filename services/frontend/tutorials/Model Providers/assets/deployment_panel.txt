@@ -1,0 +1,6 @@
+[PLACEHOLDER] Deployment Panel
+Description: The main deployment configuration screen on the Nosana Dashboard.
+Key elements to show:
+- Template selection (OpenClaw).
+- Environment variable configuration (Secrets).
+- The 'Create Deployment' button.
