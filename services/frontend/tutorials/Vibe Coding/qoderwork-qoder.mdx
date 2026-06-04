@@ -1,0 +1,394 @@
+
+# Build a "Best of Tokyo" City Guide in 3 Hours
+
+<Callout type="info">
+This is a hands-on workshop by **AI Builders x Qoder**. You'll use AI tools to research, build, and present — no prior coding experience required.
+</Callout>
+
+## What You'll Create
+
+By the end of this workshop, you'll have:
+
+1. **Curated research** — a collection of real spots, reviews, and local tips for a Tokyo neighborhood or theme (using QoderWork)
+2. **An interactive city guide** — a beautiful web app with cards, filters, and a map view (using Qoder)
+3. **A presentation** — a visual slide deck showcasing your guide and the process (using QoderWork)
+
+Every participant picks their own theme, so every guide is unique.
+
+
+
+## Prerequisites
+
+Before the workshop, please have the following ready on your laptop:
+
+- **Qoder** desktop app installed → [qoder.com/en](https://qoder.com/en)
+- **QoderWork** enabled within Qoder → [qoder.com/qoderwork](https://qoder.com/qoderwork)
+- A modern web browser (Chrome recommended)
+- No coding experience necessary
+
+<Callout type="tip">
+You'll receive **Qoder Credits** at the event to cover all AI usage during the workshop.
+</Callout>
+
+
+
+## Workshop Overview
+
+| Phase | Time | Tool | What You'll Do |
+|-|||-|
+| Research | 25 min | QoderWork | Find real spots, gather reviews, collect details |
+| Build | 60 min | Qoder | Vibe code an interactive guide web app |
+| Present | 20 min | QoderWork | Generate a slide deck of your guide |
+
+
+
+## Phase 1: Research with QoderWork
+
+**Time: 25 minutes**
+
+QoderWork is your AI research assistant. It can search the web, synthesize information from multiple sources, and produce structured documents — all through natural conversation.
+
+### Step 1.1 — Pick Your Theme
+
+Choose a topic that excites you. This is *your* guide — make it personal.
+
+**By neighborhood:**
+- Best of Shimokitazawa (vintage, cafes, live music)
+- Best of Yanaka (old Tokyo, temples, local snacks)
+- Best of Nakameguro (river walks, design shops, brunch)
+- Best of Koenji (thrift stores, underground music, cheap eats)
+
+**By theme:**
+- Tokyo's best ramen spots
+- Hidden kissaten (retro coffee shops)
+- Late-night Tokyo (bars, izakayas, nightlife)
+- Tokyo for design lovers (architecture, galleries, shops)
+- Budget Tokyo (free/cheap experiences under ¥1000)
+
+<Callout type="example">
+**Pick something you'd genuinely want to explore.** The more specific your angle, the more interesting your guide will be. "Best ramen in Shinjuku" is better than "food in Tokyo."
+</Callout>
+
+### Step 1.2 — Research Your Spots
+
+Open **QoderWork** and start a conversation:
+
+```text
+I'm creating a city guide about [your theme].
+
+Research and find me 6-8 real places/spots with the following for each:
+1. Name (Japanese + English)
+2. One-line description (what makes it special)
+3. Address
+4. Approximate price range (¥ / ¥¥ / ¥¥¥)
+5. Best time to visit
+6. One insider tip or detail most tourists wouldn't know
+
+Focus on quality over quantity. Include a mix of well-known gems
+and lesser-known local favorites.
+```
+
+QoderWork will search the web, cross-reference sources, and compile real locations with accurate details.
+
+### Step 1.3 — Add Context and Story
+
+A great guide isn't just a list — it has a narrative. Ask QoderWork:
+
+```text
+Now help me add editorial context:
+
+1. Write a short intro paragraph (3-4 sentences) that sets the mood
+   for this guide. Why does this theme/area matter? What's the vibe?
+2. Suggest a walking route that connects 4-5 of these spots in a
+   logical order.
+3. Give me 3 "pro tips" for someone exploring this theme for the
+   first time.
+4. Suggest relevant tags/categories I can use for filtering
+   (e.g., "budget-friendly", "rainy day", "date spot", "solo-friendly").
+```
+
+### Step 1.4 — Structure the Data
+
+Ask QoderWork to format everything for easy use in the next phase:
+
+```text
+Compile all of this into a JSON-structured document I can use
+for a web app. Format each spot like this:
+
+{
+  "name_en": "",
+  "name_ja": "",
+  "description": "",
+  "address": "",
+  "price": "",
+  "best_time": "",
+  "insider_tip": "",
+  "tags": [],
+  "lat": null,
+  "lng": null
+}
+
+Also include the intro paragraph, walking route, and pro tips
+as separate fields. Save everything as a file.
+```
+
+<Callout type="success">
+**Checkpoint:** You should now have a structured data file with 6-8 real spots, an intro narrative, a walking route, pro tips, and tags. This is the content that powers your web app.
+</Callout>
+
+
+
+## Phase 2: Vibe Code Your City Guide with Qoder
+
+**Time: 60 minutes**
+
+Now you'll use **Qoder** to turn your research into a real, interactive web app. Qoder is an agentic AI coding platform — you describe what you want in natural language, and it plans, writes, and iterates on actual code.
+
+### Step 2.1 — Create the Base App
+
+Open **Qoder** and create a new workspace. Paste your research data and give it this prompt:
+
+```text
+Build a React city guide web app using my research data below.
+
+[paste your JSON data here]
+
+The app should have:
+1. A hero section with the guide title, intro paragraph, and a
+   moody background image (use a placeholder or gradient)
+2. A filter bar — users can filter spots by tags
+3. A card grid — each spot displayed as a card showing:
+   - Name (Japanese + English)
+   - Description
+   - Price range
+   - Best time to visit
+   - Tags as small badges
+4. A detail view — clicking a card expands to show the insider tip
+5. A "Pro Tips" section at the bottom
+
+Use Tailwind CSS. Make it feel editorial and modern — think
+a magazine-quality city guide, not a spreadsheet.
+Single-page app, no backend needed.
+```
+
+Watch Qoder work — it'll plan the component structure, write all the code, and set up the project.
+
+### Step 2.2 — Add Visual Polish
+
+Once the base is generated, refine the look and feel:
+
+```text
+Update the design:
+- Use a dark theme with warm accent colors (amber/orange tones)
+- Cards should have a subtle hover animation (slight lift + shadow)
+- Add a gradient overlay on the hero section
+- Use a clean Japanese-friendly font stack
+  (system-ui for English, Noto Sans JP fallback for Japanese)
+- Add smooth fade-in animations when cards appear
+- Make the tag filter pills look like they belong in a
+  design magazine
+```
+
+### Step 2.3 — Add Interactivity
+
+Make the guide feel alive:
+
+```text
+Add these interactive features:
+1. Clicking a tag filter animates the card grid (filtered cards
+   fade in, hidden ones fade out smoothly)
+2. Add a "Walking Route" section that displays the suggested
+   route as a numbered step-by-step with connecting lines
+3. Add a "copy address" button on each card that copies the
+   Japanese address to clipboard (useful for taxi/maps)
+4. Add a small map placeholder section showing a static
+   embedded map image or illustration
+```
+
+### Step 2.4 — Make It Responsive
+
+Ensure it works on phones (participants will want to show friends):
+
+```text
+Make the app fully responsive:
+- On mobile: cards stack in a single column
+- The filter bar scrolls horizontally on small screens
+- Hero section text is readable on all sizes
+- Touch-friendly tap targets on all interactive elements
+```
+
+### Step 2.5 — Final Touches
+
+```text
+Final polish:
+- Add a footer with "Made with AI Builders x Qoder" and today's date
+- Add a subtle page-load animation
+- Make sure the overall rhythm and spacing feels balanced
+- Add emoji indicators next to price ranges (💰 💰💰 💰💰💰)
+```
+
+<Callout type="tip">
+**Vibe Coding tip:** Don't worry about understanding the code. Focus on what you *see* in the browser. If something doesn't look right, describe the problem in plain language — "the cards feel too cramped" or "the colors are too bright" — and let Qoder fix it.
+</Callout>
+
+<Callout type="success">
+**Checkpoint:** You should have a working, interactive city guide running in your browser. Every participant's will look different based on their theme and design choices. Take a screenshot for your presentation.
+</Callout>
+
+
+
+## Phase 3: Create Your Presentation with QoderWork
+
+**Time: 20 minutes**
+
+Time to package your work into a presentation. You'll use **QoderWork** to generate a professional slide deck.
+
+### Step 3.1 — Generate the Deck
+
+Go back to **QoderWork**:
+
+```text
+Create a visual slide deck (5 slides) presenting my Tokyo city guide project.
+
+Guide title: [your title, e.g., "Hidden Kissaten: Tokyo's Retro Coffee Shops"]
+Theme: [your theme]
+Number of spots: [number]
+Key highlights: [2-3 of your favorite spots from the research]
+
+Slide structure:
+Slide 1: Title slide — guide name + "Built with Vibe Coding"
+Slide 2: The Concept — what this guide is about, who it's for
+Slide 3: Highlights — feature 2-3 standout spots with descriptions
+Slide 4: The Build Process — QoderWork for research → Qoder for coding → 3 hours total
+Slide 5: Try It Yourself — QR code placeholder + AI Builders / Qoder links
+
+Make it visually clean and modern. Save as .pptx.
+```
+
+### Step 3.2 — Add Your Screenshot
+
+```text
+Update slide 3 or 4 to include a space for my app screenshot.
+Add a device mockup frame around it so it looks professional.
+```
+
+### Step 3.3 — Prepare Your Demo Script
+
+```text
+Write me a 60-second presentation script for demoing this project.
+Cover:
+1. What I built and why I chose this theme (10 sec)
+2. Quick walkthrough of the guide features (30 sec)
+3. How I built it — research with QoderWork, code with Qoder (15 sec)
+4. Closing line (5 sec)
+
+Keep it natural and conversational, not salesy.
+```
+
+<Callout type="success">
+**Checkpoint:** You have your pitch deck and presentation script ready for the demo session.
+</Callout>
+
+
+
+## Demo Time
+
+You'll have **2 minutes** to present to the group:
+
+1. Briefly introduce your guide theme and why you picked it
+2. Show the live app in your browser — scroll through, click a few cards, use the filters
+3. Share one favorite spot from your research
+4. Explain your process (research → code → present, all with AI)
+
+
+
+## What You Built Today
+
+| Deliverable | Tool Used | Skill Learned |
+|-|--||
+| Curated research + structured data | QoderWork | AI-powered web research & data structuring |
+| Interactive city guide web app | Qoder | Vibe Coding (natural language → working code) |
+| Presentation slide deck | QoderWork | AI-generated presentations |
+
+### Key Takeaways
+
+- **QoderWork** handles research, writing, and document creation — from web search to structured output, all through conversation.
+- **Qoder** turns your descriptions into real, running code — you direct, it builds.
+- **Vibe Coding** means you focus on the creative decisions (what to include, how it should look and feel) while AI handles the implementation.
+- You shipped a complete project in 3 hours without writing a single line of code manually.
+
+
+
+## Next Steps
+
+Keep building after the workshop:
+
+- **Expand your guide** — ask Qoder to add more spots, a real map integration (Google Maps / Mapbox), or a dark/light mode toggle
+- **Deploy it** — ask Qoder to help you publish to Vercel or Netlify so you can share the link with friends
+- **Make it yours** — try a different city, a different theme, or turn it into a full travel blog
+- **Join the community** — connect with other builders at [AI Builders](https://theaibuilders.dev/)
+- **Use QoderWork daily** — research, documents, spreadsheets, slide decks — it's your productivity co-pilot
+
+<Callout type="info">
+**Resources:**
+- Qoder → [qoder.com/en](https://qoder.com/en)
+- QoderWork → [qoder.com/qoderwork](https://qoder.com/qoderwork)
+- AI Builders Community → [theaibuilders.dev](https://theaibuilders.dev/)
+</Callout>
+
+
+
+## Appendix: Prompt Cheat Sheet
+
+A quick reference of all the key prompts used in this workshop.
+
+### QoderWork — Research Phase
+
+```text
+Find me 6-8 real places for [theme]. Include: name (JP + EN),
+description, address, price range, best time, insider tip.
+```
+
+```text
+Write an intro paragraph, suggest a walking route,
+give 3 pro tips, and suggest filter tags.
+```
+
+```text
+Format everything as structured JSON and save as a file.
+```
+
+### Qoder — Build Phase
+
+```text
+Build a React city guide: hero, filter bar, card grid,
+detail view, pro tips section. Use Tailwind. Modern editorial feel.
+```
+
+```text
+Refine: dark theme, hover animations, Japanese font stack,
+fade-in animations, magazine-quality design.
+```
+
+```text
+Add interactivity: animated filtering, walking route display,
+copy-address buttons, responsive layout.
+```
+
+### QoderWork — Present Phase
+
+```text
+Create a 5-slide pitch deck: title, concept, highlights,
+build process, try-it-yourself. Save as .pptx.
+```
+
+```text
+Write a 60-second demo script: theme intro, app walkthrough,
+build process, closing.
+```
+
+
+
+<Callout type="heart">
+Built with AI Builders x Qoder. Let's build the future of AI — together.
+</Callout>
