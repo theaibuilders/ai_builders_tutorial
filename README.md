@@ -202,3 +202,5 @@ curl http://localhost:8000/health
 ```
 
 For detailed setup instructions, see [`docs/CIRCLE_AUTH_SETUP.md`](docs/CIRCLE_AUTH_SETUP.md).
+
+<!-- Redeployed: 2026-06-09 -->
