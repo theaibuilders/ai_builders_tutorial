@@ -15,9 +15,7 @@ Crawl-delay: 1
 # Allow access to CSS, JS, and image files
 Allow: /*.css$
 Allow: /*.js$
-Allow: /*.png$
-Allow: /*.jpg$
-Allow: /*.jpeg$
+Allow: /*.webp$
 Allow: /*.gif$
 Allow: /*.svg$
 Allow: /*.ico$

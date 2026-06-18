@@ -15,9 +15,9 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/ai-builders-tutorial-logo.png",
+      "src": "/ai-builders-tutorial-logo.webp",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "any maskable"
     }
   ],
@@ -27,9 +27,9 @@
   "scope": "/",
   "screenshots": [
     {
-      "src": "/github_banner.png",
+      "src": "/github_banner.webp",
       "sizes": "1200x630",
-      "type": "image/png",
+      "type": "image/webp",
       "form_factor": "wide",
       "label": "AI Builders Tutorial Homepage"
     }
