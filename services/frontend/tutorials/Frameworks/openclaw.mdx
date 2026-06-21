@@ -4,7 +4,7 @@
 
 One-click deploy OpenClaw using the OpenClaw template on [Zeabur](https://zeabur.com/referral?referralCode=aibuilders) (Dedicated Server required). Copy the Web UI URL from the Instructions tab and open it in your browser. Set your AI model in Settings or via environment variables, then test in Chat. Add Telegram, WhatsApp, or other channels from the Channels section when ready.
 
-![zeabur openclaw template](/products/openclaw/openclaw-1.png)
+![zeabur openclaw template](/products/openclaw/openclaw-1.webp)
 
 This guide walks through every section of the Gateway Dashboard — what each primitive is, how it fits together, and the key actions you'll take daily.
 
@@ -65,7 +65,7 @@ The chat UI reflects what any connected channel user would see — it's not a sp
 
 ## Control → Overview
 
-![Overview — Gateway status, entry points, and health](/products/openclaw/overview.png)
+![Overview — Gateway status, entry points, and health](/products/openclaw/overview.webp)
 
 The **Overview** page shows *Gateway status, entry points, and a fast health read*. **Gateway Access** is where the dashboard connects and authenticates (WebSocket URL, Gateway Token, Default Session Key; use **Connect** and **Refresh**). The **Snapshot** card shows **STATUS**, **UPTIME**, **TICK INTERVAL**, and **LAST CHANNELS REFRESH**. Summary cards show **INSTANCES** (presence beacons in the last 5 minutes), **SESSIONS** (recent session keys tracked by the gateway), and **CRON** (e.g. Enabled, Next wake). **Notes** gives quick reminders for remote control (e.g. Tailscale serve, session hygiene, cron). **Health: OK** in the top-right means the Gateway and WebSocket control plane are responding — if it turns red, check **Settings → Debug** and **Logs**.
 
@@ -73,7 +73,7 @@ The **Overview** page shows *Gateway status, entry points, and a fast health rea
 
 ## Control → Channels
 
-![Channels — Manage channels and settings](/products/openclaw/channels.png)
+![Channels — Manage channels and settings](/products/openclaw/channels.webp)
 
 Channels are how external messaging platforms connect to your Gateway. You’ll see four panels: **WhatsApp**, **Telegram**, **Discord**, and **Google Chat**. Each shows the same status fields:
 
@@ -144,7 +144,7 @@ Discord uses a bot token from the [Discord Developer Portal](https://discord.com
 
 ## Control → Instances
 
-![Instances — Presence beacons from connected clients and nodes](/products/openclaw/instances.png)
+![Instances — Presence beacons from connected clients and nodes](/products/openclaw/instances.webp)
 
 **Instances** lists presence beacons from connected clients and nodes. The **Connected Instances** section shows each instance with its ID, description (e.g. gateway host or `openclaw-control-ui` webchat), tags (e.g. `gateway`, `webchat`, `operator`), last-seen time, and reason (e.g. `self`, `connect`). Use **Refresh** to update the list.
 
@@ -152,7 +152,7 @@ Discord uses a bot token from the [Discord Developer Portal](https://discord.com
 
 ## Control → Sessions
 
-![Sessions — Inspect active sessions and adjust per-session defaults](/products/openclaw/sessions.png)
+![Sessions — Inspect active sessions and adjust per-session defaults](/products/openclaw/sessions.webp)
 
 Sessions are conversation threads. The **Sessions** section shows *Active session keys and per-session overrides*. Use the filters **Active within (minutes)**, **Limit**, **Include global**, and **Include unknown**, then **Refresh**. The table columns are **Key** (e.g. `agent:main:main`), **Label** (optional), **Kind** (e.g. `direct`), **Updated**, **Tokens**, **Thinking**, **Verbose**, **Reasoning**, and **Actions** (e.g. Delete). Click any session to open its full history.
 
@@ -164,7 +164,7 @@ Sessions have two behaviors:
 
 ## Control → Usage
 
-![Usage — See where tokens go, when sessions spike, and what drives cost](/products/openclaw/usage.png)
+![Usage — See where tokens go, when sessions spike, and what drives cost](/products/openclaw/usage.webp)
 
 The **Usage** tab breaks down token consumption by:
 - Model (e.g., `anthropic/claude-sonnet-4-5`, `openai/gpt-5.2`)
@@ -178,7 +178,7 @@ Use this to catch runaway cron jobs or unexpectedly expensive sessions before yo
 
 ## Agent → Agents
 
-![Agents — Manage agent workspaces, tools, and identities](/products/openclaw/agents.png)
+![Agents — Manage agent workspaces, tools, and identities](/products/openclaw/agents.webp)
 
 The **Agents** page (*Manage agent workspaces, tools, and identities*) lists configured agents (e.g. **main** with a **DEFAULT** badge). Selecting an agent shows tabs: **Overview**, **Files**, **Tools**, **Skills**, **Channels**, **Cron Jobs**. The **Overview** tab shows *Workspace paths and identity metadata* (Workspace, Primary Model, Default, Identity Name, Identity Emoji, Skills Filter) and *Model Selection* (**Primary model (default)**, **Fallbacks (comma-separated)**). Use **Chat**, **Reload Config**, and **Save** to apply changes.
 
@@ -219,7 +219,7 @@ This routes all Slack messages to the `work` agent and all Telegram messages to 
 
 ## Agent → Skills
 
-![Skills — Manage skill availability and API key injection](/products/openclaw/skills.png)
+![Skills — Manage skill availability and API key injection](/products/openclaw/skills.webp)
 
 Skills extend what your agent can do beyond basic chat. There are three types:
 
@@ -251,7 +251,7 @@ To write a **workspace skill**, create a `SKILL.md` in your workspace root descr
 
 ## Agent → Nodes
 
-![Nodes — Paired devices, capabilities, and command exposure](/products/openclaw/nodes.png)
+![Nodes — Paired devices, capabilities, and command exposure](/products/openclaw/nodes.webp)
 
 **Nodes** are companion device connections — macOS, iOS, or Android apps that extend the agent's senses and actuators:
 
@@ -266,7 +266,7 @@ Nodes appear in this panel once a companion app connects to your Gateway. On Zea
 
 ## Settings → Config
 
-![Config — Full JSON config editor and settings form](/products/openclaw/config.png)
+![Config — Full JSON config editor and settings form](/products/openclaw/config.webp)
 
 The **Config** page is a form-rendered view of your `openclaw.json`. The **Settings** panel shows validation (e.g. *valid*, *No changes*) and categories such as **All Settings**, **Environment**, **Agents**, **Authentication**, **Channels**, **Messages**, **Commands**, **Hooks**, **Skills**, **Tools**. Use the **Form** / **Raw** toggle to switch between the structured form and raw JSON. **Reload**, **Save**, **Apply**, and **Update** are in the top bar. A **Setup Wizard** section shows setup wizard state and history. Changes here hot-reload the Gateway — no restart needed for most settings.
 
@@ -307,7 +307,7 @@ Key sections of the config:
 
 ## Control → Cron Jobs
 
-![Cron Jobs — Schedule wakeups and recurring agent runs](/products/openclaw/cron-jobs.png)
+![Cron Jobs — Schedule wakeups and recurring agent runs](/products/openclaw/cron-jobs.webp)
 
 Cron Jobs let you schedule agent actions to run automatically on a time-based schedule — no inbound message required. The **Scheduler** card shows **ENABLED**, **JOBS**, and **NEXT WAKE**. Use **New Job** to create a scheduled wakeup or agent run.
 
