@@ -1409,17 +1409,17 @@ if (currentFile) {
 function getGithubUrl(filePath: string): string {
   // Special case for README.md - it's in the root directory, not tutorials
   if (filePath === 'README.md') {
-    return 'https://github.com/devonsunml/ai_builders_tutorial/tree/main';
+    return 'https://github.com/theaibuilders/ai_builders_tutorial/tree/main';
   }
   
-  const baseUrl = 'https://github.com/devonsunml/ai_builders_tutorial/blob/main/tutorials/';
+  const baseUrl = 'https://github.com/theaibuilders/ai_builders_tutorial/blob/main/services/frontend/tutorials/';
   return baseUrl + filePath;
 }
 
 // Function to generate nbviewer URL for a notebook file
 function getNbviewerUrl(filePath: string): string {
-  const githubUrl = `https://github.com/devonsunml/ai_builders_tutorial/blob/main/tutorials/${filePath}`;
-  return `https://nbviewer.org/github/devonsunml/ai_builders_tutorial/blob/main/tutorials/${filePath}`;
+  const githubUrl = `https://github.com/theaibuilders/ai_builders_tutorial/blob/main/services/frontend/tutorials/${filePath}`;
+  return `https://nbviewer.org/github/theaibuilders/ai_builders_tutorial/blob/main/services/frontend/tutorials/${filePath}`;
 }
 ---
 
