@@ -1,0 +1,109 @@
+# Ruler Config：AI コーディングアシスタントの指示を一元管理
+
+[Ruler](https://github.com/intellectronica/ruler) は、複数の AI コーディングアシスタントを使用する開発者が直面する共通の課題——分散し重複しがちな設定ファイルの管理——を解決するための強力なコマンドラインツールです。すべての AI エージェント指示の唯一の真実の情報源（Single Source of Truth）を提供し、それらを各エージェント固有の場所に自動的に配信します。
+
+このチュートリアルでは、Ruler のインストール、設定、使用の基本を案内し、AI 支援開発ワークフローを合理化する方法を説明します。
+
+![ruler-config](/products/ruler_config.webp)
+## 前提条件
+
+始める前に、システムに **Node.js**（バージョン 18.x 以上）がインストールされていることを確認してください。
+
+## インストール
+
+コマンドラインでの使用には、npm 経由でグローバルにインストールすることをお勧めします。ターミナルを開き、次のコマンドを実行してください：
+
+```bash
+npm install -g @intellectronica/ruler
+```
+## はじめに：プロジェクトの初期化
+
+Ruler のインストールが完了したら、ターミナルでプロジェクトのルートディレクトリに移動し、`init` コマンドを実行します：
+
+```bash
+ruler init
+```
+
+このコマンドは、プロジェクト内に `.ruler/` ディレクトリを作成し、Ruler に必要な構造を設定します。中身は以下の通りです：
+
+  * **`ruler.toml`**：メインの設定ファイル。Ruler に管理させたい AI エージェントを指定するために使用します。
+  * **`AGENTS.md`**：ルール用のプライマリスターター Markdown ファイル。このファイルは、統一された AI 指示ファイルのための新興オープン標準に従っています。
+
+## 主要概念
+
+### `.ruler/` ディレクトリ
+
+このディレクトリは Ruler の中核です。すべての AI 指示の中央リポジトリとして機能します。
+
+  * **ルールファイル（`.md`）**：Ruler は `.ruler/` ディレクトリ内のすべての Markdown（`.md`）ファイルを再帰的に検出します。その内容をアルファベット順に連結して、単一の指示セットを形成します。整理のために、`coding_style.md`、`api_guidelines.md`、`project_overview.md` のようにルールを複数ファイルに分割できます。
+  * **`ruler.toml`**：この TOML ファイルで Ruler の動作を設定します。特定のエージェントの有効化・無効化や、出力パスのカスタマイズが可能です。
+
+### `ruler.toml` の設定
+
+`ruler.toml` ファイルでは、Ruler が管理すべき AI アシスタントを指定します。デフォルトでは、いくつかの一般的なエージェントが含まれていますが、コメントアウトされています。
+
+エージェントを有効にするには、そのセクションのコメントを外します。例えば、GitHub Copilot と Gemini Cli 用に Ruler を有効にする場合、aider はコメントアウトされたままにしておくと、設定は次のようになります：
+
+```toml
+[agents.copilot]
+enabled = true
+output_path = ".github/copilot-instructions.md"
+
+# [agents.aider]
+# enabled = true
+# output_path_instructions = "AGENTS.md"
+# output_path_config = ".aider.conf.yml"
+
+[agents.gemini-cli]
+enabled = true
+```
+
+## ルールの管理と適用
+
+### 指示の追加
+
+指示を追加するには、デフォルトの **`.ruler/AGENTS.md`** ファイルを開くか、`.ruler/` ディレクトリ内に新しい `.md` ファイルを作成し、標準 Markdown でガイドラインを記述します。
+
+例えば、`.ruler/style_guide.md` という名前のファイルを次の内容で作成できます：
+
+```markdown
+# General Style Guide
+
+- Follow PEP 8 for all Python code.
+- Use type hints for all function signatures.
+- Keep functions short and focused on a single task.
+- All API endpoints must be documented using OpenAPI specs.
+```
+
+### ルールの適用
+
+指示を定義した後、`apply` コマンドを使用して、有効化された AI エージェントの設定ファイルに配信します：
+
+```bash
+ruler apply
+```
+
+Ruler は `.ruler/` ディレクトリ内のすべての `.md` ファイルを読み込み、それらを結合し、`ruler.toml` で各エージェントに指定された `output_path` に内容を書き込みます。
+
+トレーサビリティのため、Ruler は各ファイルの内容の先頭にソースマーカーを付加します：
+`--- Source: <relative_path_to_md_file> ---`
+
+実際にファイルを変更せずに、どのような変更が行われるかを確認する「ドライラン」も可能です：
+
+```bash
+ruler apply --dry-run
+```
+
+### 変更の取り消し
+
+Ruler によって適用された設定を削除したい場合は、`revert` コマンドを使用できます。これにより、`apply` コマンドによって行われたすべての変更を安全に取り消します。
+
+```bash
+ruler revert
+```
+
+これは、最初からやり直したい場合や、ルールを一時的に無効にしたい場合に便利です。`apply` と同様に、`revert` コマンドも `--dry-run` フラグをサポートしています。
+
+## まとめ
+
+Ruler は、一元管理されバージョン管理されたシステムを提供することで、AI コーディングアシスタントの指示管理を簡素化します。Ruler を導入することで、開発チーム全体での一貫性を確保し、設定のオーバーヘッドを削減し、新しい AI ツールのオンボーディングをより効率的に行えます。これにより、設定の管理に費やす時間を減らし、優れたコードを書くことにより多くの時間を割けるようになります。

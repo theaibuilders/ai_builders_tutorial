@@ -1,0 +1,110 @@
+# Zeabur：Cursor からワンクリックで Vibe Coding プロジェクトをデプロイ
+
+## AI コーディング革命とデプロイのギャップ
+
+AI 駆動のコーディングツールは、コードの書き方に革命をもたらしました。シンプルなプロンプトでアプリケーション全体を構築できるようになりました。アイデアがあり、それを記述すれば、AI が具現化してくれます。
+
+![zeabur-cursor-cover](/products/zeabur/zeabur-cursor-cover.webp)
+
+しかし、コードが書かれた後に大きなギャップが生じることがよくあります。**V0、Lovable、Bolt のようなツールはアプリの生成とデプロイをシームレスに設計されていますが、Cursor、Windsurf、VS Code Copilot のような汎用 AI コーディングツールはデプロイ部分をあなたに任せています。** つまり、クリエイティブなフローから抜け出して、DevOps タスクや設定、デプロイパイプラインと格闘しなければならないということです。
+
+ここで、[Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders) の Cursor および VS Code 拡張機能が登場します。AI 駆動開発と本番環境のギャップを埋め、エディタから離れることなく、ワンクリックでプロジェクトをデプロイできるようにします。Cursor でのシンプルなプロンプトから、Zeabur 上のライブデプロイ済みアプリケーションまで、プロジェクトを進める方法を順を追って説明しましょう。
+
+
+## ステップ 1：Cursor でプロンプトを使ってアプリを構築
+
+まず、プロジェクトを生成しましょう。このチュートリアルでは、シンプルな Next.js ToDo アプリケーションを構築します。
+
+Cursor でチャットパネルを開き、AI にアプリケーションの構築を依頼できます。
+
+**プロンプト：** `can you build a simple next js based todo app`
+
+AI が必要なファイルとフォルダ構造を生成します。完了したら、アプリをローカルで実行してテストできます。
+
+```bash
+npm run dev
+```
+![zeabur-cursor-1](/products/zeabur/zeabur-cursor-1.webp)
+
+これで `http://localhost:3000` でアプリが実行されていることを確認できます。
+
+![zeabur-cursor-2-1](/products/zeabur/zeabur-cursor-2-1.webp)
+
+## ステップ 2：Zeabur 拡張機能をインストール
+
+ワンクリックデプロイのプロセスを開始するには、まず Visual Studio Marketplace から Zeabur 拡張機能をインストールする必要があります。
+
+1.  Cursor で **Extensions** ビューに移動します。
+2.  「**Zeabur**」を検索します。
+3.  **Install** をクリックします。
+
+![zeabur-cursor-2-2](/products/zeabur/zeabur-cursor-2-2.webp)
+
+## ステップ 3：ワンクリックでデプロイ
+
+拡張機能をインストールすると、アクティビティバーに新しい Zeabur アイコンが表示されます。
+
+1.  **Zeabur アイコン** をクリックします。
+2.  **Deploy** ボタンをクリックします。
+
+このアクションにより、ローカルコードがパッケージ化され、Zeabur のデプロイサービスに送信されます。
+
+![zeabur-cursor-3](/products/zeabur/zeabur-cursor-3.webp)
+
+ブラウザで Zeabur のウェブサイトを開いてプロセスを完了するよう促されます。**Open** をクリックします。
+
+![zeabur-cursor-4](/products/zeabur/zeabur-cursor-4.webp)
+
+## ステップ 4：Zeabur の AI がプロジェクトを分析
+
+ここで魔法が起こります。Zeabur にリダイレクトされると、AI がアップロードされたコードを自動的に分析します。言語、フレームワーク（この場合は TypeScript と Tailwind CSS を使用した Next.js）、必要なビルドステップを検出します。DevOps コードや設定ファイルを1行も書く必要はありません。
+
+![zeabur-cursor-5](/products/zeabur/zeabur-cursor-5.webp)
+
+## ステップ 5：新しいプロジェクトを設定
+
+分析の後、Zeabur はいくつかのシンプルな設定ステップをガイドします。
+
+1.  **Create a new Zeabur project** をクリックします。
+
+![zeabur-cursor-6](/products/zeabur/zeabur-cursor-6.webp)
+
+2.  デプロイの **リージョンを選択** します。最適なパフォーマンスのために、ユーザーに最も近いリージョンを選んでください。
+
+![zeabur-cursor-7](/products/zeabur/zeabur-cursor-7.webp)
+
+## ステップ 6：起動して公開
+
+Zeabur はデプロイプロセスを開始します。依存関係のインストール、アプリケーションのビルド、必要なインフラのプロビジョニングを行います。一時的なドメイン名がサービスに自動的に割り当てられます。
+
+![zeabur-cursor-8](/products/zeabur/zeabur-cursor-8.webp)
+
+ステータスをリアルタイムで監視できます。数分以内にサービスが稼働します！Zeabur ダッシュボードは、デプロイステータス、ドメイン、ログを含むプロジェクトの完全な概要を提供します。
+
+![zeabur-cursor-9](/products/zeabur/zeabur-cursor-9.webp)
+
+これで完了です！🎉 アプリが完全にデプロイされました。
+
+![zeabur-cursor-10](/products/zeabur/zeabur-cursor-10.webp)
+
+エディタ内のシンプルなテキストプロンプトから、複雑な DevOps のオーバーヘッドなしに、完全にデプロイされたウェブアプリケーションへと進めることができました。このシームレスなワークフローにより、クリエイティブなゾーンに留まり、かつてないほど速く構築してリリースできます。
+
+## 無料クレジットを獲得 💰
+
+AI Builders コミュニティを通じて **5 米ドル分の無料 Zeabur クレジット** を請求できます。Cursor で生成した Next.js（または任意の）アプリの実験、プレビューの実行、反復的な再デプロイのテストに最適です。
+
+1. AI Builders の Zeabur 特典ページにアクセス：[https://theaibuilders.dev/zeabur](https://theaibuilders.dev/zeabur)
+2. コミュニティに参加/サインインし、短い引き換え手順に従う。
+3. クレジットが適用されるのを待つ（コードまたは自動）。少し時間がかかる場合があります—Zeabur の Billing ページまたはメールを確認してください。
+
+スケールアップする場合（より大きなインスタンス、データベースなどのサービスの追加、より高いトラフィック）、残高の消費が早くなります。初期の実験は軽量に保ちましょう。
+
+> ヒント：**リソースをアップグレードする前に、まず無料クレジットでデプロイしましょう**。コールドスタート時間、環境変数、ビルド出力を検証してからスケールしてください。
+
+## まとめ
+
+Zeabur のワンクリックデプロイをコーディング環境に直接統合することで、最も重要なこと——優れたアプリケーションの構築——に集中しながら、デプロイの複雑さは任せることができます。
+
+今すぐ [Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders) をチェックして、簡単なアプリデプロイの未来を体験しましょう！
+
+楽しいコーディングとデプロイを！🎉

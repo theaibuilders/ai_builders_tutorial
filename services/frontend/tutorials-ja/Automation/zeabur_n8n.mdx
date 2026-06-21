@@ -1,0 +1,82 @@
+# Zeaburで月額わずか$5でn8nをセルフホスト
+
+m/referral?referralCode=aibuilders
+このチュートリアルでは、デプロイメントプロセスを簡素化するクラウドプラットフォーム[Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)上に、セルフホストのn8nインスタンスをデプロイする方法を学びます。事前構築済みテンプレートを使用して、わずか数分で稼働させることができます。費用は約**月額$5**です。
+
+## なぜn8nをセルフホストするのか？
+
+- **コスト効率**：有料の自動化プラットフォームより大幅に安価。
+- **フルコントロール**：データを自分で所有し、n8nインスタンスをカスタマイズ可能。
+- **無制限のワークフロー**：ワークフローや実行回数に制限なし。
+
+## Zeaburの始め方
+
+まず、Zeaburアカウントが必要です。
+
+1. [Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)にアクセスして新規アカウントを作成します。
+2. GitHubアカウントをZeaburに接続します。これがZeaburでn8nインスタンスをデプロイする方法です。
+![Zeabur1](/products/zeabur/zeabur1.png)
+
+## ワンクリックデプロイ
+
+Zeaburはn8nデプロイ用のワンクリックテンプレートを提供しています。
+
+1. Zeaburのn8nテンプレートにアクセスします。
+![Zeabur2](/products/zeabur/zeabur2.png)
+2. **Deploy**ボタンをクリックします。
+3. セルフホストn8nインスタンスに名前を付け、クラウドプロバイダー設定を構成します。
+4. Zeaburアカウントに新しいn8nプロジェクトが作成され、自動的にデプロイが開始されます。
+
+## セルフホストn8nの使用
+
+設定したドメインを使用してn8nインスタンスにアクセスできます。
+
+1. ブラウザでn8nドメインを開きます。
+2. オーナーアカウントの作成が求められます。
+![Zeabur3](/products/zeabur/zeabur3.png)
+3. その後、n8nダッシュボードが表示され、ワークフローを作成する準備が整います。
+![Zeabur4](/products/zeabur/zeabur4.png)
+
+完了！これでZeabur上でセルフホストn8nインスタンスが稼働しています。🎉
+
+## n8nインスタンスの追加設定
+
+以下のオプションでn8nインスタンスをさらに設定できます。
+
+### カスタムドメインのバインド
+
+1. Zeaburダッシュボードでn8nプロジェクトに移動します。
+2. **Networking**タブを開きます。
+3. カスタムドメインを追加します。
+
+### 環境変数の設定
+
+APIキーやその他のシークレットを安全に保つために、環境変数を使用します。
+
+1. Zeaburプロジェクトで**Variables**タブを開きます。
+2. 環境変数を追加します。例えば、OpenAI APIキーを追加するには：
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+```
+これでn8nワークフロー内で式`{{ $env.OPENAI_API_KEY }}`を使用してこれらの変数にアクセスできます。
+
+## 無料クレジットを取得💰
+
+AI Buildersコミュニティを通じて**$5 USDのZeabur無料クレジット**を請求できます（基本n8nインスタンスの約1ヶ月分）：
+
+1. AI BuildersのZeabur特典ページにアクセス：[https://theaibuilders.dev/zeabur](https://theaibuilders.dev/zeabur)。
+2. 手順に従います（まだコミュニティに参加していない場合は参加し、短いフォームを送信）。
+3. Zeaburからクレジットコード/自動クレジット適用を受け取ります（処理に少し時間がかかる場合があります — メールまたはZeaburの請求ダッシュボードを確認）。
+
+> ヒント：リソースをスケールアップする前にクレジットを適用して、無料利用期間を最大化しましょう。
+
+Zeaburの料金は従量課金制です。クレジットなしの場合、基本n8nインスタンスは通常約**月額$5**で、特にスタータークレジットが適用されていれば、n8nをセルフホストする非常に手頃な方法です。
+
+## まとめ
+
+このチュートリアルに従って、Zeabur上にセルフホストn8nインスタンスのデプロイに成功しました。これで強力で手頃な自動化プラットフォームが手元にあります。
+
+今すぐ[Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)をチェックして、n8nでワークフローの自動化を始めましょう！
+
+ハッピーオートメーション！🎉

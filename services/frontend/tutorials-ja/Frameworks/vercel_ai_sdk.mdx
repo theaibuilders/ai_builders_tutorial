@@ -1,0 +1,163 @@
+# Vercel AI SDK: Next.jsでチャットボットを構築する
+
+## 概要
+Vercel AI SDKは、AI搭載アプリケーションの開発を簡素化する強力なオープンソースライブラリです。様々な言語モデル向けの統合APIと、Next.js、Svelte、Vueなどの人気フレームワーク向けのUIフックを提供します。このチュートリアルでは、Vercel AI SDKとNext.jsを使用してシンプルなチャットボットを構築する方法を学びます。
+
+## 前提条件
+
+開始する前に、以下を用意してください：
+
+  * **Node.js**（バージョン18以上）
+  * **OpenAI APIキー**。OpenAIプラットフォームから取得できます。
+
+## プロジェクトのセットアップ
+
+まず、新しいNext.jsプロジェクトを作成する必要があります。ターミナルを開き、以下のコマンドを実行します：
+
+```bash
+npx create-next-app@latest my-ai-chatbot
+```
+
+プロンプトが表示されたら、デフォルト設定をそのまま受け入れて構いません。
+
+次に、プロジェクトのディレクトリに移動し、Vercel AI SDKコア、Reactバインディング、OpenAIプロバイダーをインストールします：
+
+```bash
+cd my-ai-chatbot
+npm install ai @ai-sdk/react @ai-sdk/openai
+```
+
+### 環境変数
+
+OpenAI APIキーを安全に保存するため、プロジェクトのルートに`.env.local`ファイルを作成します：
+
+```bash
+touch .env.local
+```
+
+次に、APIキーを`.env.local`ファイルに追加します：
+
+```
+OPENAI_API_KEY=your-openai-api-key
+```
+
+`your-openai-api-key`を実際のOpenAI APIキーに置き換えてください。このファイルはデフォルトで`.gitignore`に含まれているため、リポジトリにコミットされることはありません。`.env.local`を作成または変更した後は、開発サーバーを再起動してください。
+
+## チャットボットの構築
+
+それでは、チャットボットのインターフェースとバックエンドロジックを作成しましょう。
+
+### フロントエンド
+
+`src/app/page.tsx`ファイルを見つけ、内容を以下のコードに置き換えます：
+
+```typescript
+'use client';
+
+import { useChat } from '@ai-sdk/react';
+import { useState } from 'react';
+import type { UIMessage } from 'ai';
+
+export default function Chat() {
+  const { messages, sendMessage, error } = useChat<UIMessage>();
+  const [input, setInput] = useState('');
+
+  const handleSubmit = (e?: { preventDefault?: () => void }) => {
+    e?.preventDefault?.();
+    const text = input.trim();
+    if (!text) return;
+    void sendMessage({ text });
+    setInput('');
+  };
+
+  return (
+    <div className="flex flex-col w-full max-w-md mx-auto stretch">
+      {error ? <div className="text-red-500 mb-2">{String(error)}</div> : null}
+      {messages.map((m) => (
+        <div key={m.id} className="whitespace-pre-wrap">
+          {m.role === 'user' ? 'User: ' : 'AI: '}
+          {m.parts
+            .filter((p) => p.type === 'text')
+            .map((p) => (p as { type: 'text'; text: string }).text)
+            .join('')}
+        </div>
+      ))}
+
+      <form onSubmit={handleSubmit}>
+        <input
+          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+          value={input}
+          placeholder="Say something..."
+          onChange={(e) => setInput(e.target.value)}
+        />
+      </form>
+    </div>
+  );
+}
+```
+
+このコードはVercel AI SDKのReactバインディングの`useChat`フックを使用してチャット状態を管理します。v5では、フックは`messages`と`sendMessage`を返します。入力状態はローカルで管理され、メッセージテキストは`message.parts`から読み取られ、リクエストからのエラーは上部にレンダリングされます。
+
+### バックエンド
+
+次に、OpenAI APIとの通信を処理するAPIルートを作成します。`src/app/api/chat/route.ts`に新しいファイルを作成し、以下のコードを追加します：
+
+```typescript
+import { openai } from '@ai-sdk/openai';
+import { streamText, convertToCoreMessages } from 'ai';
+
+// IMPORTANT! Set the runtime to edge
+export const runtime = 'edge';
+
+export async function POST(req: Request) {
+  if (!process.env.OPENAI_API_KEY) {
+    return Response.json(
+      { error: 'Missing OPENAI_API_KEY. Add it to your .env.local file.' },
+      { status: 500 }
+    );
+  }
+
+  try {
+    const body = await req.json().catch(() => ({}));
+    const messages = Array.isArray(body?.messages) ? body.messages : [];
+
+    const coreMessages = convertToCoreMessages(messages);
+
+    const result = await streamText({
+      model: openai('gpt-4o-mini'),
+      messages: coreMessages,
+    });
+
+    return result.toUIMessageStreamResponse();
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Unknown error while streaming response';
+    return Response.json({ error: message }, { status: 500 });
+  }
+}
+```
+
+このコードは、フロントエンドからチャットメッセージを受信し、コアメッセージ形式に変換し、`toUIMessageStreamResponse()`を使用してOpenAIのレスポンスをv5のUIメッセージ形式と互換性のある形でクライアントにストリーミングするAPIルートを作成します。また、`OPENAI_API_KEY`が設定されているかを検証し、設定されていない場合はJSONエラーを返します。このエラーはUIに表示されます。
+
+## アプリケーションの実行
+
+チャットボットを実行する準備ができました！ターミナルで以下のコマンドを実行します：
+
+```bash
+npm run dev
+```
+
+開発サーバーが起動します。ブラウザで`http://localhost:3000`を開いて、チャットボットの動作を確認してください。
+
+<img src="/products/vercel_ai_sdk.webp" alt="Vercel AI SDKのスクリーンショット" style="max-width:100%;margin:24px 0;border-radius:12px;box-shadow:0 2px 16px #0002;" />
+
+## まとめ
+
+おめでとうございます！Vercel AI SDKとNext.jsを使用してシンプルなチャットボットを構築しました。以下のことを学びました：
+
+  * Vercel AI SDKを使用したNext.jsプロジェクトのセットアップ
+  * `useChat`フックを使用したチャット状態の管理
+  * OpenAI APIからのレスポンスをストリーミングするAPIルートの作成
+  * 環境変数を使用したAPIキーの安全な保存
+
+これはVercel AI SDKでできることの始まりにすぎません。関数呼び出し、構造化データのストリーミング、異なる言語モデルの使用など、より高度な機能を探索できます。詳細については、Vercel AI SDKのドキュメントを参照してください。

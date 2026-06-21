@@ -73,3 +73,59 @@ export function extractTutorialPath(urlPath: string): string | null {
   const match = urlPath.match(/\/tutorials\/(.+)/);
   return match ? match[1] : null;
 }
+
+/**
+ * Category/section name translations per language
+ */
+export const categoryTranslations: Record<string, Record<string, string>> = {
+  'ja-jp': {
+    'Overview': '概要',
+    'Vibe Coding': 'Vibe Coding',
+    'Automation': '自動化',
+    'Web Search': 'ウェブ検索',
+    'Image And Video': '画像と動画',
+    'Image and Video': '画像と動画',
+    'Data And Memory': 'データとメモリ',
+    'Data and Memory': 'データとメモリ',
+    'Model Providers': 'モデルプロバイダー',
+    'Gateways': 'ゲートウェイ',
+    'Frameworks': 'フレームワーク',
+    'Chat UI Framework': 'チャットUIフレームワーク',
+    'Observarbility': 'オブザーバビリティ',
+    'Observability': 'オブザーバビリティ',
+    'Fine Tuning': 'ファインチューニング',
+    'Audio': 'オーディオ',
+    'Browser Use': 'ブラウザ利用',
+    'Drafts': '下書き',
+  },
+  'ja': {
+    'Overview': '概要',
+    'Vibe Coding': 'Vibe Coding',
+    'Automation': '自動化',
+    'Web Search': 'ウェブ検索',
+    'Image And Video': '画像と動画',
+    'Image and Video': '画像と動画',
+    'Data And Memory': 'データとメモリ',
+    'Data and Memory': 'データとメモリ',
+    'Model Providers': 'モデルプロバイダー',
+    'Gateways': 'ゲートウェイ',
+    'Frameworks': 'フレームワーク',
+    'Chat UI Framework': 'チャットUIフレームワーク',
+    'Observarbility': 'オブザーバビリティ',
+    'Observability': 'オブザーバビリティ',
+    'Fine Tuning': 'ファインチューニング',
+    'Audio': 'オーディオ',
+    'Browser Use': 'ブラウザ利用',
+    'Drafts': '下書き',
+  },
+};
+
+/**
+ * Get translated category name, falling back to the original if no translation exists
+ */
+export function getCategoryName(name: string, language: string): string {
+  if (language === 'en' || !categoryTranslations[language]) {
+    return name;
+  }
+  return categoryTranslations[language][name] ?? name;
+}

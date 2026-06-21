@@ -1,0 +1,342 @@
+# OpenClawの使い方：ゲートウェイダッシュボードの完全ガイド
+
+## ワンクリックでOpenClawをセットアップ
+
+[Zeabur](https://zeabur.com/referral?referralCode=aibuilders)（専用サーバーが必要）のOpenClawテンプレートを使ってワンクリックデプロイ。InstructionsタブからWeb UI URLをコピーしてブラウザで開きます。Settingsまたは環境変数でAIモデルを設定し、Chatでテストします。準備ができたらChannelsセクションからTelegram、WhatsAppなどのチャネルを追加します。
+
+![zeabur openclaw template](/products/openclaw/openclaw-1.webp)
+
+このガイドでは、ゲートウェイダッシュボードのすべてのセクションを説明します。各プリミティブが何であり、どう組み合わさり、日常的に取るべき主要なアクションを理解できます。
+
+## OpenClawの構造
+
+個々の画面に入る前に、他のすべてが構築される4つのコアプリミティブを理解しましょう：
+
+- **Gateway** — 常時稼働のコントロールプレーン。すべてのチャネル接続を所有し、メッセージをエージェントにルーティングし、ダッシュボードを提供します。
+- **Channels** — メッセージング統合（WhatsApp、Telegram、Discordなど）。外部の世界がエージェントに到達する方法です。
+- **Agents** — 独自のワークスペース、モデル設定、セッション履歴を持つ独立したLLMインスタンス。
+- **Sessions** — 会話スレッド。DMは共有された`main`セッションに統合され、グループチャットは独立したままです。
+
+スキル、Cronジョブ、ノード、ツールはすべて、セッション内でエージェントが_できること_を拡張します。
+
+
+
+## サイドバーの一覧
+
+ダッシュボードのサイドバーは4つのグループに整理されています：
+
+```
+Chat
+  └── Chat                    ← ブラウザベースのWebChatでエージェントと対話
+
+Control
+  ├── Overview                ← ゲートウェイステータス、エントリーポイント、ヘルスチェック
+  ├── Channels                ← WhatsApp、Telegram、Discord、Google Chat…
+  ├── Instances                ← 接続されたクライアントとノードからのプレゼンスビーコン
+  ├── Sessions                 ← アクティブなセッションキーとセッションごとのオーバーライド
+  ├── Usage                    ← トークン＋コスト追跡
+  └── Cron Jobs                ← スケジュール起動と定期エージェント実行
+
+Agent
+  ├── Agents                  ← エージェントワークスペース、ツール、アイデンティティの管理
+  ├── Skills                  ← スキルの可用性とAPIキー注入の管理
+  └── Nodes                    ← ペアリングされたデバイス、機能、コマンド公開
+
+Settings
+  ├── Config                  ← 完全なJSON設定エディタと設定フォーム
+  ├── Debug                   ← ライブゲートウェイログ
+  └── Logs                     ← 永続化された実行履歴
+```
+
+
+
+## Chat
+
+**Chat**タブは、外部チャネルを接続せずにエージェントと会話する最速の方法です。WebSocket経由でGatewayに直接接続し、`main`セッションを開始します。
+
+次の用途に使用します：
+- 設定変更後のエージェント動作のテスト
+- チャネルに公開する前の新しいスキルの試用
+- リアルタイムでのモデルレスポンスのデバッグ
+
+チャットUIは、接続されたチャネルユーザーが見るものを反映しています。特別なモードではなく、組み込みのチャネルです。
+
+
+
+## Control → Overview
+
+![Overview — ゲートウェイステータス、エントリーポイント、ヘルスチェック](/products/openclaw/overview.webp)
+
+**Overview**ページには*ゲートウェイステータス、エントリーポイント、クイックヘルスチェック*が表示されます。**Gateway Access**はダッシュボードが接続・認証する場所です（WebSocket URL、Gateway Token、Default Session Key。**Connect**と**Refresh**を使用）。**Snapshot**カードには**STATUS**、**UPTIME**、**TICK INTERVAL**、**LAST CHANNELS REFRESH**が表示されます。サマリーカードには**INSTANCES**（過去5分間のプレゼンスビーコン）、**SESSIONS**（ゲートウェイが追跡する最近のセッションキー）、**CRON**（例：Enabled、Next wake）が表示されます。**Notes**はリモートコントロールのクイックリマインダーを提供します（例：Tailscale serve、セションハイジーン、cron）。右上の**Health: OK**はGatewayとWebSocketコントロールプレーンが応答していることを意味します。赤くなった場合は**Settings → Debug**と**Logs**を確認してください。
+
+
+
+## Control → Channels
+
+![Channels — チャネルと設定の管理](/products/openclaw/channels.webp)
+
+チャネルは外部メッセージングプラットフォームがGatewayに接続する方法です。**WhatsApp**、**Telegram**、**Discord**、**Google Chat**の4つのパネルが表示されます。それぞれ同じステータスフィールドを表示します：
+
+- **Configured** — `openclaw.json`にこのチャネルの設定エントリが存在する。
+- **Running** — アダプタプロセスがアクティブにポーリングまたは接続されている。
+- **Linked / Connected** — 認証情報が有効でセッションがライブ。
+- **Last message** — 最新の受信メッセージのタイムスタンプ。
+
+### WhatsAppの接続
+
+WhatsAppは**Baileys**ライブラリを使用し、QRコードスキャンで認証します。ボットトークンは不要です。
+
+1. WhatsAppパネルの**Show QR**をクリック。
+2. スマホのWhatsApp → Settings → Linked Devices → Link a Deviceを開く。
+3. ダッシュボードに表示されたQRコードをスキャン。
+4. パネルが更新：Linked = Yes、Connected = Yes。
+
+セッションが期限切れになった場合は**Relink**を使用。低速接続でQRを長く維持するには**Wait for scan**を使用。
+
+```json
+// 設定（Settings → Config）に追加：
+{
+  "channels": {
+    "whatsapp": {
+      "enabled": true,
+      "allowFrom": ["+65XXXXXXXX"]
+    }
+  }
+}
+```
+
+> `allowFrom`は許可リストです。ここにリストされた番号のみがエージェントにメッセージできます。本番では空のままにしないでください（全許可は推奨されません）。
+
+### Telegramの接続
+
+Telegramは**grammY**ライブラリをボットトークン付きで使用します。「Channel config schema unavailable」というエラーはボットトークンがまだ設定されていないことを意味します。
+
+1. Telegram → `@BotFather`を検索 → `/newbot`。
+2. ボットトークンをコピー（形式：`123456789:ABCdef...`）。
+3. **Settings → Config**に移動して追加：
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "123456789:ABCdef...",
+      "dmPolicy": "pairing",
+      "allowFrom": ["tg:YOUR_TELEGRAM_USER_ID"]
+    }
+  }
+}
+```
+
+4. **Save**をクリックし、Telegramチャネルパネルで**Reload**。
+5. Telegramでボットを開き、`/start`を送信してペアリングを完了。
+
+**DMポリシー：**
+- `pairing` — エージェントがワンタイムコードを送信し、確認が必要（最も安全）
+- `allowlist` — `allowFrom`のユーザーのみがエージェントにアクセス可能
+- `open` — ボットを見つけた誰もがメッセージ可能（公開ボットでは避けるべき）
+
+### DiscordとGoogle Chatの接続
+
+Discordは[Discord Developer Portal](https://discord.com/developers/applications)からのボットトークンを使用します。Google ChatはGoogle Workspace管理者からのWebhook URLを使用します。どちらも同じパターンに従います：設定を追加 → Save → Reload → Connected = Yesを確認。
+
+
+
+## Control → Instances
+
+![Instances — 接続されたクライアントとノードからのプレゼンスビーコン](/products/openclaw/instances.webp)
+
+**Instances**は接続されたクライアントとノードからのプレゼンスビーコンを一覧表示します。**Connected Instances**セクションには、各インスタンスのID、説明（例：ゲートウェイホストや`openclaw-control-ui`ウェブチャット）、タグ（例：`gateway`、`webchat`、`operator`）、最終確認時間、理由（例：`self`、`connect`）が表示されます。**Refresh**を使用してリストを更新します。
+
+
+
+## Control → Sessions
+
+![Sessions — アクティブなセッションの検査とセッションごとのデフォルト調整](/products/openclaw/sessions.webp)
+
+セッションは会話スレッドです。**Sessions**セクションには*アクティブなセッションキーとセッションごとのオーバーライド*が表示されます。フィルター**Active within (minutes)**、**Limit**、**Include global**、**Include unknown**を使用し、**Refresh**をクリックします。テーブルの列は**Key**（例：`agent:main:main`）、**Label**（オプション）、**Kind**（例：`direct`）、**Updated**、**Tokens**、**Thinking**、**Verbose**、**Reasoning**、**Actions**（例：Delete）です。セッションをクリックすると完全な履歴が開きます。
+
+セッションには2つの動作があります：
+- 同じ人物からの**ダイレクトメッセージ**は共有された永続的な`main`セッションに統合されます。
+- **グループチャット**はそれぞれ独自の独立したセッションを持ち、オプションでDocker内でサンドボックス化されます。
+
+
+
+## Control → Usage
+
+![Usage — トークンの消費先、セッションのスパイク時期、コストの要因を確認](/products/openclaw/usage.webp)
+
+**Usage**タブは以下の基準でトークン消費を内訳します：
+- モデル（例：`anthropic/claude-sonnet-4-5`、`openai/gpt-5.2`）
+- エージェントID
+- チャネル
+- 期間（今日、過去7日間、過去30日間）
+
+これを使用して、暴走するCronジョブや予想外に高価なセッションをAPI請求書が届く前に検出できます。
+
+
+
+## Agent → Agents
+
+![Agents — エージェントワークスペース、ツール、アイデンティティの管理](/products/openclaw/agents.webp)
+
+**Agents**ページ（*エージェントワークスペース、ツール、アイデンティティの管理*）は設定されたエージェントを一覧表示します（例：**DEFAULT**バッジ付きの**main**）。エージェントを選択するとタブが表示されます：**Overview**、**Files**、**Tools**、**Skills**、**Channels**、**Cron Jobs**。**Overview**タブには*ワークスペースパスとアイデンティティメタデータ*（Workspace、Primary Model、Default、Identity Name、Identity Emoji、Skills Filter）と*モデル選択*（**Primary model (default)**、**Fallbacks (comma-separated)**）が表示されます。**Chat**、**Reload Config**、**Save**を使用して変更を適用します。
+
+**エージェント**は、独自のワークスペース、モデル設定、システムプロンプト/ペルソナ、ツール/スキルアクセスを持つ独立したLLMインスタンスです。デフォルトエージェントは`main`です。追加のエージェントを定義し、特定のチャネルやアカウントにバインドできます：
+
+```json
+{
+  "agents": {
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "workspace": "~/.openclaw/workspace-main",
+        "model": {
+          "primary": "anthropic/claude-sonnet-4-5",
+          "fallbacks": ["openai/gpt-5.2"]
+        }
+      },
+      {
+        "id": "work",
+        "workspace": "~/.openclaw/workspace-work",
+        "model": {
+          "primary": "openai/gpt-5.2"
+        }
+      }
+    ]
+  },
+  "bindings": [
+    { "agentId": "work", "match": { "channel": "slack" } },
+    { "agentId": "main", "match": { "channel": "telegram" } }
+  ]
+}
+```
+
+これにより、すべてのSlackメッセージが`work`エージェントに、すべてのTelegramメッセージが`main`にルーティングされます。それぞれ独自の独立したファイルワークスペースとメモリを持ちます。
+
+
+
+## Agent → Skills
+
+![Skills — スキルの可用性とAPIキー注入の管理](/products/openclaw/skills.webp)
+
+スキルは基本的なチャットを超えてエージェントができることを拡張します。3つのタイプがあります：
+
+- **Bundled** — OpenClawに同梱。設定で有効化。
+- **Managed** — ClawHubマーケットプレイス（3,500以上のスキル）。`openclaw skills install <name>`でインストール。
+- **Workspace** — ワークスペース内のローカルファイル。ワークスペースに`SKILL.md`とスクリプトを配置。
+
+ダッシュボードのスキルパネルには、インストール済みのすべてのスキルがステータス（有効/無効）とワンクリックトグル付きで表示されます。
+
+**よく使われる組み込みスキル：**
+
+- `web-search` — ライブウェブクエリ用のBrave Search API統合
+- `browser` — スクレイピングと自動化のためのヘッドレスChrome制御
+- `file-manager` — エージェントワークスペース内のファイル読み書き
+- `shell` — bashコマンドの実行（注意して使用）
+- `gmail` — Gmail Pub/Subウェブフック経由のメール読み書き
+
+ターミナルからClawHub経由でスキルをインストールするには：
+
+```bash
+openclaw skills install brave-search
+openclaw skills install github-pr-summary
+openclaw skills list
+```
+
+**ワークスペーススキル**を書くには、ワークスペースルートに`SKILL.md`を作成し、スキルが何をするかを記述します。エージェントは起動時に自動的に読み込みます。
+
+
+
+## Agent → Nodes
+
+![Nodes — ペアリングされたデバイス、機能、コマンド公開](/products/openclaw/nodes.webp)
+
+**ノード**はコンパニオンデバイス接続です。macOS、iOS、またはAndroidアプリがエージェントのセンサーとアクチュエータを拡張します：
+
+- `camera.snap` — デバイスカメラで写真を撮る
+- `screen.record` — 画面録画をキャプチャ
+- `location.get` — デバイスの現在のGPS座標を取得
+- `notifications.send` — デバイスにプッシュ通知を送信
+
+コンパニオンアプリがGatewayに接続すると、このパネルにノードが表示されます。Zeaburでは、コンパニオンアプリを実行しているデバイスからデプロイメントURLにアクセスできることを確認する必要があります。
+
+
+
+## Settings → Config
+
+![Config — 完全なJSON設定エディタと設定フォーム](/products/openclaw/config.webp)
+
+**Config**ページは`openclaw.json`のフォームレンダリングビューです。**Settings**パネルにはバリデーション（例：*valid*、*No changes*）と**All Settings**、**Environment**、**Agents**、**Authentication**、**Channels**、**Messages**、**Commands**、**Hooks**、**Skills**、**Tools**などのカテゴリが表示されます。**Form** / **Raw**トグルを使用して構造化フォームと生JSONを切り替えます。**Reload**、**Save**、**Apply**、**Update**はトップバーにあります。**Setup Wizard**セクションにはセットアップウィザードの状態と履歴が表示されます。ここでの変更はゲートウェイをホットリロードします。ほとんどの設定で再起動は不要です。
+
+設定の主要セクション：
+
+```json
+{
+  "gateway": {
+    "port": 18789,
+    "auth": { "token": "your-secret-token" }
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "~/.openclaw/workspace",
+      "model": {
+        "primary": "anthropic/claude-sonnet-4-5"
+      },
+      "sandbox": {
+        "mode": "non-main"
+      }
+    }
+  },
+  "channels": {
+    "telegram": { "enabled": true, "botToken": "..." },
+    "whatsapp": { "enabled": true, "allowFrom": ["+65XXXXXXXX"] }
+  },
+  "tools": {
+    "web": {
+      "search": { "apiKey": "BSA_YOUR_BRAVE_KEY" }
+    }
+  }
+}
+```
+
+`sandbox.mode: "non-main"`は、グループチャットをセッションごとのDockerコンテナ内で実行し、共有コンテキストでの任意のコード実行からホストを保護します。
+
+
+
+## Control → Cron Jobs
+
+![Cron Jobs — スケジュール起動と定期エージェント実行](/products/openclaw/cron-jobs.webp)
+
+Cronジョブを使用すると、エージェントアクションをタイムベースのスケジュールで自動実行できます。受信メッセージは不要です。**Scheduler**カードには**ENABLED**、**JOBS**、**NEXT WAKE**が表示されます。**New Job**を使用してスケジュール起動またはエージェント実行を作成します。
+
+**ユースケース例：**
+- 毎朝9時のブリーフィングをTelegramに送信
+- 毎時のGitHub PRサマリーをSlackに投稿
+- 週次コストレポートをUsageタブから取得
+
+### ダッシュボードからのCronジョブの追加
+
+1. **Control → Cron Jobs** → **New Job**に移動。
+2. 標準的なCron構文（または新しいバージョンでは自然言語）を使用して**schedule**を設定。
+3. エージェントが受信すべき**message**を設定（あなたが送信したかのように）。
+4. **session key**を設定 — どのエージェント/チャネルセッションで実行するか。
+5. 保存。ジョブはLast RunとNext Runのタイムスタンプ付きでリストに表示されます。
+
+各ジョブは割り当てられたエージェントの下で独立した認証コンテキストで実行されます。ジョブがエラーになっても他のジョブはクラッシュしません。障害は隔離されます。
+
+
+
+## Settings → DebugとLogs
+
+**Debug**はブラウザでライブのGatewayログをストリーミングします。ターミナルの`openclaw gateway --verbose`と同等です。以下の場合に使用します：
+- チャネルがConnected = Noだが理由がわからない場合
+- Cronジョブが実行されたが期待される出力がなかった場合
+- 新しいスキルをテストしていてツール呼び出しトレースを見たい場合
+
+**Logs**はセッションとCronジョブごとに整理された永続的な履歴実行ログを表示します。各Cronジョブの実行はモデルとトークン使用量をログに記録し、ジョブごとのコスト監査が容易です。
+
+## 次のステップ
+
+ワンクリックでOpenClawをセットアップすることに興味がある場合は、[Zeabur](https://zeabur.com/referral?referralCode=aibuilders)にアクセスし、OpenClawテンプレートを使用してデプロイしてください。

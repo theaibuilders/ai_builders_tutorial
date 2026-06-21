@@ -1,0 +1,474 @@
+{
+  "translations": {
+    "Overview/tutorial_overview.mdx": {
+      "original_path": "Overview/tutorial_overview.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Overview/tutorial_overview.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Automation/openclaw.mdx": {
+      "original_path": "Automation/openclaw.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Automation/openclaw.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/vibe-code-web-search-agent.mdx": {
+      "original_path": "Vibe Coding/vibe-code-web-search-agent.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/vibe-code-web-search-agent.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/qoderwork-qoder.mdx": {
+      "original_path": "Vibe Coding/qoderwork-qoder.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/qoderwork-qoder.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/agents_md.mdx": {
+      "original_path": "Vibe Coding/agents_md.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/agents_md.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/cursor_custom_modes.mdx": {
+      "original_path": "Vibe Coding/cursor_custom_modes.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/cursor_custom_modes.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/insforge.mdx": {
+      "original_path": "Vibe Coding/insforge.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/insforge.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/qoder-tutorial.mdx": {
+      "original_path": "Vibe Coding/qoder-tutorial.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/qoder-tutorial.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/ruler_config.mdx": {
+      "original_path": "Vibe Coding/ruler_config.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/ruler_config.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Vibe Coding/zeabur_cursor.mdx": {
+      "original_path": "Vibe Coding/zeabur_cursor.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/zeabur_cursor.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/crewai_tutorial.ipynb": {
+      "original_path": "Frameworks/crewai_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/crewai_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:34:20.056047+00:00",
+      "source_hash": "9255ab25f4f55e2365af749302739077868dc087444932ff47db6136bffe5978",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Frameworks/google_adk.ipynb": {
+      "original_path": "Frameworks/google_adk.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/google_adk.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:34:32.137890+00:00",
+      "source_hash": "b46d9867c6226c0645bacf6ab185d267310cdd60cfbcce4d38af74acc453686a",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Frameworks/langchain.ipynb": {
+      "original_path": "Frameworks/langchain.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/langchain.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:35:01.168640+00:00",
+      "source_hash": "89117e9e8c611eaefc4147c04386fd5dff0ef2f487a6aa1c7dde3b2260d0a9c4",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Frameworks/llamaindex_tutorial.ipynb": {
+      "original_path": "Frameworks/llamaindex_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/llamaindex_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:35:20.790765+00:00",
+      "source_hash": "2813791cb6d888474e4522c7cd3ee4e96f561bb4544375f50a884528a2dba390",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Frameworks/qwen_cloud_tutorial.ipynb": {
+      "original_path": "Frameworks/qwen_cloud_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/qwen_cloud_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:36:18.315259+00:00",
+      "source_hash": "db11da5f15eff238f50e7b1a83e89a5bc55238da73930422064f7c92394b3e4b",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Frameworks/strands_agents.ipynb": {
+      "original_path": "Frameworks/strands_agents.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/strands_agents.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:36:33.968273+00:00",
+      "source_hash": "feb38a5e38d3f50e8e2140a44c4e925c62b693f3de89fa009e7fa7ea194c8991",
+      "model_used": "gpt-4o",
+      "status": "completed"
+    },
+    "Chat UI Framework/copilotkit_tutorial.mdx": {
+      "original_path": "Chat UI Framework/copilotkit_tutorial.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Chat UI Framework/copilotkit_tutorial.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "f353ba4b065136e9584deed1ff7369e4a05d92e5b5863e723cbceceb27de4285",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Chat UI Framework/gradio_tutorial.ipynb": {
+      "original_path": "Chat UI Framework/gradio_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Chat UI Framework/gradio_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "897c7364102cb7ca2bf81fff987579a03f03023bf40e84760d7094662d3990da",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Web Search/brightdata_proxy.ipynb": {
+      "original_path": "Web Search/brightdata_proxy.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Web Search/brightdata_proxy.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "3fd80462a18e3c6d1aafc42c722bec44cdeb18a39d451d4c71bce6255bf51bce",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Web Search/brightdata_tutorial.ipynb": {
+      "original_path": "Web Search/brightdata_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Web Search/brightdata_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "64d5b8a71924b5c4d29f1ba591e5c14cc801696ebd17520f909a53079194211f",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Web Search/oxylabs_web_scraper.ipynb": {
+      "original_path": "Web Search/oxylabs_web_scraper.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Web Search/oxylabs_web_scraper.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "beb4ffc24620b831e56c98813248ee488eb7a1e2a7b478384188d0e9af295dd8",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Gateways/litellm_tutorial.ipynb": {
+      "original_path": "Gateways/litellm_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Gateways/litellm_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "7eea55763f7847cbee4e13d5c78907ab13c2e2773b35c1ab194530b2c5d0ac98",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Gateways/openrouter_tutorial.ipynb": {
+      "original_path": "Gateways/openrouter_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Gateways/openrouter_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "0fee326200f4e2d6daa62291473faff6fc516a6ac8595ac9f11b176a7f966897",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Fine Tuning/finetuning_togetherai.ipynb": {
+      "original_path": "Fine Tuning/finetuning_togetherai.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Fine Tuning/finetuning_togetherai.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "a38da4b030610438965277a5a4a0a31f80db018d075eec14df9aebdc2842e52a",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Fine Tuning/replicate_fine_tuning.ipynb": {
+      "original_path": "Fine Tuning/replicate_fine_tuning.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Fine Tuning/replicate_fine_tuning.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T12:00:00+00:00",
+      "source_hash": "17b74607c34ffb73fc3a40e8867d3a9ae3583713bab24833c28579d9e011be59",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Automation/anygen.mdx": {
+      "original_path": "Automation/anygen.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Automation/anygen.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Automation/flowithos.mdx": {
+      "original_path": "Automation/flowithos.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Automation/flowithos.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Automation/qoderwork.mdx": {
+      "original_path": "Automation/qoderwork.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Automation/qoderwork.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Automation/zeabur_n8n.mdx": {
+      "original_path": "Automation/zeabur_n8n.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Automation/zeabur_n8n.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Browser Use/actionbook.mdx": {
+      "original_path": "Browser Use/actionbook.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Browser Use/actionbook.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Browser Use/stagehand_tutorial.ipynb": {
+      "original_path": "Browser Use/stagehand_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Browser Use/stagehand_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Audio/deepgram_tutorial.ipynb": {
+      "original_path": "Audio/deepgram_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Audio/deepgram_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Audio/fish_audio_tutorial.ipynb": {
+      "original_path": "Audio/fish_audio_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Audio/fish_audio_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Observarbility/deepeval_tutorial.ipynb": {
+      "original_path": "Observarbility/deepeval_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Observarbility/deepeval_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T04:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/acontext.mdx": {
+      "original_path": "Frameworks/acontext.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/acontext.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/elizaos.mdx": {
+      "original_path": "Frameworks/elizaos.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/elizaos.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/mastra_tutorial.mdx": {
+      "original_path": "Frameworks/mastra_tutorial.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/mastra_tutorial.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/mcp_apps_tutorial.mdx": {
+      "original_path": "Frameworks/mcp_apps_tutorial.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/mcp_apps_tutorial.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/momen.mdx": {
+      "original_path": "Frameworks/momen.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/momen.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/nosana_mastra.mdx": {
+      "original_path": "Frameworks/nosana_mastra.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/nosana_mastra.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/openclaw.mdx": {
+      "original_path": "Frameworks/openclaw.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/openclaw.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Frameworks/vercel_ai_sdk.mdx": {
+      "original_path": "Frameworks/vercel_ai_sdk.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Frameworks/vercel_ai_sdk.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/ai21_tutorial.ipynb": {
+      "original_path": "Model Providers/ai21_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/ai21_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/cerebras_tutorial.ipynb": {
+      "original_path": "Model Providers/cerebras_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/cerebras_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/decentralized_openclaw_nosana_tutorial.ipynb": {
+      "original_path": "Model Providers/decentralized_openclaw_nosana_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/decentralized_openclaw_nosana_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/nosana_gpt_oss_tutorial.ipynb": {
+      "original_path": "Model Providers/nosana_gpt_oss_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/nosana_gpt_oss_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/nosana_tutorial_openai_sdk.ipynb": {
+      "original_path": "Model Providers/nosana_tutorial_openai_sdk.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/nosana_tutorial_openai_sdk.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/replicate_tutorial.ipynb": {
+      "original_path": "Model Providers/replicate_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/replicate_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/sensenova_tutorial.ipynb": {
+      "original_path": "Model Providers/sensenova_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/sensenova_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/togetherai_tutorial.ipynb": {
+      "original_path": "Model Providers/togetherai_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/togetherai_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/wavespeed.ipynb": {
+      "original_path": "Model Providers/wavespeed.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/wavespeed.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    },
+    "Model Providers/zeabur_ai_hub_tutorial.ipynb": {
+      "original_path": "Model Providers/zeabur_ai_hub_tutorial.ipynb",
+      "translated_path": "services/frontend/tutorials-ja/Model Providers/zeabur_ai_hub_tutorial.ipynb",
+      "language": "ja-jp",
+      "translation_date": "2026-06-21T05:00:00Z",
+      "source_hash": "",
+      "model_used": "manual",
+      "status": "completed"
+    }
+  },
+  "last_updated": "2026-06-21T05:00:00Z",
+  "version": "1.0"
+}

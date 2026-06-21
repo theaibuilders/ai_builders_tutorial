@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import LeftSidebar from '../components/LeftSidebar.astro';
 import MainContent from '../components/MainContent.astro';
 import RightSidebar from '../components/RightSidebar.astro';
@@ -13,6 +14,7 @@ interface Props {
   description?: string;
   keywords?: string[];
   type?: 'website' | 'article';
+  lang?: string;
 }
 
 const { 
@@ -22,7 +24,8 @@ const {
   headings = [],
   description,
   keywords = [],
-  type = currentFile ? 'article' : 'website'
+  type = currentFile ? 'article' : 'website',
+  lang = 'en'
 } = Astro.props;
 
 // Generate dynamic description based on content
@@ -225,6 +228,9 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
     }
     </script>
     
+    <!-- View Transitions: eliminates sidebar flash on page navigation -->
+    <ViewTransitions />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -308,7 +314,81 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
       // Always use dark mode
       document.documentElement.classList.add('dark');
     </script>
-    
+
+    <!-- Language preference restore — runs before first paint to prevent flash -->
+    <script is:inline>
+      (function() {
+        var VALID_LANGS = ['zh-cn', 'ja-jp'];
+        var params = new URLSearchParams(window.location.search);
+        var langParam = params.get('lang');
+
+        // Determine the effective language (from URL or localStorage) to decide
+        // whether sidebar flash prevention is needed. This must happen BEFORE
+        // the body renders so the CSS class is in place for the first paint.
+        var effectiveLang = langParam;
+        if (!effectiveLang) {
+          try {
+            var savedLang = localStorage.getItem('preferred_language');
+            if (savedLang && VALID_LANGS.indexOf(savedLang) !== -1) {
+              effectiveLang = savedLang;
+            }
+          } catch(e) {}
+        }
+        // When a non-English language is active, hide the sidebar tutorial list
+        // until the page is fully rendered to prevent a flash of English content.
+        if (effectiveLang && VALID_LANGS.indexOf(effectiveLang) !== -1) {
+          document.documentElement.classList.add('prevent-sidebar-flash');
+        }
+
+        if (!langParam) {
+          // No lang in URL — check localStorage and redirect before any paint
+          try {
+            var saved = localStorage.getItem('preferred_language');
+            if (saved && VALID_LANGS.indexOf(saved) !== -1) {
+              var url = new URL(window.location.href);
+              url.searchParams.set('lang', saved);
+              window.location.replace(url.toString());
+            }
+          } catch(e) {}
+        } else if (VALID_LANGS.indexOf(langParam) !== -1) {
+          // Valid lang in URL — persist it
+          try { localStorage.setItem('preferred_language', langParam); } catch(e) {}
+        }
+
+        // Intercept <a> clicks to forward the current lang param to all internal navigation
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+          // Walk up to find the <a> tag
+          while (target && target.tagName !== 'A') {
+            target = target.parentElement;
+          }
+          if (!target || !target.href) return;
+          try {
+            var href = new URL(target.href);
+            // Only internal links on the same origin
+            if (href.origin !== window.location.origin) return;
+            // Only tutorial pages
+            if (!href.pathname.startsWith('/tutorials')) return;
+            // Only inject if there's a current lang and the link doesn't already have one
+            var currentLang = new URLSearchParams(window.location.search).get('lang');
+            if (currentLang && VALID_LANGS.indexOf(currentLang) !== -1 && !href.searchParams.get('lang')) {
+              e.preventDefault();
+              href.searchParams.set('lang', currentLang);
+              window.location.href = href.toString();
+            }
+          } catch(e) {}
+        }, true);
+      })();
+    </script>
+
+    <!-- Prevent flash of English sidebar content during navigation in non-English mode -->
+    <style>
+      html.prevent-sidebar-flash .sidebar-tutorials {
+        opacity: 0;
+        transition: opacity 0.15s ease;
+      }
+    </style>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RNHCYDMDCX"></script>
     <script is:inline>
@@ -404,14 +484,16 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
       <!-- Left Sidebar (Full) -->
       <aside 
         id="left-sidebar"
+        transition:persist
         class="w-80 flex-shrink-0 border-r border-dark-border lg:static fixed left-0 top-0 h-full z-50 bg-dark-bg transform -translate-x-full lg:translate-x-0 transition-all duration-300 ease-in-out"
       >
-        <LeftSidebar sections={sections} currentFile={currentFile} />
+        <LeftSidebar sections={sections} currentFile={currentFile} lang={lang} />
       </aside>
       
       <!-- Collapsed Sidebar -->
       <aside 
         id="collapsed-sidebar"
+        transition:persist
         class="w-16 flex-shrink-0 border-r border-dark-border bg-dark-bg fixed left-0 top-0 h-screen z-50 lg:flex flex-col items-center py-6"
         style="display: none;"
       >
@@ -619,7 +701,7 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
       window.scrollToTop = scrollToTop;
       
       // Initialize mobile navigation
-      document.addEventListener('DOMContentLoaded', () => {
+      function initNavigation() {
         const navToggle = document.getElementById('mobile-nav-toggle');
         const tocToggle = document.getElementById('mobile-toc-toggle');
         
@@ -720,7 +802,11 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
             }
           });
         }
-      });
+      }
+
+      document.addEventListener('DOMContentLoaded', initNavigation);
+      // Re-initialize after View Transitions page swap
+      document.addEventListener('astro:page-load', initNavigation);
     </script>
 
     <!-- Tutorial HMR CSS Animation -->
@@ -749,6 +835,23 @@ const pageTitle = `${title} | AI Builders Tutorial - Learn AI Engineering & Deve
         }
       }
       */
+    </script>
+
+    <!-- Reveal sidebar after first paint to prevent flash of English content -->
+    <script is:inline>
+      (function() {
+        function revealSidebar() {
+          document.documentElement.classList.remove('prevent-sidebar-flash');
+        }
+        // Double requestAnimationFrame ensures the sidebar paints invisible
+        // on the first frame, then smoothly fades in on the next frame.
+        requestAnimationFrame(function() {
+          requestAnimationFrame(revealSidebar);
+        });
+        // Fallback: always remove after 300ms in case rAF doesn't fire
+        // (e.g., when the tab is in the background)
+        setTimeout(revealSidebar, 300);
+      })();
     </script>
   </body>
 </html>

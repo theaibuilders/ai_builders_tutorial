@@ -1,0 +1,395 @@
+# Nosana x Mastra: インテリジェントAIエージェントの構築
+
+このチュートリアルでは、Mastraフレームワークを使用してインテリジェントAIエージェントを構築し、Nosanaの分散型GPUネットワークのオープンソースモデルを活用する方法を説明します。
+
+![nosana-mastra](/products/nosana/nosana_mastra.webp)
+
+## コア技術の理解
+
+### Nosanaとは？
+
+[Nosana](https://nosana.com/?utm_source=aibuilders)は、Solana上に構築された分散型GPUマーケットプレイスで、GPU所有者とAI開発者を接続します。世界中の活用されていないコンシューマーGPUを活用することで、Nosanaは従来のクラウドプロバイダーと比較して最大85%低いコストでコスト効率の高いAI推論コンピュートパワーを提供します。ネットワークはDockerコンテナを通じてAIワークロードを処理し、動的価格設定と本番デプロイメントへのシームレスな統合を提供します。
+
+主な機能：
+- **分散型インフラストラクチャ**：Solanaブロックチェーン上に構築されたピアツーピアGPUシェアリング
+- **AI推論フォーカス**：訓練済みAIモデルの実行に特別に最適化
+- **Docker対応**：任意のAIフレームワークでコンテナ化されたアプリケーションをデプロイ
+- **パフォーマンス検証**：すべてのGPUはデプロイ前に厳格なベンチマークを実施
+
+### Mastraとは？
+
+Mastraは、本番対応のAIエージェントとワークフローを構築するために設計されたオープンソースのTypeScriptフレームワークです。Gatsbyのチームによって作成されたMastraは、エージェント、ワークフロー、メモリシステム、ツール統合、組み込みのオブザーバビリティを備えた包括的なツールキットを提供します。フレームワークはシームレスなツール統合のためにModel Context Protocol（MCP）をサポートし、テスト用のローカルプレイグラウンドを含んでいます。
+
+コアプリミティブ：
+- **エージェント**：LLMとツールを使用してタスクを解決する自律システム
+- **ワークフロー**：サスペンド/レジューム機能付きのステートマシンベースのオーケストレーション
+- **ツール**：エージェントが外部システムと対話するために実行する型安全な関数
+- **メモリ**：永続的な会話履歴とセマンティックリコール
+- **MCP統合**：外部サービスへの接続用ユニバーサルプラグインシステム
+
+## プロジェクトセットアップ
+
+### 前提条件
+
+以下がインストールされていることを確認してください：
+- Node.js 18+とnpm/pnpm
+- バージョン管理用のGit
+- クレジットが事前ロードされたNosanaアカウント（GPT-OSSモデルのデプロイとアクセス用）
+
+### Mastraプロジェクトの初期化
+
+CLIを使用して新しいMastraプロジェクトを作成します：
+
+```bash
+npm create mastra@latest my-agent-project
+```
+
+セットアップ中に以下のプロンプトが表示されます：
+
+```
+Where should we create the Mastra files? (default: src/)
+│  src/
+│
+◇  Select a default provider:
+│  OpenAI
+│
+◇  Enter your OpenAI API key?
+│  Skip for now
+│
+◇  Make your IDE into a Mastra expert? (Installs Mastra's MCP server)
+│  Skip for now
+```
+
+お気に入りのIDEでプロジェクトを開きます：
+
+```bash
+cd my-agent-project
+```
+### NosanaでのGPT-OSS 20Bモデルのデプロイ
+
+エージェントを設定する前に、Nosanaのインフラストラクチャ上にGPT-OSS 20Bモデルをデプロイする必要があります：
+
+![nosana-template](/products/nosana/nosana-template.webp)
+
+1. [Nosanaダッシュボード](https://nosana.com/dashboard?utm_source=aibuilders)に移動
+2. Nosanaアカウントでログイン
+3. **Deploy**ページに移動
+4. 利用可能なモデルテンプレートから**GPT-OSS 20B**を選択
+5. 希望するGPU構成を選択（推奨：NVIDIA RTX 4090以上）
+6. **Deploy**をクリックし、モデルがプロビジョニングされるのを待つ（通常2〜5分）
+7. デプロイが完了したら、**APIエンドポイントURL**をコピー。次のような形式です：
+   ```
+   https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci
+   ```
+
+### 環境変数の設定
+
+`.env.example`をコピーして`.env`にリネームし、Nosanaエンドポイントで環境変数を設定します：
+
+```bash
+# For Nosana Ollama Endpoint with GPT-OSS 20B
+OLLAMA_API_URL=https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci/api
+MODEL_NAME_AT_ENDPOINT=gpt-oss:20b
+```
+
+`https://YOUR_NOSANA_URL_ID.node.k8s.prd.nos.ci`を実際のNosana APIエンドポイントURLに置き換えてください（`Open Service`をクリックしてページリンクをコピー＆ペーストするだけです）。
+
+<div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 16px; margin: 16px 0; border-radius: 4px;">
+  <strong>⚠️ 重要：</strong> Nosana URLの末尾に余分な<code>/api</code>を付けることを忘れないでください。そうしないとモデルエンドポイントが正しく動作しません。
+</div>
+
+MastraにはOllamaがデフォルトテンプレートとして含まれていないため、以下のプロンプトをAIアシスタントに使用して、Ollamaモデルを使用するようにプロジェクトを設定できます：
+
+```
+I need to configure my Mastra project to use Ollama instead of OpenAI.
+Please help me:
+
+1. Update the agent configuration files to use Ollama with the following
+   settings:
+   - API URL: process.env.OLLAMA_API_URL
+   - Model: process.env.MODEL_NAME_AT_ENDPOINT
+2. Update any imports and model initialization to use the Ollama provider
+   from @ai-sdk/ollama
+3. Ensure all agents in the project are configured to use this Ollama setup
+```
+
+### Mastraプロジェクトの起動
+
+プロジェクトのセットアップが完了したら、以下のコマンドを実行するだけで起動できます：
+
+```bash
+pnpm run dev
+```
+
+次のような出力が表示されるはずです：
+
+```
+...
+ mastra  0.17.7 ready in XXXX ms
+
+│ Playground: http://localhost:4111/
+│ API:        http://localhost:4111/api
+```
+
+コンソール出力に表示される`Playground`リンク（http://localhost:4111/）をクリックすると、デフォルトの天気エージェントのモデルとして`gtp-oss:20b`が表示されるはずです。
+![mastra_gpt_oss_20b](/products/nosana/mastra_gpt_oss_20b.webp)
+
+モデルに`what's the weather like in Singapore today?`のような質問をすると、今日のシンガポールの天気状況のツールレスポンスが表示されるはずです。
+![mastra_weather_test](/products/nosana/mastra_weather_test.webp)
+
+## 最初のエージェントの構築
+
+### カスタムエージェントの作成
+
+Mastraのエージェントは、LLMとツールを組み合わせてタスクを達成する自律システムです。新しいエージェントファイルを作成します：
+
+```typescript
+// src/mastra/agents/assistant.ts
+import { Agent } from '@mastra/core/agent';
+import { openai } from '@ai-sdk/openai';
+
+export const assistantAgent = new Agent({
+  name: 'Personal Assistant',
+  instructions: `You are a helpful personal assistant that can:
+    - Answer questions about various topics
+    - Help with task management
+    - Provide recommendations
+    
+    Always be concise and accurate in your responses.
+    Use available tools when needed to accomplish tasks.`,
+  model: openai('gpt-4o-mini'),
+  tools: {},
+});
+```
+
+### カスタムツールの実装
+
+ツールは外部APIやサービスへの接続によってエージェントの機能を拡張します。データ取得用のツールを作成します：
+
+```typescript
+// src/mastra/tools/index.ts
+import { createTool } from '@mastra/core';
+import { z } from 'zod';
+
+export const searchTool = createTool({
+  id: 'web-search',
+  description: 'Search the web for information on a given topic',
+  inputSchema: z.object({
+    query: z.string().describe('The search query'),
+  }),
+  outputSchema: z.object({
+    results: z.string().describe('Search results summary'),
+  }),
+  execute: async ({ context }) => {
+    const { query } = context;
+    const response = await fetch(
+      `https://api.example.com/search?q=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+    
+    return {
+      results: data.summary || 'No results found',
+    };
+  },
+});
+
+export const calculatorTool = createTool({
+  id: 'calculator',
+  description: 'Perform mathematical calculations',
+  inputSchema: z.object({
+    expression: z.string().describe('Mathematical expression to evaluate'),
+  }),
+  outputSchema: z.object({
+    result: z.number(),
+  }),
+  execute: async ({ context }) => {
+    const { expression } = context;
+    try {
+      const result = eval(expression);
+      return { result: parseFloat(result) };
+    } catch (error) {
+      throw new Error('Invalid mathematical expression');
+    }
+  },
+});
+```
+
+エージェントにツールを追加します：
+
+```typescript
+import { assistantAgent } from './agents/assistant';
+import { searchTool, calculatorTool } from './tools';
+
+export const enhancedAgent = new Agent({
+  name: 'Enhanced Assistant',
+  instructions: assistantAgent.instructions,
+  model: openai('gpt-4o-mini'),
+  tools: { searchTool, calculatorTool },
+});
+```
+### リサーチワークフローの作成
+ワークフローは制御フローロジックでエージェントとツールの実行の複雑なシーケンスをオーケストレーションします。
+
+```typescript
+// src/mastra/workflows/research.ts
+import { Step, Workflow, createWorkflow } from '@mastra/core/workflows';
+import { z } from 'zod';
+import { researchAgent } from '../agents/research';
+import { writerAgent } from '../agents/writer';
+
+const researchStep = new Step({
+  id: 'research',
+  execute: async ({ context }) => {
+    const { topic } = context.triggerData;
+    
+    const result = await researchAgent.generate(
+      `Research comprehensive information about: ${topic}`
+    );
+    
+    return { research: result.text };
+  },
+});
+
+const writeStep = new Step({
+  id: 'write',
+  execute: async ({ context }) => {
+    const research = context.getStepResult('research')?.research;
+    
+    const result = await writerAgent.generate(
+      `Write a detailed article using this research: ${research}`
+    );
+    
+    return { article: result.text };
+  },
+});
+
+export const researchWorkflow = createWorkflow({
+  name: 'research-and-write',
+  triggerSchema: z.object({
+    topic: z.string(),
+  }),
+})
+  .then(researchStep)
+  .then(writeStep)
+  .commit();
+```
+
+プログラムによるワークフローの実行：
+
+```typescript
+const result = await researchWorkflow.execute({
+  triggerData: { topic: 'Quantum Computing' },
+});
+
+console.log(result.results.write.article);
+```
+
+### エージェントメモリの追加
+
+メモリにより、エージェントは会話間でコンテキストを維持し、過去のインタラクションを思い出すことができます。
+
+```typescript
+import { Agent } from '@mastra/core/agent';
+import { Memory } from '@mastra/memory';
+
+export const memoryAgent = new Agent({
+  name: 'Memory-Enabled Assistant',
+  instructions: 'You remember past conversations and provide personalized responses.',
+  model: openai('gpt-4o-mini'),
+  memory: new Memory(),
+  tools: {},
+});
+```
+
+会話でのメモリの使用：
+
+```typescript
+const response = await memoryAgent.generate(
+  'My name is Alex and I work in finance',
+  {
+    memory: {
+      thread: 'user-123',
+      resourceid: 'conversation',
+    },
+  }
+);
+
+const followUp = await memoryAgent.generate(
+  'What did I say my profession was?',
+  {
+    memory: {
+      thread: 'user-123',
+      resourceid: 'conversation',
+    },
+  }
+);
+```
+
+## テストと検証
+
+### Mastraプレイグラウンドの使用
+
+Mastraプレイグラウンドはインタラクティブなテスト機能を提供します：
+
+1. `http://localhost:4111`にアクセス
+2. 異なるプロンプトでエージェントをテスト
+3. ツール呼び出しと実行トレースを検査
+4. エージェントの意思決定プロセスをデバッグ
+5. ワークフローの実行ステップを監視
+
+### 評価の実装
+
+評価はエージェントのパフォーマンスを測定・追跡するのに役立ちます：
+
+```typescript
+import { createEval } from '@mastra/core';
+
+const accuracyEval = createEval({
+  name: 'response-accuracy',
+  evaluate: async ({ output, expected }) => {
+    const score = calculateSimilarity(output, expected);
+    return {
+      score,
+      passed: score > 0.8,
+      metadata: { output, expected },
+    };
+  },
+});
+```
+
+## ベストプラクティスとヒント
+
+### エージェント設計
+- 役割と機能を定義する明確で詳細なシステムプロンプトを書く
+- シンプルなエージェントから始め、段階的に複雑さを追加する
+- 統合する前にツールを個別にテストする
+
+### ツール実装
+- LLMの理解を深めるために説明的なツール説明を提供する
+- ツールのexecute関数に適切なエラーハンドリングを実装する
+- 型安全な入出力バリデーションにZodスキーマを使用する
+
+### パフォーマンス最適化
+- リアルタイムのユーザーフィードバックにストリーミングレスポンスを使用する
+- 高コストな操作にキャッシュを実装する
+- 無限ループを防ぐためにmaxStepsを制限する
+- リソース使用量を監視し、効率のために最適化する
+- 適切なロギングとオブザーバビリティを実装する
+
+## まとめ
+
+Nosanaのオープンソースモデルを使用したMastraフレームワークでインテリジェントAIエージェントを構築する方法を学びました。このチュートリアルでは、開発環境のセットアップ、カスタムエージェントの作成、ツールとワークフローの実装、メモリ機能の追加、Mastraプレイグラウンドを使用したローカルテストについて取り上げました。
+
+主なポイント：
+- Mastraのコアプリミティブの理解：エージェント、ツール、ワークフロー、メモリ
+- Ollamaを介したNosanaのオープンソースモデルへの接続
+- 特定の機能を持つカスタムエージェントの構築
+- Zodスキーマによる型安全なツールの作成
+- マルチステップワークフローの実装
+- プレイグラウンドを使用したエージェントのテストと検証
+
+## 次のステップ
+
+Mastraの旅を続けるには：
+- 異なるNosanaモデルと構成を試す
+- より複雑なワークフローと統合を構築する

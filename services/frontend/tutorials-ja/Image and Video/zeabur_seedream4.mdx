@@ -1,0 +1,86 @@
+
+# Zeabur: LobeChat経由でSeedream 4を使った画像編集
+
+このチュートリアルでは、[Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)にLobeChatをデプロイする方法を紹介します。数分で完了するシームレスなプロセスです。その後、LobeChatを強力なSeedream 4モデル用に設定し、高度なAI画像生成と編集を行います。実際の例として、ロゴを看板に配置する手順を追っていきます。
+
+![zeabur-seedream4-with-zeabur](/products/zeabur/seedream-4-with-zeabur.webp)
+## なぜこのアプローチか？
+
+始める前に、なぜZeaburへのLobeChatワンクリックデプロイとFal AI API（Seedream 4）の直接使用を組み合わせるのかを説明します。
+
+1. **技術的ハードルが低い**: Fal APIを直接呼び出すには、ヘッダー、認証、ペイロード形式など、技術的な知識が必要に感じられることがあります。自分でホストするLobeChat UIはその複雑さを抽象化しながら、制御権はあなたに残します。
+2. **追加のサブスクリプションを回避**: サードパーティがホストする「Seedream UI」スタイルのサイトは、多くの場合月額料金やクレジットのマークアップが含まれます。LobeChatを自分で実行し、Falの従量課金制を使えば、実際のモデル呼び出し分だけ支払えます。
+3. **持続的なクリエイティブワークフロー**: Falのプレイグラウンドでは素早く実験できますが、豊かで検索可能なチャット＋画像生成履歴は保持されません。LobeChatは会話、プロンプト、参照画像のコンテキスト、出力を保存するため、意図的に反復できます。
+
+これらを合わせると、**最小限のセットアップ摩擦（ワンクリックデプロイ）＋コスト効率（直接Fal API使用）＋持続的なクリエイティブ履歴（LobeChatに保存されたチャットと画像）**という両方の長所を得られます。では、セットアップして実例を見ていきましょう。
+
+## ツールの紹介
+
+* **LobeChat**: オープンソースのモダンなAIチャットフレームワークです。高パフォーマンスを目的とし、プライベートデプロイが可能です。LobeChatは幅広いAIモデルとプラグインをサポートしており、さまざまなAI駆動タスクに対応できる多用途なツールです。
+* **Zeabur**: アプリケーションのホスティングを簡素化するデプロイメントプラットフォームです。Zeaburを使えばワンクリックでサービスをデプロイでき、寛大な無料枠も提供しているため、個人プロジェクトや実験に最適です。
+* **Seedream 4**: ByteDanceが開発した強力な画像生成モデルです。テキストプロンプトから高品質で一貫性のある画像を生成することに優れ、インペイントやオブジェクト配置などの高度な画像編集機能も提供します。
+* **Fal AI**: Seedream 4を含む、様々なサーバーレスでオンデマンドのAIモデルへAPIアクセスを提供するプラットフォームです。
+
+## 前提条件
+
+始める前に、以下を用意してください。
+
+* 無料で登録できる[**Zeaburアカウント**](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)。
+* **Fal AIのAPIキー**。[Fal AIのWebサイト](https://fal.ai/)で登録して取得できます。
+
+## ステップ1: ZeaburにLobeChatをデプロイする
+
+Zeaburのワンクリックデプロイメントテンプレートのおかげで、ZeaburへのLobeChatのデプロイは非常に簡単です。
+
+1. **LobeChatテンプレートに移動する**（LobeChat Database Versionを使用）: ブラウザで[ZeaburのLobeChatデプロイページ](https://zeabur.com/templates/RRSPSD)を開きます。
+2. **「Deploy」をクリックする**: 「Deploy」ボタンをクリックしてプロセスを開始します。
+![zeabur-lobechatdatabase](/products/zeabur/lobechatdatabase.webp)
+
+3. **LobeChatインスタンスにアクセスする**: デプロイが完了すると、ZeaburはLobeChatインスタンスのURLを提供します。
+4. **デプロイ後の設定**: [ZeaburのLobeChatデプロイページ](https://zeabur.com/templates/RRSPSD)のガイドに従い、必要な設定を完了します。
+5. **logtoアカウントを設定する**: 初回アクセス時に、プライベートインスタンス用にサインインまたはアカウント作成を求められることがあります。
+![zeabur-lobetalk-signin-logto](/products/zeabur/lobetalk-signin-logto.webp)
+
+## ステップ2: LobeChatでSeedream 4を設定する
+
+Seedream 4を有効にするには、LobeChatをFal AIサービスプロバイダーにAPIキーを使って接続する必要があります。
+
+1. **AI Paintingページに移動する**: LobeChatアプリケーションで、左側のサイドバーのペイントブラシアイコンをクリックして、**AI Painting**ページに移動します。
+2. **Fal APIキーを入力する**: モデル選択ドロップダウンで、falの横にある歯車アイコンを選択します。入力フィールドにAPIキーを貼り付けます。LobeChatはキーを安全に暗号化して保存します。キーを入力したら、トグルスイッチでFalプロバイダーを有効にします。これで、Seedream 4.0を含むFalが提供するすべてのモデルにアクセスできます。
+![zeabur-lobetalk-falapi](/products/zeabur/lobetalk-falapi.webp)
+
+## ステップ3: Seedream 4を使った高度な画像編集
+
+LobeChatの設定が完了したら、実用的な画像編集例を追っていきます。写真の看板にカスタムロゴを配置します。
+
+1.  **AI Paintingに移動する**: LobeChatの左側サイドバーでペイントブラシアイコンをクリックし、**AI Painting**ページを開きます。
+
+2.  **Seedream 4.0を選択する**: Paintingページで、モデルドロップダウンメニューに**Seedream 4.0**が選択されていることを確認します。
+
+3.  **参照画像をアップロードする**: これが高度な編集の鍵です。
+    * **Reference Images**ボックスに、メインの背景画像（例: 街の看板の写真）をドラッグ＆ドロップします。
+    * 追加または統合したい2枚目の画像（例: ロゴファイル）をドラッグ＆ドロップします。複数の画像をアップロードしてAIをガイドできます。
+
+4.  **パラメータを設定する**: 希望の出力に合わせて設定を調整します。
+    * **Aspect Ratio**: メインの参照画像に合わせたアスペクト比を選択します。
+    * **Width & Height**: 最終画像の具体的な寸法を設定します。
+    * **Number of Images**: 生成したいバリエーション数を選択します。
+
+5.  **正確なプロンプトを書く**: テキストボックスに、画像をどのように組み合わせるかをAIに明確かつ直接的に指示します。
+
+**スクリーンショットの例:**
+
+「Builders」ロゴを看板に配置するために、以下のプロンプトを使用しました。
+
+```text
+put the logo on the billboard, make sure to include the whole logo include the icon and text
+```
+
+AIは参照画像とテキストプロンプトを処理し、ロゴが看板に自然に統合された新しい画像を生成します。
+![zeabur-lobetalkaibuilders](/products/zeabur/lobetalkaibuilders.webp)
+
+## まとめ
+
+ZeaburにLobeChatをデプロイし、最先端のSeedream 4モデルを使うように設定できました。画像編集例を通じて、単純なテキストから画像への生成を超えて、強力なコンテキスト認識型の編集を行う方法を確認しました。自分の画像とプロンプトで実験し、AI駆動の画像操作の可能性を最大限に引き出してください。
+
+**次のステップ:** 今すぐ[Zeabur](https://zeabur.com/?utm_source=aibuilders&utm_medium=aibuilders&utm_campaign=aibuilders)で自分のインスタンスを立ち上げ、Seedream 4で作成を始めましょう。デプロイしてFal APIキーを接続すれば、数分で最初の編集画像を生成できます。🚀

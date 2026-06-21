@@ -1,0 +1,511 @@
+# Nosana: ElizaOSでAIエージェントを構築する
+
+**Qoder IDE**、**ElizaOS**、**Nosanaの分散型GPUネットワーク**を使用して、独自のパーソナルAIエージェントを構築、カスタマイズ、デプロイする方法を学びます。
+
+
+![elizaos overview](/products/elizaos/elizaos-0.webp)
+
+<Callout type="info">
+このチュートリアルでは、分散型インフラストラクチャ上で動作する完全に機能するAIエージェントの構築手順を説明します。完了すると、自分のユースケースに合わせてカスタマイズできるエージェントが完成します。
+</Callout>
+
+
+
+## 作成するもの
+
+以下の技術で構築されたパーソナルAIアシスタント：
+- **[ElizaOS](https://elizaos.ai/)** - オープンソースのAIエージェントフレームワーク
+- **[Nosana](https://nosana.com/?utm_source=aibuilders)** - 分散型GPUコンピュートネットワーク
+- **[Qoder IDE](https://qoder.com/?utm_source=aibuilders)** - AI搭載開発環境
+
+このエージェントは次のことができます：
+- 自然な会話を行う
+- セッションをまたいでコンテキストを記憶する
+- Discord、Telegram、Twitterなど向けのプラグインで拡張可能
+- 分散型インフラストラクチャ上で実行される
+
+
+
+## 前提条件
+
+開始する前に、以下を用意してください：
+
+- **Node.js 18+**（Node.js 23+推奨）
+- **pnpm** - パッケージマネージャー（`npm install -g pnpm`）
+- **Ollama** - ローカル埋め込み用（[ollama.com](https://ollama.com)）
+- **Docker** - デプロイメント用
+- **Git** - バージョン管理
+- **Qoder IDE** - AI搭載IDE（[qoder.ai](https://qoder.ai)）
+
+
+
+## ステップ1：リポジトリのクローン
+
+プロジェクトリポジトリをクローンします：
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/theaibuilders/nosana_elizaos
+cd nosana_elizaos
+```
+
+**Qoder IDE**でプロジェクトを開きます：
+
+```bash
+# Qoderで開く
+qoder .
+```
+
+<Callout type="tip">
+Qoder IDEはAIアシストコーディングを提供し、エージェントのカスタマイズ、デバッグ、カスタムプラグインの作成を高速化できます。
+</Callout>
+
+
+
+## ステップ2：依存関係のインストール
+
+pnpmを使用してすべての必要なパッケージをインストールします：
+
+```bash
+pnpm install
+```
+
+以下がインストールされます：
+- `@elizaos/core` - ElizaOSコアフレームワーク
+- `@elizaos/plugin-bootstrap` - 基本機能を備えたベースプラグイン
+- `@elizaos/plugin-openai` - OpenAI互換APIサポート（Nosana用）
+- `@elizaos/cli` - コマンドラインツール
+
+
+
+## ステップ3：埋め込み用のOllamaセットアップ
+
+NosanaはLLM推論を提供しますが、埋め込み生成はサポートしていません。埋め込みにはローカルでOllamaを使用します：
+
+```bash
+# 埋め込みモデルをインストール
+ollama pull nomic-embed-text
+
+# Ollamaサーバーを起動（別のターミナルで実行し続けてください）
+ollama serve
+```
+
+<Callout type="warning">
+開発中はOllamaをバックグラウンドで実行し続けてください。エージェントはメモリとナレッジ機能のためにOllamaを必要とします。
+</Callout>
+
+
+
+## ステップ4：環境変数の設定
+
+例から`.env`ファイルを作成します：
+
+```bash
+cp .env.example .env
+```
+
+設定に合わせて`.env`を編集します：
+
+```env
+# Model name
+MODEL_NAME=DeepSeek-R1-Distill-Qwen-7B
+
+# OpenAI plugin settings (using Nosana endpoint)
+OPENAI_API_KEY=nosana
+OPENAI_BASE_URL=https://<your-nosana-endpoint>.node.k8s.prd.nos.ci/v1
+OPENAI_SMALL_MODEL=DeepSeek-R1-Distill-Qwen-7B
+OPENAI_LARGE_MODEL=DeepSeek-R1-Distill-Qwen-7B
+
+# Local Ollama for embeddings
+OPENAI_EMBEDDING_URL=http://localhost:11434/v1
+OPENAI_EMBEDDING_MODEL=nomic-embed-text
+OPENAI_EMBEDDING_DIMENSIONS=768
+
+# Server configuration
+SERVER_PORT=3000
+AI_SDK_LOG_WARNINGS=false
+```
+
+<Callout type="info">
+NosanaエンドポイントURL（`OPENAI_BASE_URL`として機能）は、NosanaダッシュボードでQwenモデルをデプロイすることで取得できます：
+
+![NosanaダッシュボードからOPENAI_BASE_URLを取得](/products/elizaos/elizaos-1.webp)
+</Callout>
+
+
+
+## ステップ5：プロジェクト構成の理解
+
+主要なファイルとディレクトリは以下の通りです：
+
+```
+nosana_elizaos/
+├── characters/
+│   └── agent.character.json   # エージェントの個性と設定
+├── src/
+│   └── index.ts               # カスタムプラグイン（オプション）
+├── nos_job_def/
+│   └── nosana_eliza_job_definition.json  # デプロイメント設定
+├── .env                       # 環境変数
+├── Dockerfile                 # コンテナ設定
+└── package.json               # 依存関係
+```
+
+### 主要ファイルの説明
+
+**`characters/agent.character.json`** - 以下を定義します：
+- 名前とユーザー名
+- 個性（システムプロンプト）
+- バイオと背景
+- ロードするプラグイン
+- モデル設定
+
+**`src/index.ts`** - カスタム機能を追加する場所：
+- アクション（エージェントができること）
+- プロバイダー（データソース）
+- エバリュエーター（決定ロジック）
+
+**`.env`** - 以下が含まれます：
+- APIエンドポイント
+- モデル設定
+- サーバー設定
+
+
+
+## ステップ6：エージェントのカスタマイズ
+
+### キャラクターファイルの編集
+
+Qoder IDEで`characters/agent.character.json`を開きます：
+
+```json
+{
+  "name": "MyAgent",
+  "username": "myagent",
+  "plugins": [
+    "@elizaos/plugin-bootstrap",
+    "@elizaos/plugin-openai"
+  ],
+  "settings": {
+    "model": "DeepSeek-R1-Distill-Qwen-7B",
+    "modelProvider": "openai",
+    "secrets": {
+      "OPENAI_API_KEY": "nosana",
+      "OPENAI_BASE_URL": "https://<your-endpoint>.node.k8s.prd.nos.ci/v1"
+    }
+  },
+  "system": "You are a helpful personal AI assistant...",
+  "bio": [
+    "A personal AI assistant running on decentralized infrastructure.",
+    "Helps with research, task management, writing, and automation."
+  ],
+  "topics": ["productivity", "research", "automation"],
+  "adjectives": ["helpful", "efficient", "reliable"],
+  "style": {
+    "all": ["Be concise and direct"],
+    "chat": ["Be conversational and friendly"]
+  }
+}
+```
+
+### 個性のカスタマイズ
+
+`system`フィールドを編集してエージェントの動作を定義します：
+
+```json
+{
+  "system": "You are Luna, a creative writing assistant. You help users brainstorm ideas, write stories, and improve their prose. You have a warm, encouraging personality and love helping people express their creativity. You give constructive feedback and always find something positive to highlight."
+}
+```
+
+<Callout type="tip">
+QoderのAIアシスタントを使って魅力的なシステムプロンプトを作成できます。エージェントにさせたいことを説明するだけです！
+</Callout>
+
+
+
+## ステップ7：エージェントのローカル実行
+
+開発サーバーを起動します：
+
+```bash
+pnpm dev
+```
+
+次のように表示されるはずです：
+
+```
+🚀 Development servers are running:
+════════════════════════════════════════════════════════════
+
+  Backend Server: http://localhost:3000
+  API Endpoint:   http://localhost:3000/api
+
+────────────────────────────────────────────────────────────
+📁 Watching for file changes...
+```
+
+[http://localhost:3000](http://localhost:3000)を開いてエージェントとチャットしましょう！
+
+
+
+## ステップ8：プラグインの追加（オプション）
+
+ElizaOSには豊富なプラグインエコシステムがあります。機能を追加する方法は次の通りです：
+
+### プラグインのインストール
+
+```bash
+# Telegramサポートを追加
+pnpm add @elizaos/plugin-telegram
+
+# Discordサポートを追加
+pnpm add @elizaos/plugin-discord
+
+# ウェブ検索を追加
+pnpm add @elizaos/plugin-web-search
+```
+
+### プラグインの有効化
+
+キャラクターファイルに追加します：
+
+```json
+{
+  "plugins": [
+    "@elizaos/plugin-bootstrap",
+    "@elizaos/plugin-openai",
+    "@elizaos/plugin-telegram"
+  ]
+}
+```
+
+### 利用可能なプラグイン
+
+| プラグイン | 説明 |
+|--|-|
+| `@elizaos/plugin-bootstrap` | 必須のベースプラグイン |
+| `@elizaos/plugin-openai` | OpenAI互換LLMサポート |
+| `@elizaos/plugin-telegram` | Telegramボット統合 |
+| `@elizaos/plugin-discord` | Discordボット統合 |
+| `@elizaos/plugin-twitter` | Twitter/X自動化 |
+| `@elizaos/plugin-web-search` | ウェブ検索機能 |
+| `@elizaos/plugin-browser` | ブラウザ自動化 |
+
+
+
+## ステップ9：カスタムアクションの作成（上級）
+
+`src/index.ts`にカスタム機能を追加します：
+
+```typescript
+import { type Plugin, type Action, logger } from "@elizaos/core";
+
+const greetAction: Action = {
+  name: "GREET",
+  description: "Send a personalized greeting",
+  similes: ["SAY_HELLO", "WELCOME"],
+  examples: [
+    [
+      { name: "user", content: { text: "Say hello to John" } },
+      { name: "assistant", content: { text: "Hello John!", actions: ["GREET"] } },
+    ],
+  ],
+  validate: async () => true,
+  handler: async (runtime, message, state, options, callback) => {
+    const name = message.content?.text?.match(/hello to (\w+)/i)?.[1] || "friend";
+    
+    if (callback) {
+      await callback({
+        text: `Hello ${name}! Welcome to our community! 🎉`,
+        actions: [],
+      });
+    }
+  },
+};
+
+export const customPlugin: Plugin = {
+  name: "custom-plugin",
+  description: "My custom ElizaOS plugin",
+  actions: [greetAction],
+  providers: [],
+  evaluators: [],
+};
+
+export default customPlugin;
+```
+
+<Callout type="tip">
+Qoderにカスタムアクションの作成を頼んでみてください！エージェントにさせたいことを説明すれば、Qoderがコードを生成します。
+</Callout>
+
+
+
+## ステップ10：Nosanaへのデプロイ
+
+### Dockerイメージのビルド
+
+```bash
+# イメージをビルド
+docker build -t yourusername/nosana-eliza-agent:latest .
+
+# まずローカルでテスト
+docker run -p 3000:3000 --env-file .env yourusername/nosana-eliza-agent:latest
+```
+
+### Docker Hubへのプッシュ
+
+```bash
+docker login
+docker push yourusername/nosana-eliza-agent:latest
+```
+
+### ジョブ定義の更新
+
+`nos_job_def/nosana_eliza_job_definition.json`を編集します：
+
+```json
+{
+  "ops": [
+    {
+      "id": "agent",
+      "args": {
+        "image": "yourusername/nosana-eliza-agent:latest",
+        "expose": 3000,
+        "env": {
+          "OPENAI_API_KEY": "nosana",
+          "OPENAI_BASE_URL": "https://<your-endpoint>.node.k8s.prd.nos.ci/v1",
+          "OPENAI_SMALL_MODEL": "DeepSeek-R1-Distill-Qwen-7B",
+          "OPENAI_LARGE_MODEL": "DeepSeek-R1-Distill-Qwen-7B",
+          "MODEL_NAME": "DeepSeek-R1-Distill-Qwen-7B",
+          "SERVER_PORT": "3000",
+          "NODE_ENV": "production"
+        }
+      },
+      "execution": {
+        "group": "run"
+      },
+      "type": "container/run"
+    }
+  ],
+  "version": "0.1"
+}
+```
+
+### Nosanaダッシュボードからのデプロイ
+
+![NosanaダッシュボードからQwenモデルをデプロイ](/products/elizaos/elizaos-1.webp)
+
+1. [Nosanaダッシュボード](https://dashboard.nosana.com/deploy)にアクセス
+2. **Expand**をクリックしてジョブ定義エディタを開く
+3. ジョブ定義JSONを貼り付け
+4. コンピュートマーケットを選択（例：`nvidia-3090`）
+5. **Deploy**をクリック
+
+### CLIからのデプロイ
+
+```bash
+npm install -g @nosana/cli
+
+nosana job post \
+  --file ./nos_job_def/nosana_eliza_job_definition.json \
+  --market nvidia-3090 \
+  --timeout 30
+```
+
+
+
+## トラブルシューティング
+
+### よくある問題
+
+**"The model `gpt-4o` does not exist"**
+
+モデル環境変数を設定してください：
+```env
+OPENAI_SMALL_MODEL=DeepSeek-R1-Distill-Qwen-7B
+OPENAI_LARGE_MODEL=DeepSeek-R1-Distill-Qwen-7B
+```
+
+**埋め込みエラー**
+
+Ollamaが実行中であることを確認してください：
+```bash
+ollama serve
+```
+
+モデルがインストールされていることを確認：
+```bash
+ollama pull nomic-embed-text
+```
+
+**埋め込み次元の不一致**
+
+正しい次元数を設定してください：
+```env
+OPENAI_EMBEDDING_DIMENSIONS=768
+```
+
+**エージェントが応答しない**
+
+以下を確認してください：
+1. NosanaエンドポイントURLが正しいこと
+2. 埋め込み用にOllamaが実行中であること
+3. キャラクターファイルが有効なJSONであること
+
+
+
+## Qoder IDEの効果的な使い方
+
+Qoder IDEはエージェント開発を強力にサポートします：
+
+### Qoderに頼んでみる...
+
+- **「天気データを取得するカスタムアクションを追加して」** - アクションコードを生成
+- **「src/index.tsのTypeScriptエラーを修正して」** - コードをデバッグ
+- **「エージェントをもっと親しみやすくするためにキャラクターファイルを更新して」** - 個性を編集
+- **「プラグインがロードされないのはなぜ？」** - 問題を診断
+- **「これをNosanaにデプロイして」** - デプロイメントを案内
+
+### キーボードショートカット
+
+- `Cmd/Ctrl + I` - Qoder AIチャットを開く
+- `Cmd/Ctrl + K` - インラインコード生成
+- `Cmd/Ctrl + Shift + I` - AIアシストデバッグ
+
+
+
+## 次のステップ
+
+動作するエージェントができたら、次に試してみてください：
+
+1. **プラグインの追加** - Discord、Telegram、Twitterに接続
+2. **カスタムアクションの作成** - 独自の機能を追加
+3. **個性の改善** - システムプロンプトを微調整
+4. **ナレッジの追加** - エージェントにドメインの専門知識を付与
+5. **デプロイと共有** - Nosanaで24時間365日稼働
+
+
+
+## リソース
+
+- [ElizaOSドキュメント](https://elizaos.github.io/eliza/docs)
+- [ElizaOSプラグインディレクトリ](https://elizaos.github.io/eliza/docs/core/plugins)
+- [Nosanaドキュメント](https://docs.nosana.io)
+- [Nosanaダッシュボード](https://dashboard.nosana.com)
+- [Qoder IDE](https://qoder.ai)
+- [DeepSeekモデル](https://huggingface.co/deepseek-ai)
+
+
+
+## コミュニティとサポート
+
+- **Nosana Discord** - [nosana.com/discord](https://nosana.com/discord)
+- **ElizaOS Discord** - [discord.gg/elizaos](https://discord.gg/elizaos)
+- **Twitter** - [@nosana_ai](https://x.com/nosana_ai) · [@elizaos](https://x.com/elizaos)
+
+
+
+<Callout type="success">
+おめでとうございます！分散型インフラストラクチャ上で独自のAIエージェントを構築しデプロイしました。ハッピービルディング！🚀
+</Callout>

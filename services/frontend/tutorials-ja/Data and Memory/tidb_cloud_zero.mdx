@@ -1,0 +1,257 @@
+# TiDB Cloud Zero: 「Pulse」を構築 — AI検索付きリアルタイムフィードバックウォール
+
+このチュートリアルでは、**Pulse** — AI駆動のセマンティック検索とライブ分析を備えたリアルタイムフィードバックウォール — を構築します。このアプリはTiDBの独自機能、つまりベクトル検索、HTAP（リアルタイム分析）、高並列書き込みを紹介します。手動コーディングは不要で、AIプロンプトだけで構築できます。
+
+[TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders)は、サインアップ不要、設定不要、使い捨て可能なMySQL互換データベースで、ベクトル検索が内蔵されています。1回のAPI呼び出しで、完全に機能するデータベースが手に入ります。認証情報、請求、セットアップは不要です。
+
+![tidb cloud zero](/products/tidb/tidb_cloud_zero_1.jpg)
+
+## 構築するもの
+
+![pulse app](/products/tidb/tidb_cloud_zero_2.jpg)
+
+
+
+## 紹介するTiDBの機能
+
+| 機能 | TiDBの能力 | 使い方 |
+|---------|-----------------|---------------|
+| **AI検索** | ベクトル検索 | キーワードだけでなく、意味でフィードバックを検索 |
+| **ライブ分析** | HTAP | ライブなトランザクションデータに対するリアルタイム集計 |
+| **フィードバック投稿** | 高並列 | 多数の同時書き込みを処理 |
+| **感情チャート** | HTAP | 書き込みと並行して複雑なGROUP BYクエリを実行 |
+| **MySQL構文** | MySQL互換 | ベクトル拡張を備えた馴染みのSQL |
+
+
+
+## 前提条件
+
+- Python 3.10以上がインストールされていること
+- OpenAI APIキー（埋め込み用）
+
+
+
+## 開始する
+
+新しいフォルダを作成し、お好みのエディタまたはIDEで開きます。
+
+```bash
+mkdir pulse-app
+cd pulse-app
+```
+
+エディタでフォルダを開き、**agent mode**（またはAIアシスタントの同等機能）に切り替えてプロンプトを送信します。
+
+
+
+## ステップ1: データベースをプロビジョニングする
+
+AIチャットで以下のプロンプトを送信します。
+
+```
+Read https://zero.tidbcloud.com/SKILL.md and follow the instructions to create a database using TiDB Cloud Zero.
+```
+
+AIは、ベクトル検索をサポートした無料のMySQL互換データベースをプロビジョニングします。
+
+
+
+## ステップ2: データベースの認証情報を保存する
+
+データベース情報はチャットに表示されますが、スクロールして消える可能性があります。保存しましょう。
+
+```
+Save the TiDB database connection info you just created to a file called tidb_info.md
+```
+
+
+
+## ステップ3: Pulseアプリを構築する
+
+次に、AIにアプリ全体を構築してもらいます。
+
+```
+Build a Streamlit app called "Pulse" - a real-time feedback wall with AI search.
+
+Requirements:
+
+1. Database Setup:
+   - Read credentials from tidb_info.md
+   - Create a feedback table with: id (auto increment), name (varchar), message (text), sentiment (varchar), embedding (VECTOR(1536)), created_at (timestamp)
+   - Use mysql-connector-python with SSL enabled
+
+2. Core Features:
+   a) Post Feedback section:
+      - Input fields for name and message
+      - On submit: analyze sentiment (positive/neutral/negative), generate OpenAI embedding, store in database
+   
+   b) AI Search section:
+      - Text input for semantic search
+      - Search by meaning using vector similarity (cosine distance)
+      - Display top 5 matching feedback items
+   
+   c) Live Analytics section:
+      - Total feedback count
+      - Feedback posted in last hour
+      - Sentiment breakdown with progress bars (% positive, neutral, negative)
+   
+   d) Live Feed section:
+      - Show latest 10 feedback items
+      - Display name, message, sentiment emoji, and relative time
+      - Auto-refresh every 5 seconds
+
+3. Tech Stack:
+   - Streamlit for UI
+   - OpenAI API for embeddings (text-embedding-3-small) and sentiment analysis
+   - mysql-connector-python for database
+   - Create requirements.txt
+   - Store OpenAI key in .env file
+
+4. UI:
+   - Clean, modern design
+   - Use Streamlit columns for layout
+   - Sentiment emojis: 😊 positive, 😐 neutral, 😞 negative
+```
+
+AIは必要なファイルをすべて作成し、データベースをセットアップします。
+
+
+
+## ステップ4: OpenAI APIキーを設定する
+
+AIにAPIキーのセットアップを依頼します。
+
+```
+Create a .env file with a placeholder for OPENAI_API_KEY and remind me to add my key
+```
+
+その後、`.env`ファイルにOpenAI APIキーを追加します。
+
+
+
+## ステップ5: アプリを実行する
+
+AIにアプリを起動してもらいます。
+
+```
+Install the dependencies and run the Streamlit app
+```
+
+Pulseアプリが `http://localhost:8501` で起動します！
+
+
+
+## ステップ6: 機能をテストする
+
+TiDBの力を確かめるために、以下のアクションを試してください。
+
+**ベクトル検索をテスト:**
+1. 投稿: "The application loads very slowly"
+2. 投稿: "Love the new color scheme"
+3. 検索: "performance issues" → 遅い読み込みのフィードバックが見つかります！
+
+**HTAP分析をテスト:**
+- 投稿しながらライブ分析がリアルタイムで更新されるのを確認
+- 感情の割合が瞬時に再計算される
+
+**高並列をテスト:**
+- 複数のブラウザタブを開く
+- 各タブから同時にフィードバックを投稿
+- すべての書き込みが成功し、分析は一貫性を保つ
+
+
+
+## ステップ7: サンプルデータを追加する（オプション）
+
+テストデータでアプリを埋めます。
+
+```
+Add a button to generate 50 sample feedback entries with varied sentiments and realistic messages about a product. Use batch inserts for efficiency.
+```
+
+これにより、TiDBが大規模なデータセットを扱いながら分析を高速に保つ様子が示されます。
+
+
+
+## 仕組み
+
+```
+┌──────────────┐     ┌──────────────┐     ┌──────────────────────┐
+│   Streamlit  │────▶│   OpenAI     │     │   TiDB Cloud Zero    │
+│   Frontend   │     │   API        │     │                      │
+└──────────────┘     └──────────────┘     │  ┌────────────────┐  │
+       │                    │             │  │ Feedback Table │  │
+       │                    │             │  │ + VECTOR index │  │
+       │  1. Post feedback  │             │  └────────────────┘  │
+       │───────────────────▶│             │                      │
+       │                    │ 2. Generate │                      │
+       │                    │   embedding │                      │
+       │                    │────────────▶│ 3. Store with vector │
+       │                    │             │                      │
+       │  4. Semantic search              │                      │
+       │─────────────────────────────────▶│ 5. Vector similarity │
+       │                                  │    search            │
+       │  6. Live analytics               │                      │
+       │─────────────────────────────────▶│ 7. Real-time GROUP BY│
+       │                                  │    (HTAP)            │
+       │◀─────────────────────────────────│                      │
+       │         8. Results               │                      │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+- **ベクトル検索**: TiDBは埋め込みを`VECTOR(1536)`として保存し、コサイン類似度検索をネイティブで実行
+- **HTAP**: 分析クエリは、書き込みと同じデータベースで実行 — ETLもデータウェアハウスも不要
+- **高並列**: TiDBは並列挿入を処理しながら一貫性を維持
+- **MySQL互換**: ベクトル拡張を備えた標準SQL構文
+
+
+
+## なぜTiDBか、他の選択肢と比べて？
+
+| 要件 | PostgreSQL + pgvector | Pinecone + PostgreSQL | [TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders) |
+|-------------|----------------------|----------------------|------------------|
+| ベクトル検索 | ✅ 拡張が必要 | ✅ 別サービス | ✅ 内蔵 |
+| リアルタイム分析 | ⚠️ スケールで遅くなる | ❌ 別DB | ✅ ネイティブHTAP |
+| 水平スケール | ❌ 複雑なシャーディング | ⚠️ 2つのシステム | ✅ 自動 |
+| セットアップの複雑さ | 中 | 高（2サービス） | **ゼロ** |
+
+
+
+## 重要な注意事項
+
+- **認証不要** — [TiDB Cloud Zero](https://zero.tidbcloud.com/?utm_source=aibuilders) APIは無料で公開されています
+- **インスタンスは30日後に自動期限切れ** — 永続的に保持するにはクレームしてください
+- **接続時は常にTLSを使用**してください
+- **OpenAIのコスト** — 埋め込みには手頃な`text-embedding-3-small`モデルを使用
+
+
+
+## データベースのクレーム（永続化）
+
+データベースは30日で期限切れになります。永続的に保持するには:
+
+1. `tidb_info.md`ファイルの**Claim URL**を開きます
+2. TiDB Cloudにサインアップまたはログインします
+3. データベースが永続的なアクセス権を持つあなたのアカウントに移行されます
+
+
+
+## TiDBダッシュボードでデータベースを確認する
+
+インスタンスをクレームしたら、TiDB Cloudダッシュボードから直接データを確認できます。
+
+1. [TiDB Cloud](https://tidbcloud.com)にログインし、クレームしたクラスタを開きます
+2. 左側のサイドバーで**SQL Editor**を開きます
+3. **Schemas**ペインを使ってデータベースとテーブルを参照 — `id`、`name`、`message`、`sentiment`、`embedding`、`created_at`の列を持つ`feedback`テーブルが表示されます
+4. Resultビューでクエリを実行したりデータを参照したりして、Pulseアプリのフィードバックエントリを確認します
+
+![TiDB Cloud SQL Editor showing feedback table](/products/tidb/tidb_cloud_zero_3.jpg)
+
+
+
+## 次のステップ
+
+- **Streamlit Cloudにデプロイ** — Pulseアプリの無料ホスティング
+- **認証を追加** — Streamlitのセッションステートでフィードバックをユーザー別に追跡
+- **高度な分析** — フィードバックの傾向を示す時系列チャートを追加
+- **多言語サポート** — TiDBはUnicodeをネイティブに処理し、グローバルなフィードバックに対応

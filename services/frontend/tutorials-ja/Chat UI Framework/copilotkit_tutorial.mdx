@@ -1,0 +1,194 @@
+# CopilotKit: Next.js で AI パワード To-Do アプリを構築する
+
+この実践チュートリアルへようこそ。ここでは、スマートな To-Do リストアプリケーションの作り方を学びます。フロントエンドには Next.js、そしてアプリ内 AI コパイロットを構築するための強力なオープンソースフレームワークである CopilotKit を使用します。チュートリアルの終わりには、タスク管理のための自然言語コマンドを理解する To-Do アプリが完成します。
+
+## CopilotKit とは？
+
+CopilotKit は、アプリケーションに AI アシスト機能を簡単に構築、デプロイ、監視できるフルスタックフレームワークです。アプリのロジックや状態を AI エージェントに接続するためのツールやコンポーネントを提供し、シームレスで直感的なユーザー体験を実現します。
+
+## 前提条件
+
+開始する前に、以下のものを用意してください。
+
+* マシンに **Node.js**（v18 以降）がインストールされていること。
+* **React** および **Next.js** の基礎知識。
+[Copilot Cloud ダッシュボード](https://www.copilotkit.ai/)から取得した **Copilot Cloud public API key**。
+
+## ステップ 1: Next.js プロジェクトのセットアップ
+
+まず、新しい Next.js アプリケーションを作成しましょう。ターミナルを開き、以下のコマンドを実行してください。
+
+```bash
+npx create-next-app@latest my-todo-app --typescript --tailwind --eslint
+cd my-todo-app
+```
+
+これにより、TypeScript、Tailwind CSS、ESLint を含む新しい Next.js プロジェクトが作成されます。
+
+## ステップ 2: CopilotKit の初期化
+
+以下の単一コマンドから始めます。
+
+```bash
+npx copilotkit@latest init
+```
+
+## ステップ 3: 環境変数の設定
+
+環境変数を `.env.local` に追加します。
+
+- `NEXT_PUBLIC_COPILOT_API_KEY="your-copilot-cloud-public-key"`
+- `NEXT_PUBLIC_COPILOTKIT_RUNTIME_URL` は未定義/空のままにしてください（Cloud SDK がルーティングを処理します）
+
+プレースホルダーを実際のキーに置き換えることを忘れないでください。`.env.local` はデフォルトで gitignore されています。
+
+Copilot プロバイダーは `src/app/copilotkit/layout.tsx` で定義され、env から `NEXT_PUBLIC_COPILOT_API_KEY` を読み取ります。Copilot Cloud を使用する場合、独自の API ルートを実行する必要はありません。
+
+## ステップ 4: To-Do アプリ UI の構築
+
+### ユーザーインターフェースの作成
+
+To-Do リストのユーザーインターフェースを作成しましょう。`src/app/copilotkit/page.tsx` のコードを以下のコードに置き換えてください。
+
+```tsx
+// src/app/copilotkit/page.tsx
+"use client";
+
+import { useState } from "react";
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { CopilotSidebar } from "@copilotkit/react-ui";
+
+interface Todo {
+  id: number;
+  text: string;
+  completed: boolean;
+}
+
+export default function Home() {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState("");
+
+  // Expose current todos so Copilot can read them
+  useCopilotReadable({
+    description: "The user's current to-do items with their completion status.",
+    value: todos,
+  });
+
+  useCopilotAction({
+    name: "manage_todos",
+    description: "Manage the to-do list.",
+    parameters: [
+      {
+        name: "action",
+        type: "string",
+        description: "The action to perform: 'add', 'remove', or 'toggle'.",
+        enum: ["add", "remove", "toggle"],
+      },
+      {
+        name: "todo",
+        type: "string",
+        description: "The to-do item to manage.",
+      },
+    ],
+    handler: ({ action, todo }) => {
+      if (action === "add") {
+        setTodos((prev) => [
+          ...prev,
+          { id: Date.now(), text: todo, completed: false },
+        ]);
+      } else if (action === "remove") {
+        setTodos((prev) => prev.filter((t) => t.text !== todo));
+      } else if (action === "toggle") {
+        setTodos((prev) =>
+          prev.map((t) =>
+            t.text === todo ? { ...t, completed: !t.completed } : t
+          )
+        );
+      }
+    },
+  });
+
+  const handleAddTodo = () => {
+    if (newTodo.trim() !== "") {
+      setTodos([...todos, { id: Date.now(), text: newTodo, completed: false }]);
+      setNewTodo("");
+    }
+  };
+
+  return (
+    <CopilotSidebar>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4">My To-Do List</h1>
+          <div className="flex mb-4">
+            <input
+              type="text"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              className="flex-grow p-2 border rounded-l-md"
+              placeholder="Add a new to-do"
+            />
+            <button onClick={handleAddTodo} className="p-2 bg-blue-500 text-white rounded-r-md">
+              Add
+            </button>
+          </div>
+          <ul>
+            {todos.map((todo) => (
+              <li
+                key={todo.id}
+                className={`flex items-center justify-between p-2 mb-2 rounded-md ${
+                  todo.completed ? "bg-green-200" : ""
+                }`}
+              >
+                <span className={todo.completed ? "line-through" : ""}>
+                  {todo.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </CopilotSidebar>
+  );
+}
+```
+
+注: `useCopilotReadable` は `todos` を Copilot に可視化し、「To-Do は何？」のような質問に答えられるようにします。
+
+### useCopilotAction でスマート化
+
+魔法は `useCopilotAction` フックで起こります。このフックを使用すると、AI コパイロットが実行できるアクションを定義できます。今回の場合、To-Do アイテムの追加、削除、切り替えができる `manage_todos` アクションを作成しました。
+
+`useCopilotAction` の `handler` 関数では、各アクションのロジックを定義します。コパイロットにコマンドを与えると（例: 「牛乳を買う To-Do を追加して」）、適切なパラメーターでこの関数が呼び出されます。
+
+## ステップ 5: アプリケーションの実行
+
+さて、AI パワード To-Do アプリを動作させましょう。開発サーバーを実行します。
+
+```bash
+npm run dev
+```
+
+ブラウザを開き、`http://localhost:3000/copilotkit` に移動します。Copilot サイドバー付きの To-Do リストアプリケーションが表示されます。以下のようなコマンドを試してみてください。
+
+  * 「犬の散歩を To-Do に追加して」
+  * 「食料品の買い物と家の掃除を To-Do に追加して」
+  * 「犬の散歩を完了済みにして」
+  * 「食料品の買い物の To-Do を削除して」
+
+AI がコマンドを実行するにつれて、To-Do リストがリアルタイムで更新されるのが確認できます。
+
+![CopilotKit のスクリーンショット](/products/copilotkit.png)
+
+## まとめ
+
+おめでとうございます！🎉 CopilotKit を使用して AI パワード To-Do リストアプリケーションを正常に構築しました。以下のことが学べました。
+
+  * CopilotKit を使用した Next.js プロジェクトのセットアップ。
+  * `.env.local` ファイルを使用した API キーの設定。
+  * `<CopilotKit>` プロバイダーと `<CopilotSidebar>` コンポーネントの使用。
+  * `useCopilotAction` フックを使用したカスタムアクションの定義により、アプリケーションをインタラクティブにする方法。
+
+CopilotKit には、ワンオフタスク用の `CopilotTask` や AI アシスト執筆用の `CopilotTextarea` など、さらに探索できる機能が多数あります。詳しくは [公式 CopilotKit ドキュメント](https://docs.copilotkit.ai/) を確認することをお勧めします。
+
+Happy coding!

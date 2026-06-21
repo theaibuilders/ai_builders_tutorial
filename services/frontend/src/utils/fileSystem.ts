@@ -449,6 +449,74 @@ export function findTutorialFile(sections: TutorialSection[], targetPath: string
   return undefined;
 }
 
+// Build a map of { relativePath (without extension) -> translatedTitle } for a language
+// This is used to display translated titles in the sidebar without loading full file content
+export function loadTranslatedTitleMap(language: string): Record<string, string> {
+  const titleMap: Record<string, string> = {};
+
+  if (!language || language === 'en') {
+    return titleMap;
+  }
+
+  const translatedDir = getTutorialsDir(language);
+  if (!fs.existsSync(translatedDir)) {
+    return titleMap;
+  }
+
+  try {
+    const sectionDirs = fs.readdirSync(translatedDir).filter(item => {
+      const fullPath = path.join(translatedDir, item);
+      return fs.statSync(fullPath).isDirectory();
+    });
+
+    for (const sectionDir of sectionDirs) {
+      const sectionPath = path.join(translatedDir, sectionDir);
+      const fileNames = fs.readdirSync(sectionPath).filter(file =>
+        file.endsWith('.md') || file.endsWith('.mdx') || file.endsWith('.ipynb')
+      );
+
+      for (const fileName of fileNames) {
+        const filePath = path.join(sectionPath, fileName);
+        const relativePath = `${sectionDir}/${fileName}`;
+        const keyPath = relativePath.replace(/\.(md|mdx|ipynb)$/, '');
+
+        try {
+          if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
+            const content = readMarkdownFile(filePath);
+            if (content) {
+              // Extract first heading as title
+              const titleMatch = content.match(/^#\s+(.+)$/m);
+              if (titleMatch) {
+                titleMap[keyPath] = titleMatch[1].trim();
+              }
+            }
+          } else if (fileName.endsWith('.ipynb')) {
+            const notebook = readNotebookFile(filePath);
+            if (notebook && notebook.cells) {
+              const firstMarkdownCell = notebook.cells.find((c: any) => c.cell_type === 'markdown');
+              if (firstMarkdownCell && firstMarkdownCell.source) {
+                const source = Array.isArray(firstMarkdownCell.source)
+                  ? firstMarkdownCell.source.join('')
+                  : firstMarkdownCell.source;
+                const titleMatch = source.match(/^#{1,3}\s*\*?\*?(.+?)\*?\*?$/m);
+                if (titleMatch) {
+                  titleMap[keyPath] = titleMatch[1].trim();
+                }
+              }
+            }
+          }
+        } catch (err) {
+          // skip files that can't be read
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error building translated title map:', error);
+  }
+
+  return titleMap;
+}
+
 // Load translated content for a tutorial file if available
 export function loadTranslatedTutorial(originalFile: TutorialFile, language: string): TutorialFile | null {
   if (!language || language === 'en') {

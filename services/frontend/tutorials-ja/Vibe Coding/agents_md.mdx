@@ -1,0 +1,82 @@
+# Agents.md: AIコーディングエージェントへの指示標準
+
+## Agents.md とは？
+
+[Agents.md](https://agents.md/) は、AIコーディングエージェント向けに専用の指示ファイルを作成するためのオープンなMarkdownベースの仕様です。**「機械のためのREADME」**と考えてください。`README.md` ファイルが人間の開発者向けにプロジェクトの概要やセットアップ手順を提供するのに対し、`AGENTS.md` はAIエージェント専用であり、コードベースで効果的に作業するために必要なコンテキストと指示を提供します。
+
+![agents-md](/products/agentsmd.webp)
+## Agents.md を使う理由
+
+AIエージェント専用の指示ファイルを使用することには、いくつかのメリットがあります：
+
+  * **一貫性**: プラットフォーム（GitHub Copilot、OpenAI Codexなど）に関わらず、すべてのAIエージェントがプロジェクトの同じルールや規約に従うことを保証します。
+  * **明確性**: 機械可読の指示と人間可読のドキュメントを分離することで、`README.md` は整理された状態を保ちながら、エージェントは必要な正確な情報を受け取ることができます。
+  * **効率性**: 明確な指示があれば、エージェントはより自律的かつ効果的に作業でき、手動による介入や修正の必要性が減ります。
+  * **標準化**: コミュニティ主導の標準として、`AGENTS.md` は増え続けるAIツールやプラットフォームでサポートされており、AIエージェントの指示を管理する将来性のある方法です。
+
+## 主要なコンセプト
+
+`AGENTS.md` は単なるMarkdownファイルなので、新しい構文を学ぶ必要はありません。標準的なMarkdownの見出し、リスト、コードブロックを使って指示を構造化できます。`AGENTS.md` ファイルに含めると良い主なセクションを以下に示します：
+
+  * **プロジェクト概要**: エージェントにコンテキストを伝えるためのプロジェクトの簡単な説明。
+  * **開発環境のセットアップ**: 開発環境のセットアップ、依存関係のインストール、プロジェクトの実行コマンド。
+  * **テスト手順**: テストの実行方法とコード品質を確保するための確認事項。
+  * **コーディング規約**: コードスタイル、命名規則、ベストプラクティスに関するガイドライン。
+  * **プルリクエストのガイドライン**: プルリクエストのフォーマット、説明に含める内容、その他PRに関するルール。
+  * **セキュリティに関する考慮事項**: エージェントが把握しておくべきセキュリティ関連の情報やプラクティス。
+
+## はじめに
+
+Agents.md を始めるには、プロジェクトリポジトリのルートに `AGENTS.md` という名前のファイルを作成するだけです。
+
+### `AGENTS.md` の例
+
+以下は、Node.js プロジェクト向けのシンプルな `AGENTS.md` ファイルの例です：
+
+```markdown
+# Instructions for AI Agents
+
+## Project Overview
+
+This is a simple web server built with Express.js. The main application logic is in `src/index.js`, and tests are in the `src/` directory.
+
+## Development Environment Setup
+
+To set up the development environment, run the following commands:
+npm install
+
+To start the development server, use:
+npm run dev
+
+## Testing
+
+Run the tests using the following command:
+npm test
+Please ensure all tests pass before submitting a pull request.
+
+## Coding Conventions
+
+  * Use Prettier for code formatting. Run `npm run format` to format your code.
+  * Follow the Airbnb JavaScript style guide.
+  * Use camelCase for variable and function names.
+
+## Pull Request Guidelines
+
+  * All pull requests should be made to the `develop` branch.
+  * Include a clear and concise title and description for your pull request.
+  * Reference the issue number in the pull request description (e.g., "Closes \#123").
+```
+
+## エージェントを実行する
+
+リポジトリに `AGENTS.md` ファイルを配置すると、この標準をサポートするAIコーディングエージェントが自動的に検出して使用します。たとえば、GitHub Copilot などのツールを使ってコードを操作すると、`AGENTS.md` ファイルを読み込んでプロジェクトの規約や要件を把握し、より正確でコンテキストを考慮したコード提案を行います。
+
+## 高度なコンセプト
+
+### モノレポ
+
+複数のパッケージを持つ大規模プロジェクト（モノレポ）の場合、グローバルな指示を含むルートレベルの `AGENTS.md` ファイルを持ちながら、各パッケージに特化した指示のためにサブディレクトリにも `AGENTS.md` ファイルを配置できます。エージェントは、作業中のコードに最も近い `AGENTS.md` ファイルを使用します。
+
+## まとめ
+
+Agents.md は、AIコーディングエージェントとのコラボレーションを改善するためのシンプルながら強力なツールです。明確で一貫した指示を提供することで、エージェントがプロジェクトでより効果的に作業できるようになり、より高品質なコードと生産性の向上につながります。ソフトウェア開発におけるAIの利用が拡大し続ける中、Agents.md のような標準は、人間とAIのコラボレーションを合理化する上でますます重要になっていくでしょう。

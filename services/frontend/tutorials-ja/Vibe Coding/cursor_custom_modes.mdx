@@ -1,0 +1,169 @@
+# Cursor カスタムモード: ワークフローに特化したAIアシスタントを作成する
+
+Cursor のカスタムモードは、AIを汎用アシスタントから、あなたの特定のワークフローに合わせた専門家チームへと変えます。長く繰り返しの多いプロンプトを書く代わりに、ドキュメントの生成、コードのリファクタリング、テストの作成といったタスク専用のモードを作成できます。このガイドでは、重要なコンセプトを説明し、最初のカスタムモードを作成する手助けをします。
+
+![cursor-custom-modes](/products/cursor/cursor-custom-modes.webp)
+## カスタムモードとは？
+
+デフォルトでは、Cursor は **Agent**（複雑なマルチファイルタスク向け）や **Ask**（質問と学習向け）といった汎用モードを提供しています。カスタムモードを使うと、特定の指示、ツール、動作を持つ独自のアシスタントを定義できます。
+
+主なメリットは次のとおりです：
+* **効率性**: 単一のコマンドやショートカットで繰り返しタスクを自動化できます。
+* **一貫性**: AIが毎回特定のガイドライン、コーディング標準、または出力形式に従うことを保証します。
+* **精度**: AIを特定のツールセットに限定することで、ファイルを読むだけにしたいのに編集してしまうといった意図しない操作を防ぎます。
+
+## カスタムモードの有効化と作成
+
+まず、設定で*機能*を有効にする必要があります。
+
+1.  `Settings` > `Cursor Settings` > `Chat` に移動します。
+2.  `Custom Modes` オプションをオンに切り替えます。
+
+有効化したら、チャットパネルから直接新しいモードを作成できます：
+
+1.  チャットインターフェースを開きます。
+2.  モードセレクタードロップダウン（おそらく「Agent」と表示されている）をクリックし、`Add custom mode` を選択します。
+3.  以下のオプションを使ってモードを設定します。
+
+## 設定オプション
+
+Models、Tools、MCPs、Instructions を適切に設定する方法を理解することが、効果的なモードを構築するための鍵です。
+
+### 1. Models
+
+モードが使用するモデルを選択します。以下を考慮してください：
+- タスクに対する品質とスピードの要件。
+- コンテキストウィンドウの必要サイズ。
+- ツールの互換性。
+- コストとレート制限。
+
+### 2. Tools
+
+ツールはモードの能力を決定します。動作を微調整するために、ツールの組み合わせへのアクセスを付与できます。
+
+* **Search**:
+    * `Codebase`: AIがプロジェクト全体でセマンティック検索を実行できるようにします。
+    * `Web`: 外部情報を取得するためのWeb検索を有効にします。
+    * `Grep`: 特定の文字列をテキストベースで検索します。
+    * `List directory`: 指定されたパスのファイルとフォルダを一覧表示します。
+    * `Search files`: globまたは正規表現パターンを使ってファイル名で検索します。
+    * `Read files`: 特定のファイルの内容を読み込みます。
+    * `Fetch rules`: プロジェクトのルールやガイドラインを読み込みます（例：.cursorrules やリポジトリの規約）。
+* **Edit**:
+    * `Edit & Reapply`: AIがファイルのコードを変更できるようにします。
+    * `Delete file`: ワークスペースから指定したファイルを削除します。元に戻せないため、注意して使用してください。
+* **Run**:
+    * `Terminal`: シェルコマンドを実行する権限を付与します。
+
+### 3. MCP
+
+モードが使用する設定済みのMCP（Model Control Protocol）を選択します。MCPは、AIがツールとどのように連携し、タスクを実行するかを管理するのに役立ちます。
+
+### 4. 高度なオプション
+    * `Auto-apply Edits`: AIが確認なしにコード変更を適用します。注意して使用してください。
+    * `Auto-run`: AIが確認なしにターミナルコマンドを実行します。注意して使用してください。
+    * `Custom instructions`: ここでAIのペルソナ、コンテキスト、ルールを定義します。最も効果的な指示は、具体的でロールベースのものです。「コメントを書いて」と言う代わりに、次のように指定します：
+
+## 実践例：Project Architect
+
+このモードは、製品要件ドキュメント（PRD）を構造化されたアクション可能な開発計画に変換します。厳密な手順に従って動作します：PRDを要求し、不足している技術仕様を収集し、plan.md の出力場所に合意してから、規定の10部構成（Setup、Backend Foundation、Feature Backend、Frontend Foundation、Feature Frontend、Integration、Testing、Documentation、Deployment、Maintenance）を使って最終的なMarkdownチェックリストのみを生成します。生成時には計画の内容のみを出力します。
+
+カスタムモードUIでは、次のように設定します：
+
+```text
+name: "Project Architect"
+model: "claude-4-sonnet-1m"
+keybindings: "Command+Shift+P"
+```
+
+有効なツール：
+```text
+Search
+- Codebase: On // Align the plan with the existing code structure.
+- Web: Off // Plan must be PRD-driven; avoids external info.
+- Grep: On // Fast lookups for PRD terms (feature names, packages, env vars).
+- List directory: Off // Not required for planning; keeps permissions minimal.
+- Search files: Off // Redundant with Codebase + Grep; reduces tool surface area.
+- Read file: On // Review existing docs/specs for context.
+- Fetch rules: Off // Prevents local rules from overriding the fixed 10-part output.
+
+Edit
+- Edit & Reapply: On // Needed to create/update plan.md after user approval.
+- Delete file: Off // No destructive actions needed for planning; safety first.
+
+Run
+- Terminal: On // For light, read-only checks (e.g., ls/tree) or confirming folder existence; 
+```
+MCP: None
+
+高度なオプションをクリックして設定します：
+- Auto-apply Edits: Off //No destructive actions needed for planning; safety first.
+- Auto-run: Off //No destructive actions needed for planning; safety first.
+
+カスタム指示を追加します：
+```text
+"""
+Your role is a Project Architect AI. Your objective is to convert a Product Requirements Document (PRD) into a structured, actionable development plan.
+
+Operating Procedure
+You must operate in the following sequence. Do not deviate.
+
+Require a PRD: Do not proceed without a PRD. If one is not given, your sole response must be: "Please provide the PRD. You can use the PRD generator mode to create one: https://playbooks.com/modes/prd"
+
+Gather Technical Specifications: Once the PRD is received, review it for the tech stack (database, frameworks, auth, etc.). If key details are missing, ask the user for clarification before continuing.
+
+Agree on Output Location: Propose creating a plan.md file in the project's root or a /docs/ folder. Wait for the user's approval before generating the file.
+
+Produce the Plan: With all prerequisites met, generate the final Markdown checklist. Output nothing but the plan's content.
+
+Output Blueprint
+The generated plan must meet these specifications:
+
+Comprehensive Scope: The plan must be holistic. For every feature in the PRD, create distinct backend and frontend tasks. Ensure the entire software lifecycle is covered.
+
+Mandatory Structure: The plan must strictly follow this 10-part structure, presented in order:
+
+Project Setup
+
+Backend Foundation
+
+Feature-specific Backend
+
+Frontend Foundation
+
+Feature-specific Frontend
+
+Integration
+
+Testing
+
+Documentation
+
+Deployment
+
+Maintenance
+
+Markdown Template: Adhere to this format for the final output.
+
+Markdown
+
+# [Project Title] Development Plan
+
+##Overview
+[A brief project summary based on the PRD.]
+
+##1. Project Setup
+- [ ] Task: [Description of task]
+  - [ ] Sub-task or detail
+- [ ] Task: [Description of task]
+
+##2. Backend Foundation
+- [ ] Task: [Description of task]
+- [ ] Task: [Description of task]
+
+[Continue for all subsequent sections...]
+"""
+```
+
+## まとめ
+カスタムモードのライブラリを構築することで、開発ワークフローを大幅に加速し、AIアシスタントをより強力で予測可能なパートナーにすることができます。

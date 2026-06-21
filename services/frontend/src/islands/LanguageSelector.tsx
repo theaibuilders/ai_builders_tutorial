@@ -32,13 +32,9 @@ export default function LanguageSelector({ currentPath }: LanguageSelectorProps)
       const savedLang = localStorage.getItem('preferred_language');
       if (savedLang && LANGUAGES.some(l => l.code === savedLang)) {
         setCurrentLanguage(savedLang);
-        // If we have a saved preference but URL doesn't have it, redirect to apply language
-        if (savedLang !== 'en' && !langParam) {
-          const url = new URL(window.location.href);
-          url.searchParams.set('lang', savedLang);
-          window.location.replace(url.toString());
-          return;
-        }
+        // Note: We intentionally do NOT redirect here to avoid a flash of English content.
+        // The early inline script in TutorialLayout.astro handles redirecting on first load
+        // for users with a saved non-English preference, before any content is painted.
       }
     }
   }, []);

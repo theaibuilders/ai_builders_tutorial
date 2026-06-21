@@ -1,0 +1,384 @@
+# Actionbook：最初のAIブラウザエージェントを構築する
+
+このチュートリアルでは、**Actionbook CLI**と**Action Manuals**を使用してGoogleを検索する小さなNode.js AIエージェントを構築します — すべてローカルマシン上で動作します。チュートリアルの最後には、Action Manualsが事前計算されたセレクタを提供する方法、CLIがブラウザを制御する方法、そしてLLMですべてを連携させる方法を理解できます。
+
+![Actionbook Banner](/products/actionbook/actionbook-1.png)
+
+> **構築するもの：** `node agent.mjs "your query"`で実行するコマンドラインエージェント。Google用のAction Manualをフェッチし、検索入力セレクタを抽出し、実際のブラウザを開き、クエリを入力して、結果のスクリーンショットを撮影します。
+
+## Actionbookの仕組み
+
+Actionbookなしでは、AIエージェントはHTMLページ全体をダウンロードし、解析し、どの要素をクリックするか推測する必要があります — トークンを大量消費してハルシネーションが発生します。Actionbookはエージェントに**Action Manuals**を提供します：人気サイトの各インタラクティブ要素の検証済みセレクタを持つ事前計算済みプレイブックです。
+
+```
+Your Agent
+  │
+  ├─ actionbook search "google search"        ──►  利用可能なAction Manualsを検索
+  │                                                 • google.com:/:default
+  │                                                 • google.com:/advanced_search:default
+  │
+  ├─ actionbook get "google.com:/:default"    ◄──  セレクタを含む完全なマニュアル
+  │                                                 • textarea_search: textarea[aria-label="Search"]
+  │                                                 • button_search: [aria-label="Google Search"]
+  │
+  ├─ actionbook browser open "google.com"     ──►  実際のChrome/Edge/Brave
+  │                                                 (CDP経由で接続 — ドライバー不要)
+  │
+  └─ actionbook browser fill / press          ──►  検証済みセレクタを使用してアクション実行
+```
+
+CLIはRustで書かれており、すでにインストールされているブラウザに接続します — 追加のダウンロードは不要です。Action ManualsはActionbookによって管理・バージョン管理されているため、サイトが変更された場合でも、更新されるのはマニュアルであり、エージェントではありません。
+
+
+
+## 前提条件
+
+開始前に、以下を確認してください：
+
+- **Node.js 18以上** — `node --version`で確認
+- **Chrome、Brave、Edge、またはArc**がマシンにインストール済み
+- **OpenAI APIキー**（無料枠で可能） — `.env`に保存
+- ターミナル（macOS Terminal、Windows PowerShell、またはLinuxシェル）
+
+
+
+## プロジェクト構造
+
+このチュートリアルで作成するすべてのファイルを示します：
+
+```
+my-actionbook-agent/
+├── agent.mjs          ← すべてを統括するAIエージェント
+├── browser.mjs        ← Actionbook CLIコマンドの薄いラッパー
+├── .env               ← APIキー（コミットしない）
+└── package.json
+```
+
+
+
+## ステップ1 — Actionbook CLIのインストール
+
+ターミナルを開いて実行：
+
+```bash
+npm install -g @actionbookdev/cli
+```
+
+インストールが成功したか確認：
+
+```bash
+actionbook --version
+```
+
+バージョン番号が表示されるはずです。「command not found」エラーが表示された場合は、npmのグローバルbinディレクトリが`PATH`にあることを確認してください（`npm bin -g`で場所を確認）。
+
+
+
+## ステップ2 — CLIを手動で試す
+
+コードを書く前に、Actionbookをインタラクティブに探索して、エージェントが自動的に何をするか理解しましょう。
+
+**Action Manualsを検索して探索：**
+```bash
+# Google関連のAction Manualsを検索
+actionbook search "google search"
+
+# GoogleホームページのAction Manualをすべて取得
+actionbook get "google.com:/:default"
+```
+
+**ブラウザを開いて操作：**
+```bash
+# 既存のChrome/Brave/EdgeでGoogleを開く
+actionbook browser open "https://www.google.com"
+
+# Action Manualのセレクタを使用して検索ボックスに入力
+actionbook browser fill 'textarea[aria-label="Search"]' "Actionbook browser agent"
+
+# Enterを押して検索
+actionbook browser press "Enter"
+
+# スクリーンショットで確認
+actionbook browser screenshot ./result.png
+
+# 完了したら必ず閉じる
+actionbook browser close
+```
+
+> **何が起きたか？** `search`コマンドがGoogleの利用可能なAction Manualsを見つけました。`get`コマンドが検証済みセレクタを含む完全なマニュアルを取得しました。CLIはChrome DevTools Protocol（CDP）経由で実際のブラウザに接続し、これらのセレクタを使って自動化を実行しました。WebDriver、Selenium、別途Chromiumのダウンロードは不要 — すでにインストールされているブラウザを使用します。
+
+
+
+## ステップ3 — プロジェクトを作成
+
+```bash
+mkdir my-actionbook-agent
+cd my-actionbook-agent
+npm init -y
+npm install openai dotenv
+```
+
+**`package.json`** — ESモジュールを使用するために`"type": "module"`を追加：
+
+```json
+{
+  "name": "my-actionbook-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node agent.mjs"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "dotenv": "^16.0.0"
+  }
+}
+```
+
+**`.env`** — キーをここに貼り付け：
+
+```bash
+OPENAI_API_KEY=sk-your-key-here
+```
+
+
+
+## ステップ4 — browser.mjs — CLIラッパー
+
+このファイルは各Actionbook CLIコマンドをJavaScript関数でラップして、エージェントが簡単に呼び出せるようにします。
+
+```js
+// browser.mjs
+// Wraps Actionbook CLI commands so the agent can call them from JS.
+import { execSync } from "node:child_process";
+
+// Run a CLI command and return its stdout as a string.
+// opts.stdio = "inherit" lets you see live output in the terminal.
+function run(cmd, opts = {}) {
+  return execSync(cmd, { encoding: "utf8", ...opts });
+}
+
+// ── Action Manual Commands ───────────────────────────────────────────────────
+
+/** Search for action manuals. Returns raw text output from the CLI. */
+export function searchActions(query) {
+  console.log(`[actionbook] Searching: "${query}"`);
+  return run(`actionbook search "${query}"`);
+}
+
+/** Fetch the full action manual for an area ID (e.g. "google.com:/:default"). */
+export function getManual(areaId) {
+  console.log(`[actionbook] Getting manual: ${areaId}`);
+  return run(`actionbook get "${areaId}"`);
+}
+
+// ── Browser Commands ─────────────────────────────────────────────────────────
+
+/** Open a URL in your existing Chrome/Brave/Edge browser. */
+export function browserOpen(url) {
+  console.log(`[actionbook] Opening: ${url}`);
+  run(`actionbook browser open "${url}"`, { stdio: "inherit" });
+}
+
+/** Fill an input field with text (official Actionbook command). */
+export function browserFill(selector, text) {
+  console.log(`[actionbook] Filling "${text}" into ${selector}`);
+  // Use single quotes for selector to avoid escaping issues with attribute selectors
+  run(`actionbook browser fill '${selector}' '${text}'`);
+}
+
+/** Press a key (e.g., "Enter", "Tab", "Escape"). */
+export function browserPressKey(key) {
+  console.log(`[actionbook] Pressing key: ${key}`);
+  run(`actionbook browser press "${key}"`);
+}
+
+/** Take a screenshot. Returns path string. */
+export function browserScreenshot(path = "./screenshot.png") {
+  run(`actionbook browser screenshot "${path}"`);
+  return path;
+}
+
+/** Close the browser session. ALWAYS call this when done. */
+export function browserClose() {
+  console.log(`[actionbook] Closing browser.`);
+  try {
+    run(`actionbook browser close`);
+  } catch {
+    // Ignore errors on close — browser may already be shut down.
+  }
+}
+```
+
+
+
+## ステップ5 — agent.mjs — AIエージェント
+
+これが頭脳です。Action Manualを検索し、検証済みセレクタを抽出してから、`browser.mjs`を使ってタスクを実行します。
+
+```js
+// agent.mjs
+import "dotenv/config";
+import OpenAI from "openai";
+import {
+  searchActions,
+  getManual,
+  browserOpen,
+  browserFill,
+  browserPressKey,
+  browserScreenshot,
+  browserClose,
+} from "./browser.mjs";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ── Step 1: Parse action IDs from search results ────────────────────────────
+
+function parseActionIds(searchOutput) {
+  const lines = searchOutput.split("\n");
+  const actionIds = [];
+
+  for (const line of lines) {
+    // Match "- ID: xxx" format
+    const idMatch = line.match(/^- ID:\s*(.+)$/);
+    if (idMatch) {
+      actionIds.push(idMatch[1].trim());
+      continue;
+    }
+    // Match "### xxx" header format
+    const headerMatch = line.match(/^###\s+([\w.-]+:[^\s]+)/);
+    if (headerMatch) {
+      actionIds.push(headerMatch[1].trim());
+    }
+  }
+
+  return actionIds;
+}
+
+// ── Step 2: Main search task using action manuals ───────────────────────────
+
+async function runSearchTask(query) {
+  console.log(`\n🤖 Agent starting task: search Google for "${query}"\n`);
+
+  try {
+    // Search for Google search action manual
+    console.log("[agent] Searching for action manual...");
+    const searchResults = searchActions("google search");
+
+    // Parse action IDs from results
+    const actionIds = parseActionIds(searchResults);
+    console.log("[agent] Found action IDs:", actionIds);
+
+    // Find the Google homepage action
+    let actionId = actionIds.find((id) => 
+      id.startsWith("google.com:/:") || id === "google.com:/:default"
+    );
+    if (!actionId) {
+      actionId = actionIds.find((id) => id.startsWith("google.com:"));
+    }
+    if (!actionId) throw new Error("No action manual found for Google");
+
+    // Get the full action manual
+    console.log(`[agent] Fetching manual for: ${actionId}`);
+    const manual = getManual(actionId);
+
+    // Extract the search input selector from the role definition
+    // The manual contains: getByRole('combobox', { name: 'Search' })
+    let searchInputSelector = '[role="combobox"]';
+    const roleMatch = manual.match(/getByRole\('combobox',\s*\{\s*name:\s*'([^']+)'\s*\}\)/);
+    if (roleMatch) {
+      const comboboxName = roleMatch[1];
+      console.log(`[agent] Found combobox name: ${comboboxName}`);
+      searchInputSelector = `textarea[aria-label="${comboboxName}"]`;
+    }
+    console.log(`[agent] Using selector: ${searchInputSelector}`);
+
+    // Execute browser automation
+    browserOpen("https://www.google.com");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // Fill the search input and submit
+    browserFill(searchInputSelector, query);
+    browserPressKey("Enter");
+
+    // Wait for results and screenshot
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const shot = browserScreenshot("./search-result.png");
+    console.log(`\n✅ Done! Screenshot saved to ${shot}`);
+  } finally {
+    browserClose();
+  }
+}
+
+// ── Entry point ──────────────────────────────────────────────────────────────
+
+const query = process.argv[2] ?? "Actionbook browser agent";
+runSearchTask(query).catch((err) => {
+  console.error("\n❌ Agent error:", err.message);
+  browserClose();
+  process.exit(1);
+});
+```
+
+
+
+## ステップ6 — エージェントを実行
+
+Chrome（またはBrave/Edge）がインストールされていることを確認してから実行：
+
+```bash
+node agent.mjs "open source AI agents"
+```
+
+エージェントが各ステップをログ出力するのが確認できます：
+
+```
+🤖 Agent starting task: search Google for "open source AI agents"
+
+[agent] Searching for action manual...
+[actionbook] Searching: "google search"
+[agent] Found action IDs: [ 'google.com:/:default', ... ]
+[agent] Fetching manual for: google.com:/:default
+[actionbook] Getting manual: google.com:/:default
+[agent] Found combobox name: Search
+[agent] Using selector: textarea[aria-label="Search"]
+[actionbook] Opening: https://www.google.com
+✓ Google
+  https://www.google.com
+[actionbook] Filling "open source AI agents" into textarea[aria-label="Search"]
+[actionbook] Pressing key: Enter
+
+✅ Done! Screenshot saved to ./search-result.png
+[actionbook] Closing browser.
+```
+
+`search-result.png`を開くと、実際のGoogle検索結果ページが表示されます。
+
+![Google Search Results](/products/actionbook/actionbook-2.png)
+
+
+## ステップ7 — 各部分の役割を理解する
+
+- **`browser.mjs`** — JS関数呼び出しを`actionbook` CLIコマンド（search、get、browser fillなど）に変換
+- **`agent.mjs`** — ワークフローを統括：マニュアルの検索 → マニュアルの取得 → セレクタの抽出 → ブラウザアクションの実行
+- **`.env`** — シークレットを保存 — このファイルはコミットしない
+
+**なぜAction Manualsを使うのか？** Action ManualsはActionbookが管理する事前計算済みプレイブックです。ウェブサイトが変更されたときに更新される検証済みセレクタが含まれています。エージェントがセレクタを推測したり完全なHTMLを解析したりする代わりに、高信頼セレクタを持つキュレートされたマニュアルを使用します — 10倍速く、100倍少ないトークンで。
+<br />
+**CDPとは？** Chrome DevTools Protocolは、ブラウザのDevToolsが使用するのと同じプロトコルです。ActionbookはCDPをネイティブに話すため、ドライバーやブラウザ拡張機能なしにタブを開いたり、クリックしたり、入力したり、スクリーンショットを撮ったりできます。
+
+## 次のステップ
+
+最初のエージェントが動作するようになったら、次を試してみましょう：
+
+- **サイトの追加** — `actionbook search "linkedin login"`を実行してLinkedInを自動化。
+- **クエリのループ** — ファイルから検索ワードのリストを読み込んで各クエリでエージェントを実行。
+- **アクションのチェーン** — 検索後、結果ページの別のマニュアルを取得してリンクをたどる。
+- **MCPサーバーの追加** — CLIに慣れたら、MCPサーバーをCursorやClaude Codeに追加して、AIIDEが自動的にActionbookを呼び出せるようにする。
+
+## リソース
+
+- [Actionbook GitHub](https://github.com/actionbook/actionbook) — ソースコード、イシュートラッカー
+- [Actionbook Docs](https://actionbook.dev/docs) — 完全なCLIとMCPリファレンス
+- [Discord Community](https://discord.gg/7sKKp7XQ2d) — 質問、エージェントの共有
+- [Request a Website](https://actionbook.dev/request-website) — インデックス対象サイトの提案

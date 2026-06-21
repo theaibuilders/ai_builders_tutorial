@@ -2,15 +2,18 @@
 import SearchBar from '../components/SearchBar.astro';
 import LanguageSelector from '../islands/LanguageSelector';
 import type { TutorialFile, TutorialSection } from '../types/tutorial';
-import { scanDraftTutorialsDirectory } from '../utils/fileSystem';
+import { scanDraftTutorialsDirectory, loadTranslatedTitleMap } from '../utils/fileSystem';
+import { getCategoryName } from '../utils/translation';
 
 interface Props {
   sections: TutorialSection[];
   currentFile?: TutorialFile;
+  lang?: string;
 }
 
-const { sections, currentFile } = Astro.props;
+const { sections, currentFile, lang = 'en' } = Astro.props;
 const currentPath = Astro.url.pathname;
+const langSuffix = lang && lang !== 'en' ? `?lang=${lang}` : '';
 
 // Detect if we're in localhost environment
 const isLocalhost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
@@ -18,6 +21,16 @@ const isLocalhost = Astro.url.hostname === 'localhost' || Astro.url.hostname ===
 // Load draft tutorials if in localhost
 const draftSections = isLocalhost ? scanDraftTutorialsDirectory() : [];
 const hasDrafts = draftSections.length > 0;
+
+// Load translated title map for the current language
+const translatedTitles = loadTranslatedTitleMap(lang);
+
+// Helper: get translated title for a file, falling back to original
+function getFileTitle(file: TutorialFile): string {
+  if (lang === 'en') return file.metadata.title;
+  const keyPath = file.path.replace(/\.(md|mdx|ipynb)$/, '');
+  return translatedTitles[keyPath] ?? file.metadata.title;
+}
 ---
 
 <div class="h-screen flex flex-col lg:pt-0">
@@ -26,7 +39,7 @@ const hasDrafts = draftSections.length > 0;
   <!-- Header with Logo -->
   <div class="flex-shrink-0 border-b border-dark-border lg:block hidden" style="padding: 24px 24px 24px 24px;">
     <div class="flex items-center justify-between mb-4" style="height: 60px; margin-left: 0; padding-left: 0;">
-  <a href="/tutorials/Overview/tutorial_overview">
+  <a href={`/tutorials/Overview/tutorial_overview${langSuffix}`}>
         <img 
           src="/ai-builders-tutorial-logo.webp" 
           alt="AI Builders Tutorial Logo" 
@@ -51,7 +64,7 @@ const hasDrafts = draftSections.length > 0;
   <!-- Mobile Logo and Search Bar -->
   <div class="lg:hidden p-3 border-b border-dark-border flex flex-col items-start">
     <div class="w-full flex items-center justify-between mb-2">
-  <a href="/tutorials/Overview/tutorial_overview" class="py-2" onclick="closeMobileNav()">
+  <a href={`/tutorials/Overview/tutorial_overview${langSuffix}`} class="py-2" onclick="closeMobileNav()">
         <img 
           src="/ai-builders-tutorial-logo.webp" 
           alt="AI Builders Tutorial Logo" 
@@ -74,7 +87,7 @@ const hasDrafts = draftSections.length > 0;
   
   <!-- Navigation Content -->
   <div class="flex-1 overflow-y-auto min-h-0">
-    <nav class="p-4 pb-20">
+    <nav class="p-4 pb-20 sidebar-tutorials">
       {/* Drafts Section - Only visible in localhost */}
       {isLocalhost && hasDrafts && (
         <div class="mb-6 border-b border-yellow-500/30 pb-6">
@@ -88,7 +101,7 @@ const hasDrafts = draftSections.length > 0;
                 <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                 <polyline points="14 2 14 8 20 8"/>
               </svg>
-              Drafts
+              {getCategoryName('Drafts', lang)}
             </span>
             <svg
               class="w-5 h-5 sm:w-4 sm:h-4 text-yellow-400 transform transition-transform group-data-[expanded]:rotate-90"
@@ -115,7 +128,7 @@ const hasDrafts = draftSections.length > 0;
 
                   return (
                     <a
-                      href={`/tutorials_draft/${cleanPath}`}
+                      href={`/tutorials_draft/${cleanPath}${langSuffix}`}
                       class={`block p-3 sm:p-2 rounded-lg text-sm transition-colors ${
                         isActive
                           ? 'bg-yellow-500/10 text-yellow-400 border-l-2 border-yellow-400'
@@ -125,7 +138,7 @@ const hasDrafts = draftSections.length > 0;
                     >
                       <div class="flex items-center">
                         <span class="truncate">
-                          {file.metadata.title}
+                          {getFileTitle(file)}
                         </span>
                       </div>
 
@@ -152,7 +165,7 @@ const hasDrafts = draftSections.length > 0;
             onclick="toggleSection(this)"
           >
             <span class="font-semibold text-dark-text capitalize">
-              {section.name}
+              {getCategoryName(section.name, lang)}
             </span>
             <svg 
               class="w-5 h-5 sm:w-4 sm:h-4 text-dark-secondary transform transition-transform group-data-[expanded]:rotate-90"
@@ -176,7 +189,7 @@ const hasDrafts = draftSections.length > 0;
               
               return (
                 <a
-                  href={`/tutorials/${cleanPath}`}
+                  href={`/tutorials/${cleanPath}${langSuffix}`}
                   class={`block p-3 sm:p-2 rounded-lg text-sm transition-colors ${
                     isActive 
                       ? 'bg-blue-500/10 text-blue-400 border-l-2 border-blue-400' 
@@ -187,7 +200,7 @@ const hasDrafts = draftSections.length > 0;
                   <div class="flex items-center">
                     <!-- File Name -->
                     <span class="truncate">
-                      {file.metadata.title}
+                      {getFileTitle(file)}
                     </span>
                   </div>
                   
@@ -282,19 +295,19 @@ const hasDrafts = draftSections.length > 0;
   // Make functions available globally
   (window as any).toggleSection = toggleSection;
   
-  // Initialize section states
-  document.addEventListener('DOMContentLoaded', () => {
+  // Initialize section states — runs on initial load AND after View Transitions navigation
+  function initSidebar() {
     // All sections start collapsed by default
     // Only expand the section containing the current file
-  // More robust detection of the active link: look for element with the active background class by attribute selector
-  const currentFileLink = document.querySelector('a.bg-blue-500\\/10, a[class*="bg-blue-500/10"]');
+    // More robust detection of the active link: look for element with the active background class by attribute selector
+    const currentFileLink = document.querySelector('a.bg-blue-500\/10, a[class*="bg-blue-500/10"]');
     if (currentFileLink) {
       const section = currentFileLink.closest('.mb-6');
       if (section) {
         const button = section.querySelector('button[data-section]') as HTMLButtonElement;
         const content = section.querySelector('[data-section-content]') as HTMLElement;
         const icon = button?.querySelector('svg');
-        
+          
         if (button && content && icon) {
           content.style.display = 'block';
           button.setAttribute('data-expanded', 'true');
@@ -302,7 +315,11 @@ const hasDrafts = draftSections.length > 0;
         }
       }
     }
-  });
+  }
+  
+  document.addEventListener('DOMContentLoaded', initSidebar);
+  // Re-run after each View Transitions page swap so the active link is highlighted correctly
+  document.addEventListener('astro:page-load', initSidebar);
 </script>
 
 <style>
