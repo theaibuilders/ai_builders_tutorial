@@ -4,7 +4,7 @@ MiniMax H3 can generate a video and its stereo soundtrack together from one prom
 
 The finished workflow produces a single playable MP4 containing both the picture and synchronized crowd, movement, impact, and music audio.
 
-![MiniMax H3 text-to-video tutorial cover featuring a Canada goose and bald eagle boxing](/products/nosana/nosana_minimax_h3/cover.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/cover.png" alt="MiniMax H3 text-to-video tutorial cover featuring a Canada goose and bald eagle boxing" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 ## What You Will Build
 
@@ -41,7 +41,7 @@ Despite the card's name, its description confirms that the environment supports 
 6. Keep one replica and the default settings unless your project requires a different timeout or strategy.
 7. Review the summary, then click **Create Deployment**.
 
-![Nosana MiniMax H3 deployment template with an NVIDIA 5090 selected](/products/nosana/nosana_minimax_h3/1.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/1.png" alt="Nosana MiniMax H3 deployment template with an NVIDIA 5090 selected" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 The [Nosana MiniMax H3 deployment template](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) follows the same sequence: select a GPU, configure the deployment, create it, monitor startup, and open the endpoint.
 
@@ -51,7 +51,7 @@ The [Nosana MiniMax H3 deployment template](https://deploy.nosana.com/deployment
 
 The first boot pulls the ComfyUI container and downloads the H3 resources. This template uses `docker.io/nosana/comfyui:2.0.11`; the captured download is approximately 19.53 GB. Wait for the resource bar to complete and for the job to remain in a healthy **Running** state. Do not open ComfyUI while the model download is still in progress, because the workflow can appear with empty model selectors.
 
-![Nosana deployment logs showing the ComfyUI container and H3 resource download](/products/nosana/nosana_minimax_h3/2.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/2.png" alt="Nosana deployment logs showing the ComfyUI container and H3 resource download" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 If startup stalls, inspect the latest log line before restarting. Repeated restarts can repeat setup work and consume paid GPU time.
 
@@ -68,7 +68,7 @@ Confirm that:
 
 Click the endpoint URL to open the hosted ComfyUI interface.
 
-![Running Nosana deployment with the ComfyUI endpoint on port 8188](/products/nosana/nosana_minimax_h3/3.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/3.png" alt="Running Nosana deployment with the ComfyUI endpoint on port 8188" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 The endpoint is public infrastructure for the duration of the deployment. Do not paste secrets into workflow text fields, and stop the deployment when you are done.
 
@@ -76,7 +76,7 @@ The endpoint is public infrastructure for the duration of the deployment. Do not
 
 In ComfyUI, click **Templates** in the left sidebar. Under **Generation Type**, choose **Video**, then select **MiniMax H3: Text to Video**.
 
-![ComfyUI template browser with MiniMax H3 Text to Video visible](/products/nosana/nosana_minimax_h3/4.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/4.png" alt="ComfyUI template browser with MiniMax H3 Text to Video visible" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 ComfyUI templates are ready-made graphs with the correct nodes and model connections. Loading a template checks for its required model files before you run it.
 
@@ -136,7 +136,7 @@ Audio: Roaring arena crowd, canvas shoe squeaks, sharp wing flutters, heavy leat
 Rules: No text, subtitles, logos, or watermarks of any kind. Photorealistic live-action texture, no cartoon, 3D render, or animated look.
 ```
 
-![MiniMax H3 node with the cinematic boxing prompt and five-second settings](/products/nosana/nosana_minimax_h3/5.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/5.png" alt="MiniMax H3 node with the cinematic boxing prompt and five-second settings" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 This prompt starts with a global visual direction, defines the scene, maps actions to time ranges, specifies camera behavior, and finishes with audio and output constraints. That structure follows MiniMax and ComfyUI's recommendation to describe the full scene first and then break it into timed shots with camera and sound instructions.
 
@@ -150,7 +150,7 @@ The shot ranges intentionally overlap slightly so the second fighter can enter b
 4. Turn on sound and review both picture and audio. Check that the file is not frozen or silent and that the core prompt intent is present.
 5. If you want another variation, change the noise seed and run again. A repeated seed can produce a similar result, but generative output is not guaranteed to be identical.
 
-![Completed MiniMax H3 generation playing inside ComfyUI](/products/nosana/nosana_minimax_h3/6.png)
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer"><img src="/products/nosana/nosana_minimax_h3/6.png" alt="Completed MiniMax H3 generation playing inside ComfyUI" class="max-w-full h-auto rounded-lg shadow-lg my-6 mx-auto block" /></a>
 
 For faster iteration, enable `turbo_mode` and use the included 8-step LoRA. ComfyUI documents this as substantially faster but notes a possible reduction in motion and audio quality. Leave turbo mode off when matching the example result shown here.
 
@@ -158,10 +158,12 @@ For faster iteration, enable `turbo_mode` and use the included 8-step LoRA. Comf
 
 Click the player to watch the generated video with sound:
 
+<a href="https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3" target="_blank" rel="noopener noreferrer" aria-label="Deploy MiniMax H3 on Nosana">
 <video controls preload="metadata" playsinline style="width: 100%; border-radius: 0.5rem; margin: 1.5rem 0;">
   <source src="/products/nosana/nosana_minimax_h3/MiniMax_H3_goose_eagle_video.mp4?v=724af7cc" type="video/mp4" />
   Your browser does not support embedded MP4 video. Open the video directly at /products/nosana/nosana_minimax_h3/MiniMax_H3_goose_eagle_video.mp4.
 </video>
+</a>
 
 The included result is an H.264 MP4 at `864 x 480`, 24 fps, with AAC audio and a duration of approximately 5.17 seconds.
 
