@@ -42,6 +42,9 @@ tutorials/Fine Tuning/results/
 *.mov
 *.avi
 
+# Keep the published MiniMax H3 tutorial result in the static site bundle.
+!services/frontend/public/products/nosana/nosana_minimax_h3/MiniMax_H3_goose_eagle_video.mp4
+
 # macOS files
 .DS_Store
 **/.DS_Store
