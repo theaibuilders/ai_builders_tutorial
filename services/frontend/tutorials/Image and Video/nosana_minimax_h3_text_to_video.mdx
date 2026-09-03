@@ -1,6 +1,6 @@
 # Generate a MiniMax H3 Text-to-Video Clip with Nosana and ComfyUI
 
-MiniMax H3 can generate a video and its stereo soundtrack together from one prompt. In this tutorial, you will deploy a ready-made H3 environment on a Nosana GPU, open its hosted ComfyUI endpoint, load the official **MiniMax H3: Text to Video** workflow, and create a five-second cinematic boxing match between a Canada goose and an American bald eagle.
+MiniMax H3 can generate a video and its stereo soundtrack together from one prompt. In this tutorial, you will [deploy a ready-made H3 environment on a Nosana GPU](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3), open its hosted ComfyUI endpoint, load the official **MiniMax H3: Text to Video** workflow, and create a five-second cinematic boxing match between a Canada goose and an American bald eagle.
 
 The finished workflow produces a single playable MP4 containing both the picture and synchronized crowd, movement, impact, and music audio.
 
@@ -10,35 +10,27 @@ The finished workflow produces a single playable MP4 containing both the picture
 
 By the end of this tutorial, you will know how to:
 
-- Launch a GPU-backed MiniMax H3 deployment from the Nosana dashboard.
+- Launch a GPU-backed MiniMax H3 deployment from the [Nosana dashboard](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3).
 - Monitor the initial model download and open the deployment's ComfyUI endpoint.
 - Load ComfyUI's native H3 text-to-video template.
 - Configure a five-second, 16:9 generation.
 - Write a timed storyboard with camera, action, sound effects, ambience, and music in one prompt.
 - Run the graph, preview the result, and stop the deployment when you are finished.
 
-## Meet the Stack
-
-**MiniMax** is a global AI foundation-model company founded in early 2022. Its multimodal model family spans language, video, speech, image, and music products. MiniMax released H3 as an open-weight, general-purpose video model that jointly generates video and native 32 kHz stereo audio. H3 supports outputs from 4 to 15 seconds, multiple aspect ratios, and 24 fps. Its open H3-Base model generates at a 768-pixel short edge; the separate H3-Regenerate-2K service is used for 2K output. Learn more in the [MiniMax H3 open-source announcement](https://www.minimax.io/news/minimax-h3-open-source) and [MiniMax company overview](https://www.minimax.io/about).
-
-**Nosana** is a distributed GPU-compute network founded in 2021 by Jesse Eisses and Sjoerd Dijkstra. It matches containerized AI workloads with available GPU hosts and exposes online workloads through public service endpoints. For this project, Nosana handles the GPU, container, H3 model files, and hosted ComfyUI service. See the [Nosana introduction](https://learn.nosana.com/about/introduction.html) and [job execution flow](https://learn.nosana.com/deployments/jobs/job_execution_flow).
-
-**ComfyUI** is an open-source, node-based interface and inference engine for generative AI. A workflow graph connects model loading, conditioning, sampling, decoding, and output nodes. Its template library includes native MiniMax H3 workflows for text-to-video, image-to-video, and reference-to-video generation. See the [ComfyUI overview](https://docs.comfy.org/) and [official MiniMax H3 workflow guide](https://docs.comfy.org/tutorials/video/minimax/minimax-h3).
-
 ## Prerequisites
 
 Before you begin, prepare:
 
-- A [Nosana Deploy](https://deploy.nosana.com/) account.
+- A [Nosana Deploy](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) account.
 - Enough Nosana credit for the GPU and setup time. GPU prices and availability change, so treat the values in the screenshots as examples and check the live dashboard before deploying.
 - A modern browser with enough free memory for the ComfyUI graph and video preview.
-- Permission to use the generated content under the current [MiniMax H3 license](https://huggingface.co/MiniMaxAI/MiniMax-H3) and applicable laws.
+- Permission to use the generated content under the current MiniMax H3 license and applicable laws.
 
 You do not need to install ComfyUI locally or manually download H3 weights when using the prepared Nosana template shown below.
 
 ## Step 1: Create the MiniMax H3 Deployment
 
-1. Sign in to [Nosana Deploy](https://deploy.nosana.com/).
+1. Sign in to [Nosana Deploy](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3).
 2. Open **Deployments** and start a new deployment.
 3. Select **MiniMax H3 Video - Image to Video (32 GB)**.
 
@@ -51,11 +43,11 @@ Despite the card's name, its description confirms that the environment supports 
 
 ![Nosana MiniMax H3 deployment template with an NVIDIA 5090 selected](/products/nosana/nosana_minimax_h3/1.png)
 
-Nosana's official [first deployment guide](https://learn.nosana.com/deployments/my-first-deployment.html) follows the same sequence: choose a template, select a GPU, configure the deployment, create it, monitor startup, and open the endpoint.
+The [Nosana MiniMax H3 deployment template](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) follows the same sequence: select a GPU, configure the deployment, create it, monitor startup, and open the endpoint.
 
 ## Step 2: Wait for the Model Files to Load
 
-Nosana redirects you to the deployment overview and starts the job automatically. Open the **Logs** tab.
+[Nosana](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) redirects you to the deployment overview and starts the job automatically. Open the **Logs** tab.
 
 The first boot pulls the ComfyUI container and downloads the H3 resources. This template uses `docker.io/nosana/comfyui:2.0.11`; the captured download is approximately 19.53 GB. Wait for the resource bar to complete and for the job to remain in a healthy **Running** state. Do not open ComfyUI while the model download is still in progress, because the workflow can appear with empty model selectors.
 
@@ -86,7 +78,7 @@ In ComfyUI, click **Templates** in the left sidebar. Under **Generation Type**, 
 
 ![ComfyUI template browser with MiniMax H3 Text to Video visible](/products/nosana/nosana_minimax_h3/4.png)
 
-ComfyUI templates are ready-made graphs with the correct nodes and model connections. According to the [ComfyUI template documentation](https://docs.comfy.org/interface/features/template), loading a template checks for its required model files before you run it.
+ComfyUI templates are ready-made graphs with the correct nodes and model connections. Loading a template checks for its required model files before you run it.
 
 For reference, the official H3 T2V workflow uses:
 
@@ -96,7 +88,7 @@ For reference, the official H3 T2V workflow uses:
 - `minimax_h3_audio_vae_fp32.safetensors` as the audio VAE.
 - `minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors` for optional turbo generation.
 
-The Nosana template provisions these components, so you can work directly in the graph instead of downloading each file manually.
+The [Nosana template](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) provisions these components, so you can work directly in the graph instead of downloading each file manually.
 
 ## Step 5: Configure the Five-Second Video
 
@@ -175,7 +167,7 @@ The included result is an H.264 MP4 at `864 x 480`, 24 fps, with AAC audio and a
 
 ## Clean Up
 
-Return to Nosana Deploy when you finish, open the deployment's **Actions** menu, and stop or delete the deployment according to your retention needs. Confirm that the status is no longer **Running** so hourly GPU billing does not continue.
+Return to [Nosana Deploy](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) when you finish, open the deployment's **Actions** menu, and stop or delete the deployment according to your retention needs. Confirm that the status is no longer **Running** so hourly GPU billing does not continue.
 
 ## Troubleshooting
 
@@ -185,7 +177,7 @@ Return to **Logs** and wait for the container and model-resource downloads to fi
 
 ### The H3 model dropdown is empty
 
-The model files may still be downloading. Check the Nosana resource progress, then refresh ComfyUI. ComfyUI's template system requires the model filenames to be present in their expected model folders.
+The model files may still be downloading. Check the [Nosana deployment](https://deploy.nosana.com/deployments/create/?template=minimax-h3-i2v-32gb&utm_source=devon&utm_medium=community&utm_campaign=minimax_h3) resource progress, then refresh ComfyUI. ComfyUI's template system requires the model filenames to be present in their expected model folders.
 
 ### The render runs out of memory
 
@@ -198,15 +190,3 @@ Short text-to-video generations may compress or blend dense choreography. Reduce
 ### The video has weak or missing sound details
 
 Keep concrete sound events near the corresponding visual action and reserve the final audio section for the overall soundscape and score. Re-run with a new seed if the first variation under-emphasizes an important sound.
-
-## Sources
-
-- [MiniMax H3 open-source announcement and technical overview](https://www.minimax.io/news/minimax-h3-open-source)
-- [MiniMax company overview](https://www.minimax.io/about)
-- [MiniMax H3 official repository](https://github.com/MiniMax-AI/MiniMax-H3)
-- [Nosana introduction](https://learn.nosana.com/about/introduction.html)
-- [Nosana first deployment guide](https://learn.nosana.com/deployments/my-first-deployment.html)
-- [Nosana job execution flow](https://learn.nosana.com/deployments/jobs/job_execution_flow)
-- [ComfyUI official documentation](https://docs.comfy.org/)
-- [ComfyUI workflow templates](https://docs.comfy.org/interface/features/template)
-- [ComfyUI MiniMax H3 T2V, I2V, and R2V guide](https://docs.comfy.org/tutorials/video/minimax/minimax-h3)
