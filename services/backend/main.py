@@ -26,7 +26,10 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router)
+# The auth router is only mounted when Circle credentials are configured;
+# deployments without auth env vars (e.g. Vercel) serve the translations API only.
+if settings.CIRCLE_HEADLESS_TOKEN:
+    app.include_router(auth.router)
 app.include_router(translations.router)
 
 @app.get("/")

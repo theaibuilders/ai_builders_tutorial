@@ -4,16 +4,18 @@ import os
 
 class Settings(BaseSettings):
     # Circle API
-    CIRCLE_HEADLESS_TOKEN: str
-    CIRCLE_COMMUNITY_ID: str
+    # Defaults are empty so the app can run without auth (e.g. on Vercel);
+    # the auth router is only mounted when a token is configured.
+    CIRCLE_HEADLESS_TOKEN: str = ""
+    CIRCLE_COMMUNITY_ID: str = ""
     CIRCLE_API_URL: str = "https://app.circle.so/api/v1"
     
     # Google OAuth
-    GOOGLE_CLIENT_ID: str
-    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
     
     # JWT
-    JWT_SECRET: str
+    JWT_SECRET: str = ""
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
     

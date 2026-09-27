@@ -56,3 +56,5 @@ tutorials/Fine Tuning/results/
 /AGENTS.md
 /AGENTS.md.bak
 # END Ruler Generated Files
+.env*
+.vercel-tmp/

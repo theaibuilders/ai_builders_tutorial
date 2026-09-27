@@ -2,6 +2,9 @@
   "name": "ai-builders-tutorial",
   "type": "module",
   "version": "0.0.1",
+  "overrides": {
+    "ansi_up": "5.2.1"
+  },
   "scripts": {
     "dev": "node manage-metadata.js auto-update && astro dev",
     "start": "node start.mjs",
@@ -14,6 +17,7 @@
     "@astrojs/node": "^8.3.4",
     "@astrojs/preact": "^3.5.3",
     "@astrojs/tailwind": "^5.1.1",
+    "@astrojs/vercel": "^7.8.2",
     "@preact/signals": "^1.3.0",
     "anser": "^2.3.2",
     "astro": "^4.15.12",

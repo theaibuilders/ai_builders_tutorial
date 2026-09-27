@@ -52,8 +52,45 @@ function highlightPythonCodeServerSide(code: string): string {
   return escaped;
 }
 
+// Syntax-highlight notebook code cells with Shiki (server-side) so input cells
+// and fenced blocks inside markdown cells are colored in the initial HTML, even
+// if client-side scripts fail. Mirrors the MDX code block treatment.
+async function highlightNotebookInputCells(root: any): Promise<void> {
+  const codeElements = root.querySelectorAll('.nb-input pre code, .nb-markdown pre code');
+  if (!codeElements || codeElements.length === 0) return;
+
+  const highlighter = await ensureMdxHighlighter();
+  const loadedLangs = new Set(highlighter.getLoadedLanguages());
+
+  for (const codeEl of codeElements) {
+    const raw = codeEl.textContent || '';
+    if (!raw.trim()) continue;
+
+    // Language: input cells use data-language; markdown fences use class="language-x"
+    const classMatch = (codeEl.getAttribute('class') || '').match(/language-([\w-]+)/);
+    const langAttr = normalizeLang(codeEl.getAttribute('data-language') || classMatch?.[1] || 'python');
+    const lang = langAttr === 'text' ? 'plaintext' : (loadedLangs.has(langAttr) ? langAttr : 'python');
+
+    let html: string;
+    try {
+      html = highlighter.codeToHtml(raw, { lang, theme: 'github-dark' });
+    } catch {
+      continue;
+    }
+    // Strip theme backgrounds and classes — the cell container provides the background
+    html = html.replace(/background-color:\s*[^;]+;?/g, '');
+    html = html.replace(/background:\s*[^;]+;?/g, '');
+    html = html.replace(/class="[^"]*"/g, '');
+    const inner = html.replace(/[\s\S]*?<code[^>]*>/, '').replace(/<\/code>[\s\S]*$/, '');
+    codeEl.innerHTML = inner;
+    codeEl.setAttribute('data-highlighted', 'true');
+    const inputCell = codeEl.closest('.nb-input');
+    if (inputCell) inputCell.setAttribute('data-highlighted', 'true');
+  }
+}
+
 // Professional notebook rendering using notebookjs
-function renderNotebookWithProfessionalTools(notebook: any): string {
+async function renderNotebookWithProfessionalTools(notebook: any): Promise<string> {
   if (!notebook || !notebook.cells) {
     return '<div class="text-center text-red-400 py-8"><p>Invalid notebook format</p></div>';
   }
@@ -61,7 +98,12 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
   try {
     // Create a new notebook renderer instance
     const renderer = nb.parse(notebook);
-    let notebookHtml = renderer.render().outerHTML;
+    const notebookRoot = renderer.render();
+
+    // Highlight input code cells (and fenced blocks in markdown cells) with Shiki
+    await highlightNotebookInputCells(notebookRoot);
+
+    let notebookHtml = notebookRoot.outerHTML;
     
     // Remove the first H1 heading from the notebook content since it's already shown in the page header
     notebookHtml = notebookHtml.replace(/<h1[^>]*>.*?<\/h1>/i, '');
@@ -525,8 +567,9 @@ function renderNotebookWithProfessionalTools(notebook: any): string {
             color: #93c5fd;
           }
           
-          /* Universal code styling */
-          .professional-notebook code, code {
+          /* Universal code styling (inline pills only — never pre code, where the
+             inline box's horizontal padding would indent the first line) */
+          .professional-notebook code:not(pre code), code:not(pre code) {
             background-color: rgba(55, 65, 81, 0.6);
             color: #93c5fd;
             padding: 0.25rem 0.5rem;
@@ -1398,7 +1441,7 @@ let renderedContent = '';
 if (currentFile) {
   if (currentFile.type === 'notebook' && currentFile.notebook) {
     // Use professional notebook rendering with notebookjs
-    renderedContent = renderNotebookWithProfessionalTools(currentFile.notebook);
+    renderedContent = await renderNotebookWithProfessionalTools(currentFile.notebook);
   } else if (currentFile.type === 'markdown' && currentFile.content) {
     // Use enhanced markdown rendering for both .md and .mdx files
     renderedContent = await renderEnhancedMarkdown(currentFile.content);
@@ -1936,8 +1979,8 @@ function getNbviewerUrl(filePath: string): string {
           const originalCode = sourceElement.textContent || sourceElement.innerText || '';
           cell.setAttribute('data-original-code', originalCode);
           
-          // Apply Python syntax highlighting
-          if (originalCode.trim()) {
+          // Apply Python syntax highlighting (skip cells already highlighted server-side with Shiki)
+          if (originalCode.trim() && !cell.hasAttribute('data-highlighted')) {
             const highlightedCode = highlightPythonCode(originalCode);
             sourceElement.innerHTML = highlightedCode;
           }

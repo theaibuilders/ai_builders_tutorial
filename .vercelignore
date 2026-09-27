@@ -1,0 +1,21 @@
+# Keep the deployment upload and Python function bundle small.
+
+# Backend: virtualenv and caches must not be uploaded
+services/backend/venv
+services/backend/__pycache__
+**/__pycache__
+
+# Local env files - secrets live in Vercel project settings instead
+services/backend/.env
+services/frontend/.env
+
+# Node artifacts - installed fresh during the Vercel build
+services/frontend/node_modules
+services/frontend/.astro
+services/frontend/dist
+
+# Tooling / docs not needed at runtime
+.vercel-tmp
+.qoder
+.zeabur
+docs
