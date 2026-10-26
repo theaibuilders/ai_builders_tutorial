@@ -1174,17 +1174,13 @@ async function renderEnhancedMarkdown(markdown: string): Promise<string> {
   html = html.replace(/background:\s*[^;]+;?/g, '');
   // Remove any CSS classes that might contain background colors
   html = html.replace(/class="[^"]*"/g, '');
-  // If bash/shell: remove inline color styles to show neutral text (no syntax coloring)
-  if (['bash','shell','sh'].includes(lang)) {
-    // Remove style attributes from spans to neutralize syntax coloring
-    html = html.replace(/<span style="[^"]*">/g, (m) => '<span>');
-  }
+  // Preserve Shiki token colors for every language, including Bash and its aliases.
   // Wrap everything in a div that forces our background
   html = `<div style="background-color: #252830 !important; padding: 0; margin: 0;">${html}</div>`;
   // Tighten line height and force our custom background color for the generated <pre>
-  html = html.replace(/<pre[^>]*>/g, '<pre style="line-height:1.25;background-color:#252830!important;background:none!important;margin:0;padding:1rem;overflow-x:auto"');
+  html = html.replace(/<pre[^>]*>/g, '<pre style="line-height:1.25;background-color:#252830!important;background:none!important;margin:0;padding:1rem;overflow-x:auto">');
   // Ensure the inner <code> has no background or padding (remove pill effect on text)
-  html = html.replace(/<code[^>]*>/g, '<code style="background:none!important;background-color:transparent!important;padding:0;border-radius:0;color:inherit"');
+  html = html.replace(/<code[^>]*>/g, '<code style="background:none!important;background-color:transparent!important;padding:0;border-radius:0;color:inherit">');
     } catch (_) {
       // Fallback to escaped plain text
       const safe = code

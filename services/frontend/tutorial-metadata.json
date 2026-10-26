@@ -247,6 +247,16 @@
     "Web Search/oxylabs_web_scraper.ipynb": {
       "authorId": "devon-sun",
       "lastUpdated": "2026-06-21"
+    },
+    "Frameworks/harness2_tutorial.mdx": {
+      "author": "AI Builders Team",
+      "lastUpdated": "2026-10-26",
+      "difficulty": "intermediate",
+      "tags": [
+        "agents",
+        "harness",
+        "evaluation"
+      ]
     }
   },
   "folderOrder": [
