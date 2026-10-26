@@ -3,10 +3,12 @@
   "services": {
     "frontend": {
       "root": "services/frontend",
+      "framework": "astro",
       "buildCommand": "npm run build && find .vercel/output/functions -name '.vc-config.json' -exec sed -i 's/nodejs18[.]x/nodejs24.x/g' {} +"
     },
     "backend": {
       "root": "services/backend",
+      "framework": "fastapi",
       "entrypoint": "main:app"
     }
   },
