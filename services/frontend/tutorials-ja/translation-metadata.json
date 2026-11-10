@@ -1,5 +1,14 @@
 {
   "translations": {
+    "Vibe Coding/codeaf.mdx": {
+      "original_path": "Vibe Coding/codeaf.mdx",
+      "translated_path": "services/frontend/tutorials-ja/Vibe Coding/codeaf.mdx",
+      "language": "ja-jp",
+      "translation_date": "2026-11-10T06:55:57Z",
+      "source_hash": "beff13099ecb7d2de746280222ec949d164106b576a4c6ea8401a25ae44d92c6",
+      "model_used": "manual",
+      "status": "completed"
+    },
     "Overview/tutorial_overview.mdx": {
       "original_path": "Overview/tutorial_overview.mdx",
       "translated_path": "services/frontend/tutorials-ja/Overview/tutorial_overview.mdx",
@@ -469,6 +478,6 @@
       "status": "completed"
     }
   },
-  "last_updated": "2026-06-21T05:00:00Z",
+  "last_updated": "2026-11-10T06:55:57Z",
   "version": "1.0"
 }

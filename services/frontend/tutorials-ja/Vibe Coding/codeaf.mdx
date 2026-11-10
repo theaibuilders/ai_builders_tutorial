@@ -1,0 +1,248 @@
+# CodeAF：AI コーディングエージェントで実装・テスト・レビューする
+
+[CodeAF](https://agentfield.ai/codeaf) は、AI コーディングエージェントを使って開発するためのオープンソースのターミナルアプリケーションです。リポジトリについてチャットで相談したり、変更の実装を専門エージェントに任せたり、複数の会話をマネージャー付きのチームにまとめたりできます。OpenRouter や、Ollama 経由のローカルモデルなど、複数のモデルプロバイダーに対応しています。ライセンスは Apache-2.0 です。[プロジェクトのソースコード](https://github.com/Agent-Field/CodeAF)。
+
+このチュートリアルでは、Python のリトライ用ヘルパー関数を修正し、外部環境に依存しないテストで結果を確認します。続いて、セキュリティ監査やプルリクエストのレビューを担当する専門エージェントの使い分けを学び、ドキュメント作成と独立したテストを行う小さなチームを作ります。
+
+![インストールコマンドと 3 種類の専門エージェントを紹介する CodeAF の公式サイト。](/products/codeaf/codeaf-hero.webp)
+
+*[CodeAF 公式サイト](https://agentfield.ai/codeaf)のスクリーンショット。2026 年 11 月 10 日撮影。画像内の比較数値は提供元が公表するベンチマーク結果であり、このチュートリアルでは独自に測定していません。*
+
+## 事前準備
+
+- 組み込みの専門エージェントを利用するには macOS または Linux が必要です。アプリケーション自体は Windows にも対応していますが、Windows ビルドにはこれらの専門エージェントは含まれません。
+- Git、Python 3.9 以降、およびターミナル操作の基礎知識。
+- 利用可能なクレジットがあるモデルプロバイダーへの接続、または設定済みのローカルプロバイダー。ソフトウェアがオープンソースでも、有料モデル API を呼び出す場合は料金が発生します。
+
+**バージョンと検証について：** このガイドの調査日は 2026 年 11 月 10 日です。公式の[コマンドリファレンス](https://agentfield.ai/docs/codeaf/commands)は v0.8.0 のマニュアルを参照元としており、ドキュメントに記載された機能が安定版より先行する場合があると案内されています。初期コードと、そのコードで失敗するテストはローカルで確認済みです。このチュートリアルのために有料の CodeAF タスクは実行していません。コマンドと動作は公式ドキュメントに照らして確認しています。
+
+## 1. CodeAF をインストールしてプロバイダーに接続する
+
+公式インストーラーを実行し、インストールされたバージョンを確認します。
+
+```bash
+curl -fsSL https://agentfield.ai/get/codeaf | bash
+codeaf version
+```
+
+シェルで `codeaf` が見つからない場合は、新しいターミナルを開くか、インストール先のディレクトリを追加します。
+
+```bash
+export PATH="$HOME/.codeaf/bin:$PATH"
+```
+
+OpenRouter に接続する場合は、次のコマンドを実行します。
+
+```bash
+codeaf connect openrouter
+```
+
+ブラウザの案内に従ってサインインしてください。接続を設定せずに `codeaf` を起動する方法もあります。その場合はプロバイダーの選択画面が開き、続いてモデルと 1 日の利用上限を設定します。すでに有効な接続がある場合は、プロバイダーの選択画面は表示されません。[初回起動ガイド](https://agentfield.ai/docs/codeaf/first-team)と[接続のトラブルシューティング](https://agentfield.ai/docs/codeaf/troubleshooting)も参照してください。
+
+## 2. バグを再現できる小さなリポジトリを作る
+
+練習用に独立したリポジトリを用意します。このヘルパー関数は一時的な失敗をリトライする想定ですが、現状では 1 回しか処理を呼び出しません。
+
+```bash
+mkdir codeaf-retry-demo
+cd codeaf-retry-demo
+git init -b main
+printf '__pycache__/\n' > .gitignore
+
+cat > retry.py <<'PY'
+def retry(operation, max_attempts=3):
+    """Call an operation, retrying temporary failures."""
+    return operation()
+PY
+
+cat > test_retry.py <<'PY'
+import unittest
+
+from retry import retry
+
+
+class RetryTests(unittest.TestCase):
+    def test_immediate_success(self):
+        self.assertEqual(retry(lambda: "ok"), "ok")
+
+    def test_recovers_after_temporary_failures(self):
+        attempts = []
+
+        def flaky():
+            attempts.append(1)
+            if len(attempts) < 3:
+                raise ConnectionError("temporary")
+            return "recovered"
+
+        self.assertEqual(retry(flaky, max_attempts=3), "recovered")
+        self.assertEqual(len(attempts), 3)
+
+    def test_stops_at_attempt_limit(self):
+        attempts = []
+
+        def unavailable():
+            attempts.append(1)
+            raise ConnectionError("still unavailable")
+
+        with self.assertRaisesRegex(ConnectionError, "still unavailable"):
+            retry(unavailable, max_attempts=2)
+        self.assertEqual(len(attempts), 2)
+
+    def test_invalid_limit_does_not_call_operation(self):
+        attempts = []
+        with self.assertRaises(ValueError):
+            retry(lambda: attempts.append(1), max_attempts=0)
+        self.assertEqual(attempts, [])
+
+
+if __name__ == "__main__":
+    unittest.main()
+PY
+
+python3 -m unittest -v
+```
+
+初期コードでは、**4 件のテストのうち 2 件が失敗し、1 件がエラー**になります。成功するのは、最初の呼び出しで処理が成功するケースだけです。残りのテストで、リトライ処理の欠落、呼び出し回数の不一致、入力値の検証漏れを確認できます。ネットワークへの接続や待機処理は使いません。
+
+この開始時点をコミットし、作業用ブランチに切り替えます。
+
+```bash
+git add .gitignore retry.py test_retry.py
+git commit -m "Add retry helper and regression tests"
+git switch -c tutorial/retry-fix
+codeaf
+```
+
+## 3. 利用上限を設定し、専門エージェントを使い分ける
+
+CodeAF 内で、次のコマンドを 1 つずつ入力します。
+
+```text
+/budget conversation 2
+/crew
+```
+
+最初のコマンドは、この会話の利用上限を 2 米ドルに設定します。次のコマンドはクルーの設定を開きます。worker が実装を担当し、planner が作業を組み立て、checker が結果を評価します。各役割には異なるモデルを指定できます。上限が低いと完了前に停止することがあるため、タスクを完了と判断する前に終了時の報告を確認してください。[クルーの設定](https://agentfield.ai/docs/codeaf/pareto-crewing)、[利用上限の管理](https://agentfield.ai/docs/codeaf/budgets)。
+
+![実装、セキュリティ監査、プルリクエストレビューの専門エージェントを比較する CodeAF 公式ドキュメントの表。](/products/codeaf/codeaf-specialists.webp)
+
+*[専門エージェントのリファレンス](https://agentfield.ai/docs/codeaf/specialists)のスクリーンショット。2026 年 11 月 10 日撮影。表には標準の上限が示されていますが、会話の残り利用枠によって実際の上限が低くなる場合があります。*
+
+作業に合ったツールを選びます。
+
+| コマンド | 用途 | 確認する根拠 |
+| --- | --- | --- |
+| `/senior-dev <brief>` | 要件が固まったコード変更の実装 | 提出されたコード、タスクブランチ、実際のビルド・テスト結果 |
+| `/sec` | ローカルのソースコードに対するセキュリティ監査 | 指摘事項、対象範囲、確信度、確認できた範囲 |
+| `/review owner/repo#123` | GitHub プルリクエストのレビュー | 指摘事項とレビュー対象のコミット |
+
+`/sec` と `/review` は、ソースコードを読み取る専用ツールを使います。テスト、ビルド、アプリケーション、攻撃コードは実行しません。レビューの投稿や、提案された修正の実装は別の操作です。[専門エージェントの概要](https://agentfield.ai/docs/codeaf/specialists)を参照してください。
+
+## 4. コーディング専門エージェントに修正を任せる
+
+CodeAF の会話に、次のプロンプトを貼り付けます。
+
+```text
+/senior-dev retry.py を修正してください。max_attempts は初回を含む呼び出し回数の上限で、正の整数に限定します。bool と整数以外の値は拒否し、operation を呼ぶ前に ValueError を送出してください。ConnectionError の場合だけリトライし、最初に成功した結果を返してください。最後の試行も失敗した場合は、その試行で発生した例外を再送出してください。それ以外の例外は直ちに呼び出し元へ伝播させてください。公開関数のシグネチャと既存のテストは変更しないでください。追加の入力検証と、リトライ対象外のエラーに対するテストを追加してください。Python 標準ライブラリだけを使用し、待機処理やネットワーク呼び出しは使わないでください。完了条件は python3 -m py_compile retry.py と python3 -m unittest -v の両方が成功することです。実行したコマンド、結果、タスクブランチを報告してください。マージは私が行います。
+```
+
+コーディング専門エージェントはすぐに作業を始めます。タスクを開くと進捗を確認できます。Git の履歴があるリポジトリでは、専用のコピーとタスクブランチで作業します。提出時に作業ツリーが固定され、ハーネスがその提出版に対してビルドとテストを実行します。提出前なら追加の指示を送れますが、提出後のメッセージで固定済みの内容を変えることはできません。[実装の流れとブランチの扱い](https://agentfield.ai/docs/codeaf/senior-dev)。
+
+ターミナルから検証コマンドを明示して実行したい場合は、チャットを終了し、スラッシュコマンドの**代わりに**次の方法を使います。
+
+```bash
+codeaf senior-dev run \
+  --max-cost 2 \
+  --verify-build "python3 -m py_compile retry.py" \
+  --verify-test "python3 -m unittest -v" \
+  -- "retry.py を修正し、ConnectionError の場合だけ max_attempts 回まで試行してください。上限は初回を含みます。bool を除く正の整数だけを受け付け、不正な値は operation を呼ぶ前に ValueError にしてください。最後の ConnectionError は再送出し、他の例外は直ちに伝播させてください。既存のテストを保ち、入力検証とリトライ対象外のエラーのテストを追加してください。外部依存や待機処理は使わないでください。"
+```
+
+フラグは依頼文の前に指定します。検証コマンドを上書きするフラグは、[senior-dev のリファレンス](https://agentfield.ai/docs/codeaf/senior-dev#checks-and-limits)で説明されています。
+
+## 5. ブランチを確認して修正を検証する
+
+タスクの終了報告から、ブランチ名、変更ファイル、実際に行われた検証、未完了の作業を確認します。デモ用リポジトリで別のターミナルを開き、次の `task/REPLACE-WITH-REPORTED-BRANCH` を報告されたブランチ名に置き換えてください。
+
+```bash
+git branch --list 'task/*'
+git diff tutorial/retry-fix...task/REPLACE-WITH-REPORTED-BRANCH
+git switch task/REPLACE-WITH-REPORTED-BRANCH
+python3 -m py_compile retry.py
+python3 -m unittest -v
+```
+
+元の 4 件のテストと、追加されたテストがすべて成功することを確認します。最後の試行の例外を保持しているか、対象外のエラーをリトライしていないか、コールバックを呼ぶ前に上限値を検証しているかをコードでも確認してください。タスクに成功と表示されていても、実際の検証結果と合わせて判断する必要があります。
+
+問題がなければ、確認したブランチを取り込みます。
+
+```bash
+git switch tutorial/retry-fix
+git merge --no-ff task/REPLACE-WITH-REPORTED-BRANCH
+python3 -m unittest -v
+```
+
+これらのコマンドは、CodeAF にマージを任せず、まだ変更を取り込んでいないことを前提にしています。先に `git status` とタスクの終了報告を確認してください。
+
+## 6. ローカルコードを監査する、または GitHub PR をレビューする
+
+デモ用リポジトリで `codeaf` を再度開き、次のコマンドを入力します。
+
+```text
+/sec changes since main
+```
+
+`main` との差分のうち、監査対象となるコードを確認します。リポジトリ全体を監査する場合は `/sec` を使います。タスクの記録には `sec-report.md`、`sec-report.json`、`sec-report.sarif` が保存される場合があります。対象範囲と、`analysis incomplete`（分析未完了）の表示がないかを確認してください。この小さなヘルパーでは指摘が出ないこともありますが、ソースコードの分析だけでシステムの安全性が証明されるわけではありません。また、この専門エージェントは最新の脆弱性データベースへの問い合わせを行いません。[監査の範囲とレポート](https://agentfield.ai/docs/codeaf/sec)。
+
+ブランチをプッシュして GitHub のプルリクエストを作成したら、次のプレースホルダーを実際の PR に置き換えます。
+
+```text
+/review owner/repo#123 リトライ回数の境界条件と例外処理を重点的に確認してください
+```
+
+レビュー対象は GitHub 上のコミットなので、プッシュしていないローカルの変更は含まれません。`review-report.md`、`review-report.json`、レビューできた範囲を確認してください。一部だけのレビューにも有用な指摘が含まれる場合がありますが、変更全体の承認を意味するものではありません。分析の実行だけでは GitHub に何も投稿されません。保存された結果を利用する前に PR が更新されていたら、レビューをやり直してください。[プルリクエストのレビュー手順](https://agentfield.ai/docs/codeaf/review)。
+
+## 7. マネージャー付きのチームを試す
+
+![入れ子になったチーム、マネージャーの状況表示、ユーザーの回答を待つ質問を示す CodeAF 公式サイトのデモ。](/products/codeaf/codeaf-teams.webp)
+
+*[公式サイト](https://agentfield.ai/codeaf)に掲載されたチーム機能デモのスクリーンショット。2026 年 11 月 10 日撮影。表示されている storefront と billing のプロジェクトは、製品の紹介用サンプルです。*
+
+`/teams` を開き、次の手順で設定します。
+
+1. **+ New team** を選び、名前を `retry-demo` にして色を選びます。
+2. **+ Add chat** で、このリポジトリのドキュメント作成用とテスト用の会話を作ります。
+3. **+ Manager** でマネージャーを新規作成するか、**Choose AI manager** で既存メンバーを割り当てます。
+4. マネージャーの会話を開き、次の目標を伝えます。
+
+```text
+このリトライ用ヘルパーを、別の開発者が使える状態にしてください。ドキュメント担当には、使い方と例外の扱いを説明する README.md の作成を依頼してください。テスト担当には、retry.py を独立した立場で確認し、python3 -m unittest -v を実行して、実装を変更せずに未検証のケースを報告するよう依頼してください。それぞれ独立して作業を進めてもらい、マージを提案する前に、確認した根拠と未解決の問題を私に報告してください。
+```
+
+チームは複数の会話をまとめる単位で、マネージャーもそれらを調整するための会話です。チームを作成しただけではモデルによる作業は始まりません。Teams に戻ると、メンバーの状況や質問を確認できます。ここでのテスト担当はコマンドを実行できる通常の会話であり、GitHub の `/review` 専門エージェントとは役割が異なります。[チームの設定](https://agentfield.ai/docs/codeaf/first-team)、[マネージャーの役割](https://agentfield.ai/docs/codeaf/managers)。
+
+## 8. スクリプトからヘッドレスモードを使う
+
+別の練習として、対話型チャットを使わずに `do` を実行してみましょう。計画、実装、checker による確認を行えます。
+
+```bash
+codeaf do "retry.py とテストを確認してください。未検証のリトライ境界条件にバグがあれば、公開 API を保ったまま修正してください。修正ごとに回帰テストを追加し、python3 -m unittest -v を実行してください。" \
+  --json --timeout 10m > codeaf-result.json
+result_code=$?
+cat codeaf-result.json
+printf 'Exit code: %s\n' "$result_code"
+```
+
+コーディング専門エージェントが使うタスクブランチとは異なり、ヘッドレスの `do` は現在のフォルダを直接編集し、質問のために停止せずに判断を進めます。使い捨てのチェックアウト、または未コミットの変更がない練習用ブランチを使ってください。結果の JSON には `ok`、`stop`、`answer`、`files`、`spend_usd` が含まれます。終了コードと結果の両方を確認します。`0` は完了、`1` は実行できなかった、`2` は未完了、`3` は上限による停止、`124` は `do` のタイムアウトを示します。[ヘッドレスモードの動作と終了コード](https://agentfield.ai/docs/codeaf/headless)。
+
+## トラブルシューティング
+
+| 症状 | 対処方法 |
+| --- | --- |
+| `codeaf` が見つからない | `$HOME/.codeaf/bin` を `PATH` に追加するか、新しいターミナルを開きます |
+| プロバイダーがキーを拒否する、または残高が不足している | `codeaf connect openrouter` で再接続し、プロバイダーのアカウント残高を確認します |
+| このガイドのコマンドが使えない | `codeaf version`、`codeaf --help`、公式ドキュメントを確認します。マニュアルが安定版より先行している場合があります |
+| 利用上限に達してタスクが停止する | 上限を引き上げるか判断する前に、終了報告と途中までの作業内容を確認します |
+| ビルドやテストの検証が行われていない | コーディング専門エージェントに `--verify-build` と `--verify-test` を明示します |
+
+インストールやプロバイダー接続の問題は、[CodeAF のトラブルシューティングガイド](https://agentfield.ai/docs/codeaf/troubleshooting)を参照してください。次のプロジェクトでも、同じ流れを活用できます。作業範囲を絞った変更を依頼し、確認可能な完了条件を決め、コードと検証結果を確認してから取り込みましょう。
