@@ -160,6 +160,13 @@
       "authorId": "devon-sun",
       "lastUpdated": "2025-11-23"
     },
+    "Vibe Coding/codeaf.mdx": {
+      "author": "AI Builders Team",
+      "lastUpdated": "2026-11-10",
+      "difficulty": "beginner",
+      "tags": ["coding-agents", "codeaf", "testing", "code-review"],
+      "description": "Fix a Python retry helper with CodeAF, verify the task branch, and explore audits, reviews, and agent teams."
+    },
     "Vibe Coding/qoder-tutorial.mdx": {
       "authorId": "devon-sun",
       "lastUpdated": "2025-11-25"
